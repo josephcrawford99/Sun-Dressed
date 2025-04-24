@@ -22,6 +22,7 @@ import ClothingSuggestions from '../components/ClothingSuggestions';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { getSuggestions } from '../services/clothingService';
 import { WeatherData } from '../services/weatherService';
+import { getLocation } from '../utils/storage';
 
 // Mock data for testing
 import {
@@ -38,6 +39,7 @@ type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 const HomeScreenContent: React.FC = () => {
   const [currentWeather, setCurrentWeather] = useState(mockSunnyWeather);
   const [clothingSuggestions, setClothingSuggestions] = useState(getSuggestions(mockSunnyWeather));
+  const [location, setLocation] = useState<string | null>(null);
   const { theme, weatherCondition, setWeatherCondition } = useTheme();
   const { colors, spacing } = theme;
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -53,6 +55,16 @@ const HomeScreenContent: React.FC = () => {
     );
     setWeatherCondition(condition);
   }, [currentWeather, setWeatherCondition]);
+
+  // Load saved location
+  useEffect(() => {
+    const loadSavedLocation = async () => {
+      const savedLocation = await getLocation();
+      setLocation(savedLocation);
+    };
+
+    loadSavedLocation();
+  }, []);
 
   const localStyles = StyleSheet.create({
     safeArea: {
@@ -92,12 +104,39 @@ const HomeScreenContent: React.FC = () => {
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 2,
+      marginLeft: spacing.sm,
     },
     settingsText: {
       color: 'white',
       fontSize: 14,
       marginLeft: spacing.xs,
     },
+    headerButtons: {
+      flexDirection: 'row',
+    },
+    locationButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: 24,
+      flexDirection: 'row',
+      alignItems: 'center',
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    locationInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    locationText: {
+      fontSize: 16,
+      color: colors.text,
+      marginLeft: spacing.xs,
+    }
   });
 
   // Weather selector buttons for testing
@@ -155,13 +194,23 @@ const HomeScreenContent: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={localStyles.settingsButton}
-        onPress={() => navigation.navigate('Settings')}
-      >
-        <Ionicons name="settings-outline" size={16} color="white" />
-        <Text style={localStyles.settingsText}>Settings</Text>
-      </TouchableOpacity>
+      <View style={localStyles.headerButtons}>
+        <TouchableOpacity
+          style={localStyles.locationButton}
+          onPress={() => navigation.navigate('Location')}
+        >
+          <Ionicons name="location-outline" size={16} color="white" />
+          <Text style={localStyles.settingsText}>Location</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={localStyles.settingsButton}
+          onPress={() => navigation.navigate('Settings')}
+        >
+          <Ionicons name="settings-outline" size={16} color="white" />
+          <Text style={localStyles.settingsText}>Settings</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -179,6 +228,14 @@ const HomeScreenContent: React.FC = () => {
         <View style={localStyles.container}>
           {/* TEST ONLY: Weather selector for different conditions */}
           <WeatherSelector />
+
+          {/* Display current location */}
+          {location && (
+            <View style={localStyles.locationInfo}>
+              <Ionicons name="location" size={18} color={colors.text} />
+              <Text style={localStyles.locationText}>{location}</Text>
+            </View>
+          )}
 
           {/* Current Weather Display */}
           <WeatherDisplay weatherData={currentWeather} />

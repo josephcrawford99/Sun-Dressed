@@ -13,6 +13,11 @@ import { useTheme } from '../utils/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { saveLocation, getLocation, savePreferences, getPreferences, UserPreferences } from '../utils/storage';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
 const SettingsScreen: React.FC = () => {
   const [location, setLocation] = useState('');
@@ -22,6 +27,7 @@ const SettingsScreen: React.FC = () => {
   });
   const { theme } = useTheme();
   const { colors, typography, spacing, effects } = theme;
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
 
   // Load saved settings
   useEffect(() => {
@@ -63,6 +69,10 @@ const SettingsScreen: React.FC = () => {
       ...prev,
       notificationsEnabled: !prev.notificationsEnabled
     }));
+  };
+
+  const navigateToLocationScreen = () => {
+    navigation.navigate('Location');
   };
 
   const styles = StyleSheet.create({
@@ -139,6 +149,28 @@ const SettingsScreen: React.FC = () => {
     headerTitle: {
       ...typography.title,
       color: colors.text,
+    },
+    locationRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.md,
+    },
+    locationButton: {
+      backgroundColor: colors.primary,
+      borderRadius: effects.borderRadius.small,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    locationButtonText: {
+      color: 'white',
+      marginLeft: spacing.xs,
+    },
+    locationDisplay: {
+      flex: 1,
+      marginRight: spacing.md,
     }
   });
 
@@ -164,15 +196,19 @@ const SettingsScreen: React.FC = () => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Location</Text>
-            <Text style={styles.label}>City or Postal Code</Text>
-            <TextInput
-              style={styles.input}
-              value={location}
-              onChangeText={setLocation}
-              placeholder="E.g., New York or 10001"
-              placeholderTextColor="rgba(0,0,0,0.3)"
-              autoCapitalize="words"
-            />
+            <View style={styles.locationRow}>
+              <View style={styles.locationDisplay}>
+                <Text style={styles.label}>Current Location</Text>
+                <Text>{location || 'Not set'}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.locationButton}
+                onPress={navigateToLocationScreen}
+              >
+                <Ionicons name="location-outline" size={16} color="white" />
+                <Text style={styles.locationButtonText}>Change</Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.infoText}>
               Your location is used to fetch accurate weather forecasts.
             </Text>

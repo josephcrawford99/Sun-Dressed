@@ -4,11 +4,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from '../screens/HomeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import LocationScreen from '../screens/LocationScreen';
 
 // Define the main navigation stack parameter types
 export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
+  Location: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -26,6 +28,11 @@ const AppNavigator = () => {
           name="Settings"
           component={SettingsScreen}
           options={{ title: 'Settings' }}
+        />
+        <Stack.Screen
+          name="Location"
+          component={LocationScreen}
+          options={{ title: 'Set Location' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
