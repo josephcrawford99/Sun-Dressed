@@ -25,7 +25,19 @@ The current version includes a special mock mode for testing and development:
 
 ## Testing With Mock Data
 
-To test the app with mock data on Android and iOS devices:
+To test the app with mock data:
+
+### Testing on Web (Recommended for Development)
+
+1. **Launch the App in Web Mode**:
+   ```
+   npm run web
+   ```
+
+2. **Testing the Mock Weather UI**:
+   - The app will open in your default browser at localhost:19006
+   - Use the weather icons at the top to test different weather conditions
+   - Observe theme changes and clothing suggestions
 
 ### Testing on Android
 
@@ -116,20 +128,19 @@ The application follows a modular architecture with the following structure:
 1. Clone the repository
 2. Install dependencies:
    ```
-   npm install
+   npm install --legacy-peer-deps
    ```
-   or
-   ```
-   yarn install
-   ```
+   The `--legacy-peer-deps` flag is needed to resolve dependency conflicts with React versions.
+
 3. Start the application:
    ```
    npm start
    ```
-   or
+   or for web:
    ```
-   yarn start
+   npm run web
    ```
+
 4. Run on Android or iOS:
    ```
    npm run android
@@ -146,6 +157,23 @@ Run tests with:
 ```
 npm test
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Missing module errors**:
+   - Run `npm install --legacy-peer-deps` to install dependencies with compatibility mode
+
+2. **React Native Web Issues**:
+   - If web mode doesn't work, run `npm install react-native-web react-dom @expo/webpack-config@^18.0.1 --legacy-peer-deps`
+
+3. **Expo CLI Not Found**:
+   - We're using `npx` in the package.json scripts, which doesn't require global installation
+
+4. **Type Errors**:
+   - Type errors in development mode won't prevent the app from running
+   - Install missing type definitions: `npm install --save-dev @types/react @types/react-native`
 
 ## Development Status
 

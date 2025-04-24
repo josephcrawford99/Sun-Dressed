@@ -9,10 +9,14 @@ interface ThemeContextType {
 }
 
 // Create the context with a default value
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>({
+  theme: createTheme(),
+  weatherCondition: 'sunny',
+  setWeatherCondition: () => {}
+});
 
 // Provider component
-export const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [weatherCondition, setWeatherCondition] = useState<WeatherCondition>('sunny');
   const theme = createTheme(weatherCondition);
 
