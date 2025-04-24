@@ -3,9 +3,10 @@ The following is a spec sheet for an app named "Climate Closet" that I would lik
 
 ## MVP Features
 - [~] Project setup and basic structure (in progress - 2023-06-20)
-- [ ] User can specify their location
-- [ ] User can see the weather forcast for the day in the morning, afternoon, and evening
-- [ ] User sees a list of clothing suggestions for each time of day
+- [~] Create a primary view for the app and test without the API and user input (2023-06-21)
+- [~] User can specify their location (2023-06-22)
+- [~] User can see the weather forcast for the day in the morning, afternoon, and evening (2023-06-22)
+- [~] User sees a list of clothing suggestions for each time of day (2023-06-22)
 
 ## Further features
 - [ ] User can rate a suggestion from the app to improve the futuresuggestions (most important). Too hot or too cold, sunny, windy, rainy, etc.

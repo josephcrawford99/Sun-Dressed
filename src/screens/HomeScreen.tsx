@@ -1,94 +1,203 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  SafeAreaView,
+  StatusBar
+} from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+
+// Theme and components
+import { ThemeProvider, useTheme } from '../utils/ThemeContext';
+import { getWeatherCondition } from '../styles/theme';
+import WeatherDisplay from '../components/WeatherDisplay';
+import ClothingSuggestions from '../components/ClothingSuggestions';
+
+// Types
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { getSuggestions } from '../services/clothingService';
+import { WeatherData } from '../services/weatherService';
+
+// Mock data for testing
+import {
+  mockSunnyWeather,
+  mockRainyWeather,
+  mockCloudyWeather,
+  mockSnowyWeather,
+  mockNightWeather
+} from '../__mocks__/weatherData';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-const HomeScreen = () => {
+// Main Home Screen Component
+const HomeScreenContent: React.FC = () => {
+  const [currentWeather, setCurrentWeather] = useState(mockSunnyWeather);
+  const [clothingSuggestions, setClothingSuggestions] = useState(getSuggestions(mockSunnyWeather));
+  const { theme, weatherCondition, setWeatherCondition } = useTheme();
+  const { colors, spacing } = theme;
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Climate Closet</Text>
-      <View style={styles.weatherContainer}>
-        <Text style={styles.weatherText}>Weather information will appear here</Text>
+  // Update clothing suggestions when weather changes
+  useEffect(() => {
+    setClothingSuggestions(getSuggestions(currentWeather));
+
+    // Set theme based on weather
+    const condition = getWeatherCondition(
+      currentWeather.description,
+      currentWeather.icon
+    );
+    setWeatherCondition(condition);
+  }, [currentWeather, setWeatherCondition]);
+
+  const localStyles = StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    gradientContainer: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+      padding: spacing.lg,
+    },
+    weatherControls: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: spacing.md,
+    },
+    weatherButtonsContainer: {
+      flexDirection: 'row',
+    },
+    weatherButton: {
+      padding: spacing.sm,
+      borderRadius: 8,
+      backgroundColor: colors.surface,
+      marginRight: spacing.xs,
+    },
+    settingsButton: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: 24,
+      flexDirection: 'row',
+      alignItems: 'center',
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    settingsText: {
+      color: 'white',
+      fontSize: 14,
+      marginLeft: spacing.xs,
+    },
+  });
+
+  // Weather selector buttons for testing
+  const WeatherSelector = () => (
+    <View style={localStyles.weatherControls}>
+      <View style={localStyles.weatherButtonsContainer}>
+        <TouchableOpacity
+          style={localStyles.weatherButton}
+          onPress={() => {
+            setCurrentWeather(mockSunnyWeather);
+            setWeatherCondition('sunny');
+          }}
+        >
+          <Ionicons name="sunny-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={localStyles.weatherButton}
+          onPress={() => {
+            setCurrentWeather(mockRainyWeather);
+            setWeatherCondition('rainy');
+          }}
+        >
+          <Ionicons name="rainy-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={localStyles.weatherButton}
+          onPress={() => {
+            setCurrentWeather(mockCloudyWeather);
+            setWeatherCondition('cloudy');
+          }}
+        >
+          <Ionicons name="cloud-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={localStyles.weatherButton}
+          onPress={() => {
+            setCurrentWeather(mockSnowyWeather);
+            setWeatherCondition('snowy');
+          }}
+        >
+          <Ionicons name="snow-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={localStyles.weatherButton}
+          onPress={() => {
+            setCurrentWeather(mockNightWeather);
+            setWeatherCondition('night');
+          }}
+        >
+          <Ionicons name="moon-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
       </View>
-      <View style={styles.clothingContainer}>
-        <Text style={styles.sectionTitle}>Clothing Suggestions</Text>
-        <Text style={styles.placeholderText}>
-          Clothing suggestions will appear here based on weather conditions
-        </Text>
-      </View>
+
       <TouchableOpacity
-        style={styles.settingsButton}
+        style={localStyles.settingsButton}
         onPress={() => navigation.navigate('Settings')}
       >
-        <Text style={styles.settingsButtonText}>Settings</Text>
+        <Ionicons name="settings-outline" size={16} color="white" />
+        <Text style={localStyles.settingsText}>Settings</Text>
       </TouchableOpacity>
     </View>
   );
+
+  return (
+    <SafeAreaView style={localStyles.safeArea}>
+      <StatusBar
+        barStyle={colors.statusBar === 'dark' ? 'dark-content' : 'light-content'}
+        backgroundColor="transparent"
+        translucent
+      />
+      <LinearGradient
+        colors={colors.gradient}
+        style={localStyles.gradientContainer}
+      >
+        <View style={localStyles.container}>
+          {/* TEST ONLY: Weather selector for different conditions */}
+          <WeatherSelector />
+
+          {/* Current Weather Display */}
+          <WeatherDisplay weatherData={currentWeather} />
+
+          {/* Clothing Suggestions */}
+          <ClothingSuggestions suggestions={clothingSuggestions} />
+        </View>
+      </LinearGradient>
+    </SafeAreaView>
+  );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  weatherContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    elevation: 2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  weatherText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  clothingContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    flex: 1,
-    elevation: 2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  placeholderText: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
-  },
-  settingsButton: {
-    backgroundColor: '#4a90e2',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  settingsButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
+// Wrapper component that provides theme
+const HomeScreen: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <HomeScreenContent />
+    </ThemeProvider>
+  );
+};
 
 export default HomeScreen;

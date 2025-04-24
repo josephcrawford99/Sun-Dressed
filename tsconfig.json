@@ -3,6 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": "./",
+    "jsx": "react-native",
+    "lib": ["ES2015", "DOM"],
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],

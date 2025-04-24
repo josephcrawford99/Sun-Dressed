@@ -19,7 +19,7 @@
 - Default to using PowerShell, C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe
 - When missing dependencies or tools, install them and if unable, pause and ask the user to install them manually
 - Navigate the file system by consulting STRUCTURE.md and standard command line navigation (using cd, ls, ../.., etc.)
-- I have installed node, npm, and yarn
+- I have installed node, npm, and yarn. If these fail to work, pause and ask the user to install them manually
 
 ## Git Workflow
 - Main branch: stable releases only

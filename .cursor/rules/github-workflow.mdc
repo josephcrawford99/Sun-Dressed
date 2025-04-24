@@ -13,7 +13,7 @@ alwaysApply: true
 
 ## Branch Structure
 - main: Production-ready code
-- develop: Integration branch
+- develop: Integration branch (currently on)
 - feature/*: New features
 - bugfix/*: Bug fixes
 

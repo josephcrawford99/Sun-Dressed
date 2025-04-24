@@ -1,0 +1,110 @@
+---
+description:
+globs: src/components/**/*.tsx,src/screens/**/*.tsx,src/styles/**/*.ts
+alwaysApply: false
+---
+---
+description: Visual design guidelines for Climate Closet application
+globs: src/components/**/*.tsx,src/screens/**/*.tsx,src/styles/**/*.ts
+alwaysApply: true
+---
+
+# Climate Closet Design System
+
+## Core Design Philosophy
+- Weather-responsive interface that shifts color schemes based on current conditions
+- Sleek, minimal UI with content-first approach
+- Single-view focused screens that maximize information density without overwhelming
+- Avoid hidden navigation patterns (hamburger menus, bottom tabs) when possible
+- Utilize transparency and depth through subtle layering
+- Incorporate metallic accents and reflective surfaces for premium feel
+
+## Color System
+
+### Weather-Responsive Base Palettes
+- **Sunny**: Gradient from soft yellow (#FFDE82) to warm orange (#FF9B71)
+- **Cloudy**: Soft grays (#D1D5DB) with silver accents (#C0C5CE)
+- **Rainy**: Blues and teals (#64B6AC to #5591A9)
+- **Snowy**: White (#FFFFFF) with ice blue accents (#E1E5F2)
+- **Night**: Deep blues (#0D1B2A) with purple hints (#48466D)
+
+### Metallic Accent Colors
+- Silver: Linear gradient (#F7F7F7 to #C0C0C0) with 15% opacity overlay
+- Gold: Linear gradient (#F4D03F to #D4AC0D) for special elements
+- Gunmetal: Linear gradient (#303841 to #3A4750) for important actions
+
+### Transparency Guidelines
+- Content cards: 85-90% opacity with blur effect
+- Overlays: 40-60% opacity
+- Action buttons: 95% opacity with metallic finish
+- Status indicators: 80% opacity
+
+## Typography
+
+- **Primary Font**: SF Pro (iOS) / Roboto (Android) / System default
+- **Display Font**: Playfair Display for weather headers
+- **Title Size**: 28px (bold)
+- **Subtitle Size**: 18px (medium)
+- **Body Text**: 16px (regular)
+- **Caption**: 14px (light)
+- **Line Height**: 1.5x font size for optimal readability
+
+## Component Styling
+
+### Cards & Containers
+- Rounded corners (12px radius)
+- Subtle shadows (x:0, y:4px, blur:12px, color: rgba(0,0,0,0.08))
+- Transparent backgrounds (85-95% opacity) with subtle blur effect
+- Inner metallic borders (0.5px) that catch light
+
+### Buttons & Interactive Elements
+- Pill-shaped primary actions (24px radius)
+- Metallic gradient backgrounds that shift with device tilt
+- Avoid traditional button borders in favor of elevation shadows
+- Tactile micro-animations on press (subtle scale: 0.98)
+
+### Weather Display
+- Large, prominent weather icons (custom, not generic)
+- Weather condition determines primary gradient of screen
+- Temperature displayed with dynamic typography (size relative to extremes)
+- Integrate weather animations as subtle background elements
+
+## Layout Philosophy
+
+### Single-View Focus
+- Prioritize vertical scrolling over lateral navigation
+- Content should be organized in clear visual hierarchy
+- Use collapsible sections instead of multiple screens
+- Group related information in proximal cards
+
+### Navigation Alternatives
+- Instead of bottom tabs: Use horizontal scrolling category chips
+- Instead of hamburger menu: Use visible quick-access floating actions
+- Instead of deep navigation: Use expandable panels and modal overlays
+- Core functions always visible on main screen
+
+## Animation & Interaction
+
+- Weather transitions: Smooth cross-dissolve between conditions (800ms)
+- Content loading: Staggered fade-in (200ms delay between elements)
+- Feedback animations: Quick (150ms), subtle scale or color shift
+- Physics-based scrolling with slight resistance
+- Parallax effects between weather background and content cards
+
+## Current Design Trends to Incorporate
+
+- **Glassmorphism**: Frosted glass effect on cards with weather-appropriate tinting
+- **Adaptive Color**: UI elements that react to ambient light and weather conditions
+- **Variable Typography**: Font weights that subtly shift based on importance
+- **Micro-interactions**: Small, delightful animations that respond to user actions
+- **3D Touch Elements**: Depth-aware buttons with pressure sensitivity (where supported)
+- **Dark Mode Optimization**: Weather appropriate dark modes for evening use
+- **Gesture Navigation**: Intuitive swipe gestures for primary actions
+
+## Accessibility Considerations
+
+- Maintain WCAG AA contrast ratios regardless of weather theme
+- Provide alternative non-transparent mode for improved readability
+- Ensure touch targets are minimum 44x44pt
+- Include haptic feedback for all interactive elements
+- Design for one-handed use with important actions in thumb zone
