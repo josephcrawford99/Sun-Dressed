@@ -1,0 +1,26 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+---
+description: Weather Wardrobe app structure reference
+globs: **/*.tsx,**/*.ts,**/*.js
+alwaysApply: true
+---
+
+# Project Structure Reference
+
+## Key Directories
+- src/components/: UI components (atoms, molecules, organisms)
+- src/screens/: Main application screens
+- src/services/: API integration services
+- src/navigation/: Navigation configuration
+- src/utils/: Helper functions and constants
+- src/assets/: Static assets (images, fonts)
+
+## Development Patterns
+- Follow atomic design pattern for components
+- Keep screens as container components
+- Implement service layer for external data fetching
+- Use TypeScript interfaces for all props and data models

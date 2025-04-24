@@ -1,0 +1,33 @@
+---
+description: Used whenever git commands are made. Important for version control.
+globs:
+alwaysApply: false
+---
+---
+description: GitHub workflow guidelines
+globs: .github/**/*
+alwaysApply: true
+---
+
+# GitHub Workflow
+
+## Branch Structure
+- main: Production-ready code
+- develop: Integration branch
+- feature/*: New features
+- bugfix/*: Bug fixes
+
+## Commit Convention
+- feat: New feature
+- fix: Bug fix
+- docs: Documentation
+- style: Formatting
+- refactor: Code restructuring
+- test: Test cases
+- chore: Maintenance tasks
+
+## PR Process
+- Create feature branch from develop
+- Implement and test feature
+- Create PR to develop
+- Add screenshots for UI changes

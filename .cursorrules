@@ -6,12 +6,20 @@
 - Navigation: React Navigation
 - API Integration: OpenWeatherMap
 - Local Storage: AsyncStorage (Firebase after MVP)
+- Use STRUCTURE.md for the file structure and adjust it to match industry standards for mobile apps
+- Add file names to STRUCTURE.md when creating new files
 
 ## Development Workflow
 - Follow specifications.md strictly for feature tracking
 - Complete all MVP features before advancing to "Further features"
 - Mark tasks as completed with [x] in specifications.md
 - Add tests before marking features complete
+
+## Development Environment
+- Default to using PowerShell, C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe
+- When missing dependencies or tools, install them and if unable, pause and ask the user to install them manually
+- Navigate the file system by consulting STRUCTURE.md and standard command line navigation (using cd, ls, ../.., etc.)
+- I have installed node, npm, and yarn
 
 ## Git Workflow
 - Main branch: stable releases only
