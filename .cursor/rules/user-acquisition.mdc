@@ -1,0 +1,16 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+---
+description: Growth-focused features
+globs: src/features/*
+---
+
+# Viral Growth Mechanisms
+- Social sharing with generated outfit images
+- Referral program with clothing credits
+- Seasonal clothing challenges with badges
+- Integration with fashion influencer APIs
+- User-generated content moderation system

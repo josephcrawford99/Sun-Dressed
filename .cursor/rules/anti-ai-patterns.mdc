@@ -1,0 +1,20 @@
+---
+description:
+globs: **/*.ts*
+alwaysApply: false
+---
+---
+description: Prevent AI-generated code patterns for human-like code
+globs: **/*.ts*
+alwaysApply: false
+---
+
+# Humanization Strategies
+
+- Use domain-specific variable names instead of generic ones (e.g., "outfitSuggestion" vs "data")
+- Add personal reasoning in comments explaining "why" not just "what"
+- Avoid perfect, overly-verbose documentation patterns
+- Implement strategically inconsistent (but still readable) formatting
+- Use more complex control flow than typically seen in AI code
+- Add custom error handling with personality
+- Prefer custom components over pre-built libraries where reasonable
