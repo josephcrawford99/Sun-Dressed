@@ -12,99 +12,197 @@ alwaysApply: true
 # Climate Closet Design System
 
 ## Core Design Philosophy
-- Weather-responsive interface that shifts color schemes based on current conditions
-- Sleek, minimal UI with content-first approach
-- Single-view focused screens that maximize information density without overwhelming
-- Avoid hidden navigation patterns (hamburger menus, bottom tabs) when possible
-- Utilize transparency and depth through subtle layering
-- Incorporate metallic accents and reflective surfaces for premium feel
+
+Climate Closet combines a clean, minimal interface with weather-responsive elements to create a practical, delightful user experience. The design system:
+
+- Prioritizes content and functionality over decorative elements
+- Uses a weather-responsive interface that adapts colors and mood to current conditions
+- Creates a cohesive experience across all weather states while maintaining brand consistency
+- Balances the minimalist black/white approach from the Figma design with modern, subtle color accents
+- Presents all critical information in a single view without requiring scrolling
+- Uses intentional spacing, typography hierarchy, and color to guide users through the interface
 
 ## Color System
 
-### Weather-Responsive Base Palettes
-- **Sunny**: Gradient from soft yellow (#FFDE82) to warm orange (#FF9B71)
-- **Cloudy**: Soft grays (#D1D5DB) with silver accents (#C0C5CE)
-- **Rainy**: Blues and teals (#64B6AC to #5591A9)
-- **Snowy**: White (#FFFFFF) with ice blue accents (#E1E5F2)
-- **Night**: Deep blues (#0D1B2A) with purple hints (#48466D)
+### Base Interface Colors
+- **Primary Background**: White (#FFFFFF)
+- **Secondary Background**: Light gray (#F5F5F5)
+- **Primary Text**: Black (#000000)
+- **Secondary Text**: Dark gray (#757575)
+- **Accent Elements**: Black (#000000) for buttons, icons, and key UI elements
+- **Dividers/Borders**: Light gray (#F5F5F5) to medium gray (#E5E5E5)
 
-### Metallic Accent Colors
-- Silver: Linear gradient (#F7F7F7 to #C0C0C0) with 15% opacity overlay
-- Gold: Linear gradient (#F4D03F to #D4AC0D) for special elements
-- Gunmetal: Linear gradient (#303841 to #3A4750) for important actions
+### Weather-Responsive Accent Palettes
+Each weather condition introduces subtle color accents that influence the mood without overwhelming the clean interface. Weather gradients should be applied with transparency/opacity to ensure they're not obtrusive:
 
-### Transparency Guidelines
-- Content cards: 85-90% opacity with blur effect
-- Overlays: 40-60% opacity
-- Action buttons: 95% opacity with metallic finish
-- Status indicators: 80% opacity
+- **Sunny**:
+  - Accent: Gold/Yellow (#FFDE82)
+  - Gradient: Soft yellow to warm orange (#FFDE82 to #FF9B71) with 15-25% opacity
+  - Header background tint: Very light yellow (#FFFBF0)
+
+- **Cloudy**:
+  - Accent: Steel blue/Gray (#C0C5CE)
+  - Gradient: Light to medium gray (#E5E7EB to #D1D5DB) with 15-25% opacity
+  - Header background tint: Cool gray (#F7F8FA)
+
+- **Rainy**:
+  - Accent: Teal (#64B6AC)
+  - Gradient: Light to medium blue (#A6D1E6 to #5591A9) with 15-25% opacity
+  - Header background tint: Light blue (#F0F7FF)
+
+- **Snowy**:
+  - Accent: Ice blue (#A1C6EA)
+  - Gradient: White to very light blue (#FFFFFF to #E1E5F2) with 15-25% opacity
+  - Header background tint: Crisp white (#F9FAFF)
+
+- **Night**:
+  - Accent: Deep blue (#48466D)
+  - Gradient: Dark blue to purple hints (#0D1B2A to #48466D) with 15-25% opacity
+  - Header background tint: Very dark blue (#0D1B2A)
+  - Text (inverted): White (#FFFFFF)
+
+### Application of Weather-Responsive Design
+- The main UI structure remains consistent across all weather conditions
+- Weather state influences:
+  - Header background gradient/tint
+  - Button and accent colors
+  - Clothing item borders and highlights
+  - Mood and tone of the entire interface
 
 ## Typography
 
-- **Primary Font**: SF Pro (iOS) / Roboto (Android) / System default
-- **Display Font**: Playfair Display for weather headers
-- **Title Size**: 28px (bold)
-- **Subtitle Size**: 18px (medium)
-- **Body Text**: 16px (regular)
-- **Caption**: 14px (light)
-- **Line Height**: 1.5x font size for optimal readability
+### Font Family
+- **Primary Font**: Inter (Clean, modern sans-serif)
+- **Secondary Font**: Libre Baskerville (For emphasized words in titles, like "Outfit" in "TODAY'S Outfit")
 
-## Component Styling
+### Typography Scale
+- **Header/Title**: 20px, Bold (700), 140% line height
+- **Subheader**: 14px, SemiBold (600), 140% line height
+- **Body Text**: 11px, Regular (400), 140% line height
+- **Small/Caption**: 9px, Regular (400), 140% line height
+- **Button Text**: 10px, Bold (700), 140% line height
 
-### Cards & Containers
-- Rounded corners (12px radius)
-- Subtle shadows (x:0, y:4px, blur:12px, color: rgba(0,0,0,0.08))
-- Transparent backgrounds (85-95% opacity) with subtle blur effect
-- Inner metallic borders (0.5px) that catch light
+### Text Styling
+- Use italic style for category labels (Top, Bottoms, Outerwear, etc.)
+- Maintain consistent casing: Title case for headers, Uppercase for buttons
+- Weather labels and day information use Regular (400) weight
+- Active/selected items use SemiBold (600) or Bold (700) weight
 
-### Buttons & Interactive Elements
-- Pill-shaped primary actions (24px radius)
-- Metallic gradient backgrounds that shift with device tilt
-- Avoid traditional button borders in favor of elevation shadows
-- Tactile micro-animations on press (subtle scale: 0.98)
+## Layout & Structure
 
-### Weather Display
-- Large, prominent weather icons (custom, not generic)
-- Weather condition determines primary gradient of screen
-- Temperature displayed with dynamic typography (size relative to extremes)
-- Integrate weather animations as subtle background elements
+### Screen Organization
+- **Header Section**: Contains greeting, location, date selection
+- **Content Section**: Displays outfit recommendations or weather information
+- **Action Area**: Contains primary actions (Edit, Save, Share)
 
-## Layout Philosophy
+### Layout Principles
+- Use a consistent grid with 12px base unit for spacing and layout
+- Maintain 12px border radius on all rounded elements (buttons, cards)
+- Group related information in visually distinct sections
+- Use proximity and alignment to create clear visual hierarchy
+- Keep primary actions easily accessible within thumb reach
 
-### Single-View Focus
-- Prioritize vertical scrolling over lateral navigation
-- Content should be organized in clear visual hierarchy
-- Use collapsible sections instead of multiple screens
-- Group related information in proximal cards
+### Card Design
+- Use subtle, light gray (#F5F5F5) background for content cards
+- Maintain consistent 12px border radius
+- Minimize shadows in favor of subtle color differentiation
+- Use consistent spacing (12px padding) within cards
+- Clothing category labels are placed in a rotated orientation along the edge of each card
 
-### Navigation Alternatives
-- Instead of bottom tabs: Use horizontal scrolling category chips
-- Instead of hamburger menu: Use visible quick-access floating actions
-- Instead of deep navigation: Use expandable panels and modal overlays
-- Core functions always visible on main screen
+### Bento Box Clothing Layout
+- Arrange clothing items in a bento box grid layout regardless of screen size
+- Each clothing category has its own cell (Top, Bottoms, Outerwear, Shoes, Accessories)
+- Allow users to click/tap any clothing item to expand to full-screen view
+- Expanded view shows additional details and data about the clothing item
+- Include a back arrow or X button to return to the bento box layout
 
-## Animation & Interaction
+## Component Library
 
-- Weather transitions: Smooth cross-dissolve between conditions (800ms)
-- Content loading: Staggered fade-in (200ms delay between elements)
-- Feedback animations: Quick (150ms), subtle scale or color shift
-- Physics-based scrolling with slight resistance
-- Parallax effects between weather background and content cards
+### Buttons
+- **Primary Buttons**: Black background (#000000) with white text, pill shape (12px radius)
+- **Secondary Buttons**: White background with black border and black text
+- **Weather/Outfit Toggle Button**: Pill-shaped button showing temperature and weather icon
+- **Size**: Maintain comfortable touch targets (minimum 44x44pt)
+- **States**: Include hover, pressed, and disabled states
 
-## Current Design Trends to Incorporate
+### Navigation & Selection
+- **Date Selection**: Horizontal scrolling dates with clear active state (black background, white text)
+- **Category Selection**: Clean, minimal tabs or chips
+- **Location Selector**: Input field with location icon
+- **Bottom Navigation**: Simplified navigation with icons for:
+  - Home/Weather (primary view)
+  - Closet/Clothing items
+  - Social features
+  - Account/Settings
 
-- **Glassmorphism**: Frosted glass effect on cards with weather-appropriate tinting
-- **Adaptive Color**: UI elements that react to ambient light and weather conditions
-- **Variable Typography**: Font weights that subtly shift based on importance
-- **Micro-interactions**: Small, delightful animations that respond to user actions
-- **3D Touch Elements**: Depth-aware buttons with pressure sensitivity (where supported)
-- **Dark Mode Optimization**: Weather appropriate dark modes for evening use
-- **Gesture Navigation**: Intuitive swipe gestures for primary actions
+### Weather/Outfit Toggle
+- Design as a pill-shaped button rather than text link
+- Include current temperature and weather icon (sun, cloud, rain, etc.)
+- Positioned near the "TODAY'S Outfit" header
+- When clicked, flips the outfit card to display detailed weather information
+- Provides immediate context for clothing suggestions
 
-## Accessibility Considerations
+### Weather Icons
+- Use distinctive, custom weather icons that match the minimal aesthetic
+- Standard size of 24x24px for consistency
+- Animate weather icons subtly to indicate current conditions
+- Ensure icons are clearly distinguishable at small sizes
 
-- Maintain WCAG AA contrast ratios regardless of weather theme
-- Provide alternative non-transparent mode for improved readability
-- Ensure touch targets are minimum 44x44pt
-- Include haptic feedback for all interactive elements
+## Sponsored Items
+
+- Apply a minimal "sponsored" label to clothing items when needed
+- Position label in the lower right corner of the clothing item cell
+- Use small, light gray text (9px) with 75% opacity
+- Ensure the label doesn't interfere with the visibility of the clothing item
+- Example text: "sponsored" in #000000 with 75% opacity
+
+## Rating System
+
+Based on the RatingPage design, the rating system should:
+
+- Display the complete outfit at the top of the rating page
+- Provide separate rating sliders for "Upper body" and "Lower body" comfort
+- Use a 5-point sliding scale from "Cold" to "Hot"
+- Include additional attribute selection options (e.g., "Favorite")
+- Use a clean, minimal form design with light gray backgrounds
+- Include a prominent "Confirm" button for submitting ratings
+- Display all items in the outfit being rated for context
+
+## Animation & Interactions
+
+- Minimize animations throughout the app, with exceptions for:
+  - Weather icons (subtle animations to represent weather conditions)
+  - Gradient bloom animation when app is first opened
+  - Micro-interactions for feedback on user actions
+- Keep animations subtle and purposeful
+- Ensure animations complete quickly (under 300ms) to maintain responsiveness
+- Consider performance implications for older devices
+
+## Accessibility Guidelines
+
+- Maintain WCAG AA contrast ratios (minimum 4.5:1 for normal text)
+- Support system text size adjustments
+- Ensure all interactive elements have clear focus states
 - Design for one-handed use with important actions in thumb zone
+- Include alt text for all weather icons and clothing images
+- Support system preferences for reduced motion
+
+## Future Design Considerations
+
+- Light/Dark mode support to be implemented in future phases
+- Expanded social features and sharing capabilities
+- More complex clothing recommendations for trips
+- Integration with user's personal clothing inventory
+- Additional animations and transitions as the app matures
+- AI-powered outfit suggestions based on user preferences and feedback
+
+## Questions for Design Refinement
+
+1. How much weather-responsive color should be introduced while maintaining the clean aesthetic?
+2. Should the bottom navigation be completely removed or redesigned?
+3. How should the toggle between weather mode and outfit mode be redesigned?
+4. What level of animation and micro-interactions is appropriate?
+5. How should clothing categories be organized on smaller screens?
+6. What approach should be taken for clothing items that are "sponsored"?
+7. How should the rating system for outfits be designed?
+8. Should the app support both light and dark mode?

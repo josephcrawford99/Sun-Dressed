@@ -1,0 +1,1790 @@
+/* Home page */
+
+position: relative;
+width: 375px;
+height: 812px;
+
+background: #FFFFFF;
+
+
+/* TODAY’S Outfit */
+
+position: absolute;
+width: 235px;
+height: 20px;
+left: 28px;
+top: 257px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 140%;
+/* or 28px */
+display: flex;
+align-items: center;
+
+color: #000000;
+
+
+
+/* Forecast blocks */
+
+position: absolute;
+width: 309px;
+height: 328px;
+left: 33px;
+top: 320px;
+
+
+
+/* Rectangle 111141364 */
+
+position: absolute;
+width: 120px;
+height: 124px;
+left: 33px;
+top: 320px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Rectangle 111141366 */
+
+position: absolute;
+width: 120px;
+height: 198px;
+left: 33px;
+top: 450px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Rectangle 111141365 */
+
+position: absolute;
+width: 181px;
+height: 124px;
+left: 161px;
+top: 320px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Rectangle 111141367 */
+
+position: absolute;
+width: 87px;
+height: 118px;
+left: 161px;
+top: 450px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Rectangle 111141369 */
+
+position: absolute;
+width: 181px;
+height: 75px;
+left: 161px;
+top: 573px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Rectangle 111141368 */
+
+position: absolute;
+width: 87px;
+height: 118px;
+left: 255px;
+top: 450px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Outerwear */
+
+position: absolute;
+width: 114px;
+height: 30px;
+left: 161px;
+top: 434px;
+
+font-family: 'Inter';
+font-style: italic;
+font-weight: 600;
+font-size: 20px;
+line-height: 140%;
+/* or 28px */
+display: flex;
+align-items: center;
+
+color: rgba(218, 218, 218, 0.75);
+
+transform: rotate(-90deg);
+
+
+/* Top */
+
+position: absolute;
+width: 114px;
+height: 28px;
+left: 38px;
+top: 434px;
+
+font-family: 'Inter';
+font-style: italic;
+font-weight: 600;
+font-size: 20px;
+line-height: 140%;
+/* identical to box height, or 28px */
+display: flex;
+align-items: center;
+
+color: rgba(218, 218, 218, 0.75);
+
+transform: rotate(-90deg);
+
+
+/* Bottoms */
+
+position: absolute;
+width: 110px;
+height: 28px;
+left: 38px;
+top: 641px;
+
+font-family: 'Inter';
+font-style: italic;
+font-weight: 600;
+font-size: 20px;
+line-height: 140%;
+/* identical to box height, or 28px */
+display: flex;
+align-items: center;
+
+color: rgba(218, 218, 218, 0.75);
+
+transform: rotate(-90deg);
+
+
+/* Shoes */
+
+position: absolute;
+width: 72px;
+height: 28px;
+left: 162px;
+top: 645px;
+
+font-family: 'Inter';
+font-style: italic;
+font-weight: 600;
+font-size: 20px;
+line-height: 140%;
+/* identical to box height, or 28px */
+display: flex;
+align-items: center;
+
+color: rgba(218, 218, 218, 0.75);
+
+transform: rotate(-90deg);
+
+
+/* Accessory */
+
+position: absolute;
+width: 105px;
+height: 28px;
+left: 162px;
+top: 563px;
+
+font-family: 'Inter';
+font-style: italic;
+font-weight: 600;
+font-size: 20px;
+line-height: 140%;
+/* identical to box height, or 28px */
+display: flex;
+align-items: center;
+
+color: rgba(218, 218, 218, 0.75);
+
+transform: rotate(-90deg);
+
+
+/* Accessory */
+
+position: absolute;
+width: 107px;
+height: 28px;
+left: 258px;
+top: 563px;
+
+font-family: 'Inter';
+font-style: italic;
+font-weight: 600;
+font-size: 20px;
+line-height: 140%;
+/* identical to box height, or 28px */
+display: flex;
+align-items: center;
+
+color: rgba(218, 218, 218, 0.75);
+
+transform: rotate(-90deg);
+
+
+/* sponsored */
+
+position: absolute;
+width: 37px;
+height: 16px;
+left: 298px;
+top: 434px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 7px;
+line-height: 16px;
+/* identical to box height, or 229% */
+letter-spacing: 0.4px;
+
+color: rgba(0, 0, 0, 0.75);
+
+
+
+/* Image */
+
+position: absolute;
+width: 110px;
+height: 100px;
+left: 196px;
+top: 332px;
+
+background: url(Jean_Jacket_Front_with_pakrat_ink_tag_removed_2000x-removebg-preview.png);
+border-radius: 8px;
+
+
+/* 543885-004263-808-2.6936f498 2 */
+
+position: absolute;
+width: 69px;
+height: 172px;
+left: 58px;
+top: 463px;
+
+background: url(543885-004263-808-2.6936f498.png);
+
+
+/* Todays Outfit Buttons */
+
+position: absolute;
+width: 308px;
+height: 22px;
+left: 34px;
+top: 290px;
+
+
+
+/* Edit button */
+
+position: absolute;
+width: 100px;
+height: 22px;
+left: 34px;
+top: 290px;
+
+
+
+/* Rectangle 111141370 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 100px;
+height: 22px;
+left: 34px;
+top: 290px;
+
+background: #000000;
+border: 1px solid #000000;
+border-radius: 12px;
+
+
+/* EDIT */
+
+position: absolute;
+width: 98.42px;
+height: 15.81px;
+left: 34px;
+top: 293px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 10px;
+line-height: 140%;
+/* or 14px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Save button */
+
+position: absolute;
+width: 100px;
+height: 22px;
+left: 137px;
+top: 290px;
+
+
+
+/* Rectangle 111141372 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 100px;
+height: 22px;
+left: 137px;
+top: 290px;
+
+background: #000000;
+border: 1px solid #000000;
+border-radius: 12px;
+
+
+/* SAVE */
+
+position: absolute;
+width: 99.08px;
+height: 15.81px;
+left: 137.05px;
+top: 293px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 10px;
+line-height: 140%;
+/* or 14px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Share button */
+
+position: absolute;
+width: 101px;
+height: 22px;
+left: 241px;
+top: 290px;
+
+
+
+/* Rectangle 111141372 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 101px;
+height: 22px;
+left: 241px;
+top: 290px;
+
+background: #000000;
+border: 1px solid #000000;
+border-radius: 12px;
+
+
+/* Group 123287 */
+
+position: absolute;
+width: 99.08px;
+height: 15.81px;
+left: 241.6px;
+top: 293px;
+
+
+
+/* SHARE */
+
+position: absolute;
+width: 99.08px;
+height: 15.81px;
+left: 241.6px;
+top: 293px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 10px;
+line-height: 140%;
+/* or 14px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Image */
+
+position: absolute;
+width: 96px;
+height: 105px;
+left: 45px;
+top: 324px;
+
+background: url(White_T-Shirt_Slides_0010_madewell_perfect_crew-removebg-preview.png),
+url(White_T-Shirt_Slides_0010_madewell_perfect_crew-removebg-preview.png);
+border-radius: 8px;
+
+
+/* Screenshot_2025-04-21_at_4.37.18_PM-removebg-preview 4 */
+
+position: absolute;
+width: 98px;
+height: 54px;
+left: 202px;
+top: 584px;
+
+background: url(Screenshot_2025-04-21_at_4.37.18_PM-removebg-preview.png);
+
+
+/* Feedback button */
+
+position: absolute;
+width: 309px;
+height: 41px;
+left: 29px;
+top: 658px;
+
+
+
+/* Rectangle 111141371 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 309px;
+height: 41px;
+left: 29px;
+top: 658px;
+
+background: #F5F5F5;
+border: 1px solid #000000;
+border-radius: 12px;
+
+
+/* RATE THIS OUTFIT: How did you feel in this? */
+
+position: absolute;
+width: 188px;
+height: 31px;
+left: 89px;
+top: 663px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 9px;
+line-height: 120%;
+/* or 11px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+
+
+/* Switch to weather mode */
+
+position: absolute;
+width: 105px;
+height: 31px;
+left: 235px;
+top: 254px;
+
+
+
+/* SWITCH TO weather mode */
+
+position: absolute;
+width: 105px;
+height: 31px;
+left: 235px;
+top: 254px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 8px;
+line-height: 115%;
+/* or 9px */
+display: flex;
+align-items: center;
+text-align: right;
+
+color: #000000;
+
+
+
+/* Line 6 */
+
+position: absolute;
+width: 64px;
+height: 0px;
+left: 276px;
+top: 280px;
+
+border: 0.75px solid #000000;
+
+
+/* Tab Bar */
+
+position: absolute;
+width: 375px;
+height: 78px;
+left: 0px;
+top: 734px;
+
+background: #FFFFFF;
+box-shadow: 0px -0.5px 0px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(10px);
+/* Note: backdrop-filter has minimal browser support */
+
+
+/* Home Indicator */
+
+position: absolute;
+width: 375px;
+height: 34px;
+left: calc(50% - 375px/2);
+bottom: 0px;
+
+
+
+/* Home Indicator */
+
+position: absolute;
+width: 134px;
+height: 5px;
+left: calc(50% - 134px/2 + 0.5px);
+bottom: 8px;
+
+background: #000000;
+border-radius: 100px;
+
+
+/* Tabs */
+
+position: absolute;
+width: 375px;
+height: 44px;
+left: calc(50% - 375px/2);
+top: calc(50% - 44px/2 - 17px);
+
+
+
+/* Tab Bar Item */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 26px 8px;
+gap: 10px;
+
+position: absolute;
+width: 76px;
+height: 44px;
+left: calc(50% - 76px/2 - 148.5px);
+top: 0px;
+
+
+
+/* cloudy 1 */
+
+width: 24px;
+height: 24px;
+
+background: url(cloudy.png);
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Tab Bar Item */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 26px 8px;
+gap: 10px;
+
+position: absolute;
+width: 79px;
+height: 47px;
+left: calc(50% - 79px/2 - 49.5px);
+top: 0px;
+
+
+
+/* hanger 1 */
+
+width: 27px;
+height: 27px;
+
+background: url(hanger.png);
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Tab Bar Item */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 26px 8px;
+gap: 10px;
+
+position: absolute;
+width: 79px;
+height: 46px;
+left: calc(50% - 79px/2 + 50.5px);
+top: 0px;
+
+
+
+/* Tab Bar Item */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 26px 8px;
+gap: 10px;
+
+position: absolute;
+width: 80px;
+height: 48px;
+left: calc(50% - 80px/2 + 150.5px);
+top: 0px;
+
+
+
+/* user 1 */
+
+width: 28px;
+height: 28px;
+
+background: url(user.png);
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Globe
+
+Keywords: world, browser, language, translate
+*/
+
+position: absolute;
+width: 26px;
+height: 26px;
+left: 225px;
+top: 12px;
+
+opacity: 0.5;
+
+
+/* Icon */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.33%;
+
+border: 1.5px solid #1E1E1E;
+
+
+/* Status Bar */
+
+position: absolute;
+width: 375px;
+height: 44px;
+left: 0px;
+top: 0px;
+
+
+
+/* Notch */
+
+position: absolute;
+visibility: hidden;
+width: 219px;
+height: 30px;
+left: 78px;
+top: -2px;
+
+
+
+/* BG */
+
+position: absolute;
+visibility: hidden;
+left: 0px;
+right: 0px;
+top: 0px;
+bottom: 0px;
+
+background: #000000;
+
+
+/* Exclude */
+
+position: absolute;
+visibility: hidden;
+width: 375px;
+height: 44px;
+left: 0px;
+top: 0px;
+
+/* Carbon / Darkest */
+background: #24262B;
+
+
+/* BG */
+
+position: absolute;
+left: 0px;
+right: 0px;
+top: 0px;
+bottom: 0px;
+
+/* Carbon Neutral/300 */
+background: #D6D9DD;
+
+
+/* Notch */
+
+position: absolute;
+width: 219px;
+height: 30px;
+left: calc(50% - 219px/2);
+top: -2px;
+
+background: #000000;
+
+
+/* Right Side */
+
+position: absolute;
+width: 66.66px;
+height: 11.34px;
+left: 293.67px;
+top: 17.33px;
+
+
+
+/* Battery */
+
+position: absolute;
+left: 89.6%;
+right: 3.91%;
+top: 39.4%;
+bottom: 34.85%;
+
+
+
+/* Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 22px;
+height: 11.33px;
+right: 17px;
+top: 17.33px;
+
+mix-blend-mode: normal;
+opacity: 0.35;
+border: 1px solid #000000;
+border-radius: 2.66667px;
+
+
+/* Combined Shape */
+
+position: absolute;
+width: 1.33px;
+height: 4px;
+right: 14.67px;
+top: 21px;
+
+background: #000000;
+mix-blend-mode: normal;
+opacity: 0.4;
+
+
+/* Rectangle */
+
+position: absolute;
+width: 18px;
+height: 7.33px;
+right: 19px;
+top: 19.33px;
+
+background: #000000;
+border-radius: 1.33333px;
+
+
+/* Wifi */
+
+position: absolute;
+left: 84.18%;
+right: 11.74%;
+top: 39.39%;
+bottom: 35.69%;
+
+background: #000000;
+
+
+/* Wifi-path */
+
+position: absolute;
+width: 15.27px;
+height: 4.74px;
+right: 44.03px;
+top: 17.33px;
+
+background: #DADADA;
+
+
+/* Wifi-path */
+
+position: absolute;
+width: 9.95px;
+height: 3.63px;
+right: 46.69px;
+top: 21.13px;
+
+background: #DADADA;
+
+
+/* Wifi-path */
+
+position: absolute;
+width: 4.63px;
+height: 3.37px;
+right: 49.36px;
+top: 24.92px;
+
+background: #DADADA;
+
+
+/* Mobile Signal */
+
+position: absolute;
+left: 78.31%;
+right: 17.16%;
+top: 40.15%;
+bottom: 35.6%;
+
+background: #000000;
+
+
+/* Cellular_Connection-path */
+
+position: absolute;
+width: 3px;
+height: 4px;
+right: 78.33px;
+top: 24.33px;
+
+background: #DADADA;
+
+
+/* Cellular_Connection-path */
+
+position: absolute;
+width: 3px;
+height: 6px;
+right: 73.67px;
+top: 22.33px;
+
+background: #DADADA;
+
+
+/* Cellular_Connection-path */
+
+position: absolute;
+width: 3px;
+height: 8.33px;
+right: 69px;
+top: 20px;
+
+background: #DADADA;
+
+
+/* Cellular_Connection-path */
+
+position: absolute;
+width: 3px;
+height: 10.67px;
+right: 64.33px;
+top: 17.67px;
+
+background: #DADADA;
+
+
+/* Recording Indicator */
+
+position: absolute;
+visibility: hidden;
+width: 6px;
+height: 6px;
+left: 298px;
+top: 8px;
+
+
+
+/* Indicator */
+
+position: absolute;
+width: 6px;
+height: 6px;
+right: 71px;
+top: 8px;
+
+/* SystemOrange / Light
+
+class var systemOrange: UIColor
+*/
+background: #FF9500;
+
+
+/* Left Side */
+
+position: absolute;
+width: 54px;
+height: 21px;
+left: 21px;
+top: 12px;
+
+
+
+/* Time */
+
+position: absolute;
+width: 54px;
+height: 21px;
+left: 21px;
+top: 12px;
+
+border-radius: 32px;
+
+
+/* 9:41 */
+
+position: absolute;
+width: 28.43px;
+height: 11.09px;
+left: 12.45px;
+top: 5.17px;
+
+background: #000000;
+
+
+/* Grey header */
+
+position: absolute;
+width: 395px;
+height: 186px;
+left: -10px;
+top: 44px;
+
+background: #F5F5F5;
+border-radius: 12px;
+
+
+/* Home location search bar */
+
+position: absolute;
+width: 334px;
+height: 28px;
+left: 21px;
+top: 131px;
+
+
+
+/* Group 123229 */
+
+position: absolute;
+width: 251px;
+height: 28px;
+left: 21px;
+top: 131px;
+
+
+
+/* Rectangle 111141363 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 251px;
+height: 28px;
+left: 21px;
+top: 131px;
+
+background: #FFFFFF;
+border: 1px solid rgba(0, 0, 0, 0.5);
+border-radius: 12px;
+
+
+/* New York, NY */
+
+position: absolute;
+width: 83px;
+height: 15px;
+left: calc(50% - 83px/2 - 94px);
+top: 137px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 140%;
+/* or 15px */
+display: flex;
+align-items: center;
+
+color: #000000;
+
+
+
+/* Map pin
+
+Keywords: location, navigation, travel, marker
+*/
+
+position: absolute;
+width: 17px;
+height: 17px;
+left: 30px;
+top: 136px;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 4.17%;
+bottom: 4.17%;
+
+border: 1.5px solid #1E1E1E;
+
+
+/* Group 123230 */
+
+position: absolute;
+width: 77px;
+height: 28px;
+left: 278px;
+top: 131px;
+
+
+
+/* Rectangle 111141363 */
+
+position: absolute;
+width: 77px;
+height: 28px;
+left: 278px;
+top: 131px;
+
+background: #FFFFFF;
+border-radius: 12px;
+
+
+/* Today */
+
+position: absolute;
+width: 33px;
+height: 15px;
+left: calc(50% - 33px/2 + 138px);
+top: 137px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 140%;
+/* or 15px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+
+
+/* Calendar
+
+Keywords: date
+*/
+
+position: absolute;
+width: 17px;
+height: 17px;
+left: 290px;
+top: 136px;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.33%;
+bottom: 8.33%;
+
+border: 1.5px solid #1E1E1E;
+
+
+/* Days of the week group */
+
+position: absolute;
+width: 395px;
+height: 51px;
+left: -10px;
+top: 171px;
+
+
+
+/* Rectangle 111141372 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 53px;
+height: 51px;
+left: -8px;
+top: 171px;
+
+background: #FFFFFF;
+border: 1px solid #F5F5F5;
+border-radius: 16px;
+
+
+/* Rectangle 111141373 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 54px;
+height: 51px;
+left: 48px;
+top: 171px;
+
+background: #FFFFFF;
+border: 1px solid #F5F5F5;
+border-radius: 16px;
+
+
+/* Rectangle 111141374 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 55px;
+height: 51px;
+left: 104px;
+top: 171px;
+
+background: #FFFFFF;
+border: 1px solid #F5F5F5;
+border-radius: 16px;
+
+
+/* Rectangle 111141375 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 54px;
+height: 51px;
+left: 162px;
+top: 171px;
+
+background: #F5F5F5;
+border: 1px solid #000000;
+border-radius: 16px;
+
+
+/* Rectangle 111141376 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 54px;
+height: 51px;
+left: 162px;
+top: 171px;
+
+background: #000000;
+border: 1px solid #000000;
+border-radius: 16px;
+
+
+/* Rectangle 111141377 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 54px;
+height: 51px;
+left: 218px;
+top: 171px;
+
+background: #FFFFFF;
+border: 1px solid #F5F5F5;
+border-radius: 16px;
+
+
+/* Rectangle 111141378 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 54px;
+height: 51px;
+left: 275px;
+top: 171px;
+
+background: #FFFFFF;
+border: 1px solid #F5F5F5;
+border-radius: 16px;
+
+
+/* Rectangle 111141379 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 53px;
+height: 51px;
+left: 332px;
+top: 171px;
+
+background: #FFFFFF;
+border: 1px solid #F5F5F5;
+border-radius: 16px;
+
+
+/* Group 123277 */
+
+position: absolute;
+width: 53.16px;
+height: 42.5px;
+left: -10px;
+top: 175.86px;
+
+
+
+/* Mon */
+
+position: absolute;
+width: 53.16px;
+height: 21.86px;
+left: calc(50% - 53.16px/2 - 170.92px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* 07 */
+
+position: absolute;
+width: 17.32px;
+height: 29.14px;
+left: calc(50% - 17.32px/2 - 170.61px);
+top: 189.21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* Group 123278 */
+
+position: absolute;
+width: 53.16px;
+height: 42.5px;
+left: 48px;
+top: 175.86px;
+
+
+
+/* Tue */
+
+position: absolute;
+width: 53.16px;
+height: 21.86px;
+left: calc(50% - 53.16px/2 - 112.92px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* 08 */
+
+position: absolute;
+width: 21.35px;
+height: 29.14px;
+left: calc(50% - 21.35px/2 - 114.26px);
+top: 189.21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* Group 123279 */
+
+position: absolute;
+width: 53.16px;
+height: 42.5px;
+left: 105px;
+top: 175.86px;
+
+
+
+/* Wed */
+
+position: absolute;
+width: 53.16px;
+height: 21.86px;
+left: calc(50% - 53.16px/2 - 55.92px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* 09 */
+
+position: absolute;
+width: 23.3px;
+height: 29.14px;
+left: calc(50% - 23.3px/2 - 55.85px);
+top: 189.21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* Group 123280 */
+
+position: absolute;
+width: 45.45px;
+height: 42.5px;
+left: 166px;
+top: 175.86px;
+
+
+
+/* Thu */
+
+position: absolute;
+width: 45.45px;
+height: 21.86px;
+left: calc(50% - 45.45px/2 + 1.23px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* 10 */
+
+position: absolute;
+width: 30.09px;
+height: 29.14px;
+left: calc(50% - 30.09px/2 + 1.39px);
+top: 189.21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Group 123281 */
+
+position: absolute;
+width: 29.4px;
+height: 42.5px;
+left: 230px;
+top: 175.86px;
+
+
+
+/* Fri */
+
+position: absolute;
+width: 29.4px;
+height: 21.86px;
+left: calc(50% - 29.4px/2 + 57.2px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* 11 */
+
+position: absolute;
+width: 25.24px;
+height: 29.14px;
+left: calc(50% - 25.24px/2 + 57.5px);
+top: 189.21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* Group 123282 */
+
+position: absolute;
+width: 37.48px;
+height: 42.5px;
+left: 283px;
+top: 175.86px;
+
+
+
+/* Sat */
+
+position: absolute;
+width: 37.48px;
+height: 21.86px;
+left: calc(50% - 37.48px/2 + 114.24px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* 12 */
+
+position: absolute;
+width: 15.5px;
+height: 29.14px;
+left: calc(50% - 15.5px/2 + 114.84px);
+top: 189.21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* Sun 13 group */
+
+position: absolute;
+width: 37.48px;
+height: 40.07px;
+left: 340px;
+top: 175.86px;
+
+
+
+/* Sun */
+
+position: absolute;
+width: 37.48px;
+height: 21.86px;
+left: calc(50% - 37.48px/2 + 171.24px);
+top: 175.86px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 9px;
+line-height: 140%;
+/* or 13px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* 13 */
+
+position: absolute;
+width: 35px;
+height: 24.29px;
+left: calc(50% - 35px/2 + 171px);
+top: 191.64px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+
+
+/* Notifications */
+
+position: absolute;
+width: 41px;
+height: 41px;
+left: 314px;
+top: 60px;
+
+
+
+/* Ellipse 13 */
+
+position: absolute;
+width: 41px;
+height: 41px;
+left: 314px;
+top: 60px;
+
+background: #FFFFFF;
+
+
+/* Bell
+
+Keywords: alarm, notification, sound
+*/
+
+position: absolute;
+width: 27px;
+height: 27px;
+left: 321px;
+top: 67px;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.33%;
+bottom: 8.35%;
+
+border: 2px solid #1E1E1E;
+
+
+/* Screenshot_2025-04-23_at_11.23.43_AM-removebg-preview 1 */
+
+position: absolute;
+width: 60px;
+height: 42px;
+left: 174px;
+top: 488px;
+
+background: url(Screenshot_2025-04-23_at_11.23.43_AM-removebg-preview.png);
+
+
+/* GOOD MORNING, Amanda */
+
+position: absolute;
+width: 202px;
+height: 54px;
+
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 100%;
+/* or 20px */
+display: flex;
+align-items: center;
+
+color: #000000;
+
+
+
+/* Save
+
+Keywords: floppy disk
+*/
+
+position: relative;
+width: 21px;
+height: 21px;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 1.5px solid #000000;

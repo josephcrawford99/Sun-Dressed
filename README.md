@@ -6,6 +6,82 @@ A mobile application that suggests what to wear based on the weather forecast.
 
 Climate Closet is designed to help users decide what to wear based on current and forecasted weather conditions. The app provides clothing recommendations for different times of the day (morning, afternoon, and evening) to ensure you're prepared for changing weather conditions.
 
+## How to Run the Mock App Demo
+
+This guide will help you run the interactive mockup of the Climate Closet app on your computer.
+
+### Prerequisites (One-time setup)
+
+1. **Install Node.js**:
+   - Download and install Node.js from [https://nodejs.org/](https://nodejs.org/) (Download the "LTS" version)
+   - This includes npm (Node Package Manager), which we'll use to install dependencies and run the app
+
+2. **Verify Installation**:
+   - After installation, open Command Prompt (Windows) or Terminal (Mac/Linux)
+   - Type these commands to verify installation:
+     ```
+     node --version
+     npm --version
+     ```
+   - Both should display version numbers if installed correctly
+
+### Running the Mock App Demo
+
+1. **Download the Project**:
+   - If you received the project as a ZIP file: Extract it to a folder on your computer
+   - If using GitHub: Clone the repository to your local machine
+
+2. **Open Command Prompt or Terminal**:
+   - Navigate to the project folder:
+     ```
+     cd path/to/climate-closet
+     ```
+   - Replace "path/to/climate-closet" with the actual path to the folder
+
+3. **Install Dependencies**:
+   - Run this command to install all required packages:
+     ```
+     npm install --legacy-peer-deps
+     ```
+   - This may take a few minutes to complete
+
+4. **Start the Web Demo**:
+   - Run this command to start the mockup in web mode:
+     ```
+     npm run web
+     ```
+   - The app will automatically open in your default web browser
+   - If it doesn't open automatically, try visiting: http://localhost:19006
+
+5. **Interact with the Mock App**:
+   - Use the weather icons at the top to switch between different weather conditions
+   - Observe how the UI adapts with different themes and clothing suggestions
+   - Navigate to different screens using the buttons/menu items
+
+6. **Stopping the App**:
+   - To stop the app, return to the Command Prompt/Terminal window
+   - Press Ctrl+C, then confirm with Y if prompted
+
+### Troubleshooting
+
+1. **"npm not recognized" error**:
+   - Make sure Node.js is installed correctly
+   - Try restarting your computer and opening a new Command Prompt/Terminal
+
+2. **Errors during installation**:
+   - Try running the install command with administrator privileges
+   - On Windows: Right-click Command Prompt and select "Run as administrator"
+   - On Mac/Linux: Use `sudo npm install --legacy-peer-deps`
+
+3. **Browser shows blank page**:
+   - Try manually navigating to http://localhost:19006
+   - Check if there are any error messages in the Command Prompt/Terminal
+
+4. **App won't start**:
+   - Try running: `npx expo-cli start --web` instead
+
+If you encounter any issues not covered here, please contact the development team for assistance.
+
 ## Features
 
 - **Weather Information**: View current weather conditions and forecasts
@@ -115,7 +191,7 @@ The application follows a modular architecture with the following structure:
 - **src/__tests__/**: Test suites for components
 - **src/__mocks__/**: Mock data for testing
 
-## Getting Started
+## Getting Started (For Developers)
 
 ### Prerequisites
 
