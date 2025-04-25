@@ -259,3 +259,7 @@ This project is currently in MVP development with focus on implementing core fea
 - [~] User can specify their location
 - [~] User can see the weather forecast for the day
 - [~] User sees a list of clothing suggestions for each time of day
+
+© 2025 Joey Crawford. All Rights Reserved.
+This code is proprietary and confidential. Unauthorized copying, transfer, or use is strictly prohibited.
+
