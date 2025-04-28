@@ -3,24 +3,20 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Alert,
+  ScrollView,
   ActivityIndicator,
-  ScrollView
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-
-// Theme and storage
 import { useTheme } from '../utils/ThemeContext';
 import { saveLocation, getLocation } from '../utils/storage';
-
-// Navigation types
 import { RootStackParamList } from '../navigation/AppNavigator';
+import InputField from '../components/InputField';
+import Button from '../components/Button';
 
 type LocationScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Location'>;
 
@@ -120,94 +116,76 @@ const LocationScreen: React.FC = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
     },
     gradientContainer: {
       flex: 1,
     },
     contentContainer: {
-      padding: spacing.lg,
-      paddingBottom: spacing.xxl,
+      padding: 24,
+      paddingBottom: 48,
     },
     headerSection: {
-      marginBottom: spacing.xl,
+      marginBottom: 32,
     },
     title: {
-      ...typography.title,
-      color: colors.text,
-      marginBottom: spacing.xs,
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginBottom: 8,
     },
     subtitle: {
-      ...typography.body,
-      color: colors.textSecondary,
-      marginBottom: spacing.lg,
+      fontSize: 16,
+      color: '#757575',
+      marginBottom: 24,
     },
     section: {
-      backgroundColor: colors.surface,
-      borderRadius: effects.borderRadius.medium,
-      padding: spacing.lg,
-      marginBottom: spacing.lg,
-      ...effects.shadow.light,
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: 24,
+      marginBottom: 24,
     },
     sectionTitle: {
-      ...typography.subtitle,
-      color: colors.text,
-      marginBottom: spacing.md,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderRadius: effects.borderRadius.small,
-      padding: spacing.md,
-      fontSize: 16,
-      color: colors.text,
-      backgroundColor: 'rgba(255,255,255,0.5)',
-      marginBottom: spacing.md,
+      fontSize: 18,
+      fontWeight: '600',
+      marginBottom: 16,
     },
     buttonRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginTop: spacing.md,
+      marginTop: 16,
     },
     button: {
       flex: 1,
-      backgroundColor: colors.primary,
-      borderRadius: effects.borderRadius.medium,
-      padding: spacing.md,
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      flexDirection: 'row',
-      ...effects.shadow.light,
+      height: 48,
+      borderRadius: 12,
+      backgroundColor: '#FFDE82',
     },
     buttonAccent: {
-      backgroundColor: colors.accent,
+      backgroundColor: '#5591A9',
     },
     buttonText: {
-      ...typography.subtitle,
       color: 'white',
-      marginLeft: spacing.xs,
+      marginLeft: 8,
+      fontSize: 16,
+      fontWeight: '600',
     },
     buttonSpacing: {
-      width: spacing.md,
-    },
-    errorText: {
-      ...typography.caption,
-      color: '#e74c3c',
-      marginTop: spacing.xs,
-      marginBottom: spacing.md,
+      width: 16,
     },
     savedLocationContainer: {
-      marginTop: spacing.md,
-      padding: spacing.md,
+      marginTop: 16,
+      padding: 16,
       backgroundColor: 'rgba(255,255,255,0.3)',
-      borderRadius: effects.borderRadius.small,
+      borderRadius: 8,
       flexDirection: 'row',
       alignItems: 'center',
     },
     savedLocationText: {
-      ...typography.body,
-      color: colors.text,
-      marginLeft: spacing.sm,
+      fontSize: 16,
+      color: '#222',
+      marginLeft: 8,
       flex: 1,
     },
   });
@@ -227,7 +205,6 @@ const LocationScreen: React.FC = () => {
             <Text style={styles.subtitle}>
               Your location helps us provide accurate weather forecasts and clothing suggestions
             </Text>
-
             {savedLocation ? (
               <View style={styles.savedLocationContainer}>
                 <Ionicons name="location" size={20} color={colors.accent} />
@@ -237,14 +214,9 @@ const LocationScreen: React.FC = () => {
               </View>
             ) : null}
           </View>
-
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Use Device Location</Text>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonAccent]}
-              onPress={getDeviceLocation}
-              disabled={isLoading}
-            >
+            <Button onPress={getDeviceLocation} disabled={isLoading} style={[styles.button, styles.buttonAccent]}>
               {isLoading ? (
                 <ActivityIndicator color="white" size="small" />
               ) : (
@@ -253,44 +225,27 @@ const LocationScreen: React.FC = () => {
                   <Text style={styles.buttonText}>Get Current Location</Text>
                 </>
               )}
-            </TouchableOpacity>
+            </Button>
           </View>
-
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Enter Manually</Text>
-            <TextInput
-              style={styles.input}
+            <InputField
               value={manualLocation}
               onChangeText={setManualLocation}
               placeholder="Enter city name or postal code"
-              placeholderTextColor="rgba(0,0,0,0.3)"
               autoCapitalize="words"
+              error={locationError || undefined}
             />
-
-            {locationError ? (
-              <Text style={styles.errorText}>{locationError}</Text>
-            ) : null}
-
             <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.goBack()}
-                disabled={isLoading}
-              >
+              <Button onPress={() => navigation.goBack()} disabled={isLoading} style={styles.button}>
                 <Ionicons name="arrow-back-outline" size={18} color="white" />
                 <Text style={styles.buttonText}>Back</Text>
-              </TouchableOpacity>
-
+              </Button>
               <View style={styles.buttonSpacing} />
-
-              <TouchableOpacity
-                style={[styles.button, styles.buttonAccent]}
-                onPress={saveManualLocation}
-                disabled={isLoading}
-              >
+              <Button onPress={saveManualLocation} disabled={isLoading} style={[styles.button, styles.buttonAccent]}>
                 <Ionicons name="save-outline" size={18} color="white" />
                 <Text style={styles.buttonText}>Save</Text>
-              </TouchableOpacity>
+              </Button>
             </View>
           </View>
         </ScrollView>

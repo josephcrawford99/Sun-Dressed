@@ -3,11 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Alert,
   ScrollView,
-  Switch
+  Switch,
+  Alert,
 } from 'react-native';
 import { useTheme } from '../utils/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,6 +14,8 @@ import { saveLocation, getLocation, savePreferences, getPreferences, UserPrefere
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import InputField from '../components/InputField';
+import Button from '../components/Button';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -78,100 +78,75 @@ const SettingsScreen: React.FC = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
     },
     gradientContainer: {
       flex: 1,
     },
     contentContainer: {
-      padding: spacing.lg,
-      paddingBottom: spacing.xxl,
+      padding: 24,
+      paddingBottom: 48,
     },
     section: {
-      backgroundColor: colors.surface,
-      borderRadius: effects.borderRadius.medium,
-      padding: spacing.lg,
-      marginBottom: spacing.lg,
-      ...effects.shadow.light,
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: 24,
+      marginBottom: 24,
     },
     sectionTitle: {
-      ...typography.subtitle,
-      color: colors.text,
-      marginBottom: spacing.md,
+      fontSize: 18,
+      fontWeight: '600',
+      marginBottom: 16,
     },
     label: {
-      ...typography.body,
-      color: colors.text,
-      marginBottom: spacing.xs,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderRadius: effects.borderRadius.small,
-      padding: spacing.md,
       fontSize: 16,
-      color: colors.text,
-      backgroundColor: 'rgba(255,255,255,0.5)',
-      marginBottom: spacing.md,
+      marginBottom: 8,
     },
     infoText: {
-      ...typography.caption,
-      color: colors.textSecondary,
-      marginTop: spacing.xs,
-      marginBottom: spacing.md,
+      fontSize: 12,
+      color: '#757575',
+      marginTop: 8,
+      marginBottom: 16,
     },
     switchRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: spacing.md,
-    },
-    saveButton: {
-      backgroundColor: colors.accent,
-      borderRadius: effects.borderRadius.large,
-      padding: spacing.md,
-      alignItems: 'center',
-      marginTop: spacing.xl,
-      ...effects.shadow.light,
-    },
-    saveText: {
-      ...typography.subtitle,
-      color: 'white',
+      marginBottom: 16,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: spacing.lg,
+      marginBottom: 24,
     },
     headerIcon: {
-      marginRight: spacing.sm,
+      marginRight: 8,
     },
     headerTitle: {
-      ...typography.title,
-      color: colors.text,
+      fontSize: 28,
+      fontWeight: 'bold',
     },
     locationRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: spacing.md,
+      marginBottom: 16,
     },
     locationButton: {
-      backgroundColor: colors.primary,
-      borderRadius: effects.borderRadius.small,
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.md,
+      backgroundColor: '#FFDE82',
+      borderRadius: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
       flexDirection: 'row',
       alignItems: 'center',
     },
     locationButtonText: {
       color: 'white',
-      marginLeft: spacing.xs,
+      marginLeft: 8,
     },
     locationDisplay: {
       flex: 1,
-      marginRight: spacing.md,
-    }
+      marginRight: 16,
+    },
   });
 
   return (
@@ -193,7 +168,6 @@ const SettingsScreen: React.FC = () => {
             />
             <Text style={styles.headerTitle}>Settings</Text>
           </View>
-
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Location</Text>
             <View style={styles.locationRow}>
@@ -201,22 +175,17 @@ const SettingsScreen: React.FC = () => {
                 <Text style={styles.label}>Current Location</Text>
                 <Text>{location || 'Not set'}</Text>
               </View>
-              <TouchableOpacity
-                style={styles.locationButton}
-                onPress={navigateToLocationScreen}
-              >
+              <Button onPress={navigateToLocationScreen} style={styles.locationButton}>
                 <Ionicons name="location-outline" size={16} color="white" />
                 <Text style={styles.locationButtonText}>Change</Text>
-              </TouchableOpacity>
+              </Button>
             </View>
             <Text style={styles.infoText}>
               Your location is used to fetch accurate weather forecasts.
             </Text>
           </View>
-
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Preferences</Text>
-
             <View style={styles.switchRow}>
               <Text style={styles.label}>
                 Temperature Unit ({preferences.temperatureUnit === 'celsius' ? '°C' : '°F'})
@@ -228,7 +197,6 @@ const SettingsScreen: React.FC = () => {
                 thumbColor="white"
               />
             </View>
-
             <View style={styles.switchRow}>
               <Text style={styles.label}>Enable Notifications</Text>
               <Switch
@@ -238,25 +206,19 @@ const SettingsScreen: React.FC = () => {
                 thumbColor="white"
               />
             </View>
-
             <Text style={styles.infoText}>
               Get daily clothing suggestions based on the weather forecast.
             </Text>
           </View>
-
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>About Climate Closet</Text>
             <Text style={styles.infoText}>
               Climate Closet helps you dress appropriately for the weather. We provide clothing recommendations based on current weather and forecast data throughout the day.
             </Text>
           </View>
-
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSaveSettings}
-          >
-            <Text style={styles.saveText}>Save Settings</Text>
-          </TouchableOpacity>
+          <Button onPress={handleSaveSettings}>
+            Save Settings
+          </Button>
         </ScrollView>
       </LinearGradient>
     </View>

@@ -32,8 +32,8 @@ const MOCK_LOCATIONS = [
 
 const HomeScreen: React.FC = () => {
   const { user } = useAuth();
-  // Location is just autofilled for now, not editable
-  const locationInput = user?.location || 'New York, NY';
+  // Location is just a static placeholder for now
+  const locationInput = 'New York, NY';
 
   return (
     <SafeAreaView style={styles.safeArea}>

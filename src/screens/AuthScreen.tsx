@@ -4,51 +4,46 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  TouchableOpacity,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { useAuth } from '../utils/AuthContext';
 import { typography } from '../styles/typography';
+import InputField from '../components/InputField';
+import Button from '../components/Button';
+import Divider from '../components/Divider';
 
 const AuthScreen: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, signup, isLoading, error } = useAuth();
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
-  const handleMockAuth = async (provider: 'apple' | 'google' | 'email') => {
-    setLoading(true);
-    setTimeout(async () => {
-      // Mock user object
-      const user = {
-        name: name || 'Amanda',
-        location: 'New York, NY',
-        email: email || 'amanda@example.com',
-        provider,
-      };
-      await login(user);
-      setLoading(false);
-      Alert.alert('Success', `Signed in as ${user.name}`);
-    }, 800);
+  const handleMockAuth = async (provider: 'apple' | 'google') => {
+    Alert.alert('Success', 'Signed in as Amanda (mock)');
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setLocalError(null);
     if (mode === 'signup' && !name.trim()) {
-      Alert.alert('Missing Info', 'Please enter your name.');
+      setLocalError('Please enter your name.');
       return;
     }
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Missing Info', 'Please enter your email and password.');
+      setLocalError('Please enter your email and password.');
       return;
     }
-    handleMockAuth('email');
+    if (mode === 'signup') {
+      await signup(email.trim(), password, name.trim());
+    } else {
+      await login(email.trim(), password);
+    }
   };
 
   return (
@@ -58,76 +53,66 @@ const AuthScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.logoRow}>
-          <Text style={StyleSheet.flatten([typography.logo, styles.logoText])}>Climate Closet</Text>
+          <Text style={typography.logo}>Climate Closet</Text>
         </View>
         <View style={styles.formContainer}>
-          <TouchableOpacity
-            style={[styles.socialButton, { backgroundColor: '#000' }]}
-            onPress={() => handleMockAuth('apple')}
-            disabled={loading}
-          >
+          <Button onPress={() => handleMockAuth('apple')} disabled={isLoading} style={styles.socialButton}>
             <AntDesign name="apple1" size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={StyleSheet.flatten([typography.button, styles.socialButtonText])}>Sign in with Apple</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.socialButton, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
-            onPress={() => handleMockAuth('google')}
-            disabled={loading}
-          >
+            Sign in with Apple
+          </Button>
+          <Button onPress={() => handleMockAuth('google')} disabled={isLoading} style={[styles.socialButton, styles.socialButtonGoogle]}>
             <AntDesign name="google" size={20} color="#000" style={{ marginRight: 8 }} />
-            <Text style={StyleSheet.flatten([typography.button, { color: '#000' }, styles.socialButtonText])}>Sign in with Google</Text>
-          </TouchableOpacity>
-          <View style={styles.dividerRow}>
-            <View style={styles.divider} />
-            <Text style={typography.caption}>or</Text>
-            <View style={styles.divider} />
-          </View>
-          <TextInput
-            style={StyleSheet.flatten([typography.body, styles.input])}
+            <Text style={{ color: '#000' }}>Sign in with Google</Text>
+          </Button>
+          <Divider text="or" />
+          <InputField
             placeholder="Email"
-            placeholderTextColor="#757575"
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
-            editable={!loading}
+            editable={!isLoading}
+            error={mode === 'signup' && localError === 'Please enter your email and password.' ? localError : undefined}
           />
-          <TextInput
-            style={StyleSheet.flatten([typography.body, styles.input])}
+          <InputField
             placeholder="Password"
-            placeholderTextColor="#757575"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
-            editable={!loading}
+            editable={!isLoading}
+            onFocus={() => setPasswordFocused(true)}
+            onBlur={() => setPasswordFocused(false)}
+            error={mode === 'signup' && passwordFocused && password.length > 0 && password.length < 6 ? 'Password must be at least 6 characters' : undefined}
           />
           {mode === 'signup' && (
-            <TextInput
-              style={StyleSheet.flatten([typography.body, styles.input])}
+            <InputField
               placeholder="First Name"
-              placeholderTextColor="#757575"
               value={name}
               onChangeText={setName}
-              editable={!loading}
+              editable={!isLoading}
+              error={mode === 'signup' && localError === 'Please enter your name.' ? localError : undefined}
             />
           )}
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text style={typography.button}>{mode === 'login' ? 'Log In' : 'Sign Up'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setMode(mode === 'login' ? 'signup' : 'login')}
-            disabled={loading}
+          {(localError || error) && (
+            <Text style={styles.errorText}>{localError || error}</Text>
+          )}
+          <Button onPress={handleSubmit} disabled={isLoading}>
+            {isLoading ? <ActivityIndicator color="#fff" /> : mode === 'login' ? 'Log In' : 'Sign Up'}
+          </Button>
+          <Button
+            onPress={() => {
+              setMode(mode === 'login' ? 'signup' : 'login');
+              setLocalError(null);
+            }}
+            disabled={isLoading}
+            style={styles.switchButton}
           >
             <Text style={typography.label}>
               {mode === 'login'
                 ? "Don't have an account? Sign up"
                 : 'Already have an account? Log in'}
             </Text>
-          </TouchableOpacity>
+          </Button>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -138,7 +123,6 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   flex1: { flex: 1 },
   logoRow: { marginTop: 48, marginBottom: 32, alignItems: 'flex-start', paddingHorizontal: 32 },
-  logoText: {},
   formContainer: { paddingHorizontal: 32, flex: 1 },
   socialButton: {
     flexDirection: 'row',
@@ -148,24 +132,22 @@ const styles = StyleSheet.create({
     height: 48,
     marginBottom: 16,
   },
-  socialButtonText: {},
-  dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 16 },
-  divider: { flex: 1, height: 1, backgroundColor: '#E5E5E5' },
-  input: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    height: 44,
-    paddingHorizontal: 16,
-    marginBottom: 12,
+  socialButtonGoogle: {
+    backgroundColor: '#fff',
+    borderColor: '#000',
+    borderWidth: 1,
   },
-  submitButton: {
-    backgroundColor: '#000',
-    borderRadius: 12,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
+  errorText: {
+    color: '#b94a48',
+    fontSize: 14,
     marginBottom: 8,
+    textAlign: 'center',
+  },
+  switchButton: {
+    backgroundColor: 'transparent',
+    elevation: 0,
+    marginTop: 0,
+    marginBottom: 0,
   },
 });
 
