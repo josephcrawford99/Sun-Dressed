@@ -20,7 +20,6 @@ const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
@@ -30,7 +29,7 @@ const AuthScreen: React.FC = () => {
       // Mock user object
       const user = {
         name: name || 'Amanda',
-        location: location || 'New York, NY',
+        location: 'New York, NY',
         email: email || 'amanda@example.com',
         provider,
       };
@@ -41,8 +40,8 @@ const AuthScreen: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (mode === 'signup' && (!name.trim() || !location.trim())) {
-      Alert.alert('Missing Info', 'Please enter your name and location.');
+    if (mode === 'signup' && !name.trim()) {
+      Alert.alert('Missing Info', 'Please enter your name.');
       return;
     }
     if (!email.trim() || !password.trim()) {
@@ -103,24 +102,14 @@ const AuthScreen: React.FC = () => {
             editable={!loading}
           />
           {mode === 'signup' && (
-            <>
-              <TextInput
-                style={StyleSheet.flatten([typography.body, styles.input])}
-                placeholder="First Name"
-                placeholderTextColor="#757575"
-                value={name}
-                onChangeText={setName}
-                editable={!loading}
-              />
-              <TextInput
-                style={StyleSheet.flatten([typography.body, styles.input])}
-                placeholder="Home Location"
-                placeholderTextColor="#757575"
-                value={location}
-                onChangeText={setLocation}
-                editable={!loading}
-              />
-            </>
+            <TextInput
+              style={StyleSheet.flatten([typography.body, styles.input])}
+              placeholder="First Name"
+              placeholderTextColor="#757575"
+              value={name}
+              onChangeText={setName}
+              editable={!loading}
+            />
           )}
           <TouchableOpacity
             style={styles.submitButton}

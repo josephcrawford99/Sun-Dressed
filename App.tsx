@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './src/utils/AuthContext';
 import AuthScreen from './src/screens/AuthScreen';
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useFonts as useLibre, LibreBaskerville_400Regular, LibreBaskerville_700Bold, LibreBaskerville_400Regular_Italic } from '@expo-google-fonts/libre-baskerville';
+import DevClearDataHeader from './src/components/DevClearDataHeader';
 
 // Simple error boundary component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
@@ -70,6 +71,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <SafeAreaProvider>
+            <DevClearDataHeader />
             <Main />
             <StatusBar style="auto" />
           </SafeAreaProvider>

@@ -21,14 +21,16 @@ export const typography: { [key: string]: TextStyle } = {
   },
   heading: {
     fontFamily: fonts.primaryBold,
+    fontStyle: 'italic',
     fontWeight: '700',
+    letterSpacing: -1.25,
     fontSize: 28,
     color: '#000',
   },
   subheading: {
     fontFamily: fonts.secondaryBold,
     fontWeight: '600',
-    fontSize: 20,
+    fontSize: 18,
     color: '#000',
   },
   body: {

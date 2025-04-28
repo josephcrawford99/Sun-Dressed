@@ -8,16 +8,14 @@ import {
   Image,
   ScrollView,
   TextInput,
-  FlatList,
-  ActivityIndicator
+  Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../utils/AuthContext';
 import { typography } from '../styles/typography';
-import { getFrequentLocations, addFrequentLocation, getHomeAddress } from '../utils/storage';
-
-const API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
-const API_URL = 'https://api.openweathermap.org/geo/1.0/direct';
+import Dropdown from '../components/Dropdown';
+import { getFrequentLocations, addFrequentLocation } from '../utils/storage';
+import * as Location from 'expo-location';
 
 const mockOutfit = {
   top: require('../assets/mock/top.png'),
@@ -27,81 +25,15 @@ const mockOutfit = {
   accessory: require('../assets/mock/accessory.png'),
 };
 
+const MOCK_LOCATIONS = [
+  { name: 'New York, NY', country: 'US' },
+  { name: 'Washington, DC', country: 'US' },
+];
+
 const HomeScreen: React.FC = () => {
   const { user } = useAuth();
-  const [editingLocation, setEditingLocation] = useState(false);
-  const [locationInput, setLocationInput] = useState(user?.location || '');
-  const [frequentLocations, setFrequentLocations] = useState<string[]>([]);
-  const [homeAddress, setHomeAddressState] = useState('');
-  const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const inputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    getFrequentLocations().then(setFrequentLocations);
-    getHomeAddress().then(addr => addr && setHomeAddressState(addr));
-  }, []);
-
-  useEffect(() => {
-    if (!editingLocation || !locationInput || locationInput.length < 2) {
-      setSuggestions([]);
-      setShowDropdown(false);
-      return;
-    }
-    setLoading(true);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetch(`${API_URL}?q=${encodeURIComponent(locationInput)}&limit=5&appid=${API_KEY}`)
-        .then(res => res.json())
-        .then((data: any[]) => {
-          setSuggestions(
-            data.map(item => ({
-              name: item.name,
-              state: item.state,
-              country: item.country,
-              lat: item.lat,
-              lon: item.lon,
-            }))
-          );
-          setShowDropdown(true);
-        })
-        .catch(() => setSuggestions([]))
-        .finally(() => setLoading(false));
-    }, 400);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [locationInput, editingLocation]);
-
-  const handleLocationSelect = async (loc: { name: string; state?: string; country?: string }) => {
-    const locString = `${loc.name}${loc.state ? ', ' + loc.state : ''}${loc.country ? ', ' + loc.country : ''}`;
-    setLocationInput(locString);
-    setEditingLocation(false);
-    setShowDropdown(false);
-    await addFrequentLocation(locString);
-    setFrequentLocations(await getFrequentLocations());
-  };
-
-  const handleHomePress = () => {
-    if (homeAddress) {
-      setLocationInput(homeAddress);
-      setEditingLocation(false);
-      setShowDropdown(false);
-      inputRef.current?.blur();
-    }
-  };
-
-  // Merge frequent locations and suggestions, but don't duplicate
-  const mergedSuggestions = [
-    ...frequentLocations
-      .filter(fl =>
-        !suggestions.some(s => `${s.name}${s.state ? ', ' + s.state : ''}${s.country ? ', ' + s.country : ''}` === fl)
-      )
-      .map(l => ({ name: l, country: '', lat: 0, lon: 0 })),
-    ...suggestions,
-  ];
+  // Location is just autofilled for now, not editable
+  const locationInput = user?.location || 'New York, NY';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -109,62 +41,16 @@ const HomeScreen: React.FC = () => {
         <View style={styles.greetingRow}>
           <View>
             <Text style={typography.label}>GOOD MORNING,</Text>
-            <Text style={StyleSheet.flatten([typography.heading, styles.name])}>{user?.name || ''}</Text>
+            <Text style={StyleSheet.flatten([typography.heading, styles.name])}>{user?.name + '!' || ''}</Text>
           </View>
           <TouchableOpacity style={styles.bellButton}>
             <Ionicons name="notifications-outline" size={28} color="#000" />
           </TouchableOpacity>
         </View>
         <View style={styles.locationRow}>
-          <View
-            style={[
-              styles.locationInput,
-              editingLocation && styles.locationInputActive,
-            ]}
-          >
-            <TouchableOpacity onPress={handleHomePress} disabled={!homeAddress} style={{ marginRight: 4 }}>
-              {homeAddress && <Ionicons name="home" size={18} color="#757575" />}
-            </TouchableOpacity>
-            <TextInput
-              ref={inputRef}
-              style={[typography.body, styles.locationTextInput]}
-              value={locationInput}
-              onChangeText={text => {
-                setLocationInput(text);
-                setEditingLocation(true);
-              }}
-              placeholder="Search for a location"
-              placeholderTextColor="#757575"
-              editable={true}
-              onFocus={() => setEditingLocation(true)}
-              onBlur={() => setEditingLocation(false)}
-              onTouchStart={() => setEditingLocation(true)}
-              onSubmitEditing={() => setShowDropdown(false)}
-              autoCorrect={false}
-              autoCapitalize="words"
-            />
-            <TouchableOpacity onPress={() => inputRef.current?.focus()} style={{ marginLeft: 4 }}>
-              <Ionicons name="location-outline" size={16} color="#757575" />
-            </TouchableOpacity>
-            {loading && <ActivityIndicator size="small" color="#000" style={styles.loading} />}
-            {showDropdown && mergedSuggestions.length > 0 && (
-              <View style={styles.dropdown}>
-                <FlatList
-                  data={mergedSuggestions}
-                  keyExtractor={(_, i) => i.toString()}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.suggestion} onPress={() => handleLocationSelect(item)}>
-                      <Text style={typography.body}>
-                        {item.name}
-                        {item.state ? `, ${item.state}` : ''}
-                        {item.country ? `, ${item.country}` : ''}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                  keyboardShouldPersistTaps="handled"
-                />
-              </View>
-            )}
+          <View style={[styles.locationInput, { position: 'relative', zIndex: 20 }]}>
+            <Ionicons name="location-outline" size={16} color="#757575" style={{ marginRight: 8 }} />
+            <Text style={typography.body}>{locationInput}</Text>
           </View>
           <TouchableOpacity style={styles.todayButton}>
             <Ionicons name="calendar-outline" size={16} color="#000" />
@@ -196,29 +82,17 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity style={styles.actionButton}><Text style={typography.button}>SHARE</Text></TouchableOpacity>
         </View>
         <View style={styles.bentoBox}>
-          <View style={styles.bentoRow}>
-            <View style={styles.bentoCell}>
-              <Image source={mockOutfit.top} style={styles.clothingImg} resizeMode="contain" />
-              <Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Top</Text>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            {/* Left column: Top over Bottom */}
+            <View style={{ flex: 1, gap: 10 }}>
+              <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.top} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Top</Text></View></View>
+              <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.bottoms} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Bottoms</Text></View></View>
             </View>
-            <View style={styles.bentoCell}>
-              <Image source={mockOutfit.outerwear} style={styles.clothingImg} resizeMode="contain" />
-              <Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Outerwear</Text>
-              <Text style={StyleSheet.flatten([typography.caption, styles.sponsored])}>sponsored</Text>
-            </View>
-          </View>
-          <View style={styles.bentoRow}>
-            <View style={styles.bentoCell}>
-              <Image source={mockOutfit.bottoms} style={styles.clothingImg} resizeMode="contain" />
-              <Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Bottoms</Text>
-            </View>
-            <View style={styles.bentoCell}>
-              <Image source={mockOutfit.accessory} style={styles.clothingImg} resizeMode="contain" />
-              <Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Accessory</Text>
-            </View>
-            <View style={styles.bentoCell}>
-              <Image source={mockOutfit.shoes} style={styles.clothingImg} resizeMode="contain" />
-              <Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Shoes</Text>
+            {/* Right column: Outerwear, Accessories, Shoes (stacked) */}
+            <View style={{ flex: 1, gap: 10 }}>
+              <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.outerwear} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Outerwear</Text><Text style={StyleSheet.flatten([typography.caption, styles.sponsored])}>sponsored</Text></View></View>
+              <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.accessory} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Accessory</Text></View></View>
+              <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.shoes} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])}>Shoes</Text></View></View>
             </View>
           </View>
         </View>
@@ -261,8 +135,8 @@ const styles = StyleSheet.create({
   actionRow: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, marginTop: 12, marginBottom: 8 },
   actionButton: { flex: 1, backgroundColor: '#000', borderRadius: 12, marginHorizontal: 4, height: 32, alignItems: 'center', justifyContent: 'center' },
   bentoBox: { marginHorizontal: 20, marginTop: 8, marginBottom: 8 },
-  bentoRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  bentoCell: { flex: 1, backgroundColor: '#F5F5F5', borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginHorizontal: 4, minHeight: 120, position: 'relative' },
+  bentoCellOuter: { flex: 1, margin: 0, padding: 0 },
+  bentoCell: { flex: 1, backgroundColor: '#F5F5F5', borderRadius: 12, alignItems: 'center', justifyContent: 'center', minHeight: 120, position: 'relative', width: '100%' },
   clothingImg: { width: 60, height: 60, marginTop: 8 },
   bentoLabel: { position: 'absolute', left: 4, top: 4, transform: [{ rotate: '-90deg' }] },
   sponsored: { position: 'absolute', right: 8, bottom: 8 },
@@ -278,7 +152,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
-  loading: { position: 'absolute', right: 16, top: 12 },
   dropdown: {
     position: 'absolute',
     top: 48,
@@ -288,13 +161,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E5E5E5',
-    zIndex: 10,
-    maxHeight: 180,
+    zIndex: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
+    maxHeight: 180,
   },
   suggestion: {
     paddingVertical: 12,
