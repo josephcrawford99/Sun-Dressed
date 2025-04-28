@@ -22,7 +22,7 @@ const AppNavigator = () => {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: 'Climate Closet' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Settings"

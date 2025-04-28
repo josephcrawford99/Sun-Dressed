@@ -3,7 +3,11 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from './src/utils/ThemeContext';
 import AppNavigator from './src/navigation/AppNavigator';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
+import { AuthProvider, useAuth } from './src/utils/AuthContext';
+import AuthScreen from './src/screens/AuthScreen';
+import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
+import { useFonts as useLibre, LibreBaskerville_400Regular, LibreBaskerville_700Bold, LibreBaskerville_400Regular_Italic } from '@expo-google-fonts/libre-baskerville';
 
 // Simple error boundary component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
@@ -30,14 +34,46 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 }
 
+function Main() {
+  const { user, isLoading } = useAuth();
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+  if (!user) {
+    return <AuthScreen />;
+  }
+  return <AppNavigator />;
+}
+
 export default function App() {
+  const [montserratLoaded] = useMontserrat({
+    Montserrat_400Regular,
+    Montserrat_500Medium,
+    Montserrat_700Bold,
+  });
+  const [libreLoaded] = useLibre({
+    LibreBaskerville_400Regular,
+    LibreBaskerville_700Bold,
+    LibreBaskerville_400Regular_Italic,
+  });
+
+  if (!montserratLoaded || !libreLoaded) {
+    return null; // or a loading spinner
+  }
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <SafeAreaProvider>
-          <AppNavigator />
-          <StatusBar style="auto" />
-        </SafeAreaProvider>
+        <AuthProvider>
+          <SafeAreaProvider>
+            <Main />
+            <StatusBar style="auto" />
+          </SafeAreaProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
