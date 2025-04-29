@@ -5,12 +5,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import LocationScreen from '../screens/LocationScreen';
+import AccountScreen from '../screens/AccountScreen';
 
 // Define the main navigation stack parameter types
 export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
   Location: undefined;
+  Account: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -18,21 +20,27 @@ const Stack = createStackNavigator<RootStackParamList>();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerShown: false
+        }}
+      >
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}
-          options={{ title: 'Settings' }}
         />
         <Stack.Screen
           name="Location"
           component={LocationScreen}
-          options={{ title: 'Set Location' }}
+        />
+        <Stack.Screen
+          name="Account"
+          component={AccountScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

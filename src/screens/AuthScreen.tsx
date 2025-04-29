@@ -53,16 +53,16 @@ const AuthScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.logoRow}>
-          <Text style={typography.logo}>Climate Closet</Text>
+          <Text style={typography.logo}>Sun Dresser</Text>
         </View>
         <View style={styles.formContainer}>
           <Button onPress={() => handleMockAuth('apple')} disabled={isLoading} style={styles.socialButton}>
             <AntDesign name="apple1" size={20} color="#fff" style={{ marginRight: 8 }} />
-            Sign in with Apple
+            <Text style={[typography.button, { color: '#fff' }]}>Sign in with Apple</Text>
           </Button>
           <Button onPress={() => handleMockAuth('google')} disabled={isLoading} style={[styles.socialButton, styles.socialButtonGoogle]}>
             <AntDesign name="google" size={20} color="#000" style={{ marginRight: 8 }} />
-            <Text style={{ color: '#000' }}>Sign in with Google</Text>
+            <Text style={[typography.button, { color: '#000' }]}>Sign in with Google</Text>
           </Button>
           <Divider text="or" />
           <InputField
@@ -97,7 +97,7 @@ const AuthScreen: React.FC = () => {
             <Text style={styles.errorText}>{localError || error}</Text>
           )}
           <Button onPress={handleSubmit} disabled={isLoading}>
-            {isLoading ? <ActivityIndicator color="#fff" /> : mode === 'login' ? 'Log In' : 'Sign Up'}
+            {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={typography.button}>{mode === 'login' ? 'Log In' : 'Sign Up'}</Text>}
           </Button>
           <Button
             onPress={() => {

@@ -14,7 +14,7 @@ export const typography: { [key: string]: TextStyle } = {
     fontStyle: 'italic',
     fontWeight: '500',
     fontSize: 60,
-    letterSpacing: -2,
+    letterSpacing: -3,
     textAlign: 'left',
     transform: [{ scaleY: 1.3 }],
     color: '#000',
@@ -56,5 +56,12 @@ export const typography: { [key: string]: TextStyle } = {
     fontWeight: '400',
     fontSize: 12,
     color: '#757575',
+  },
+  tempButton: {
+    fontFamily: fonts.primary, // Libre Baskerville
+    fontWeight: '400',
+    fontSize: 18,
+    color: '#FFF',
+    letterSpacing: 0.5,
   },
 };

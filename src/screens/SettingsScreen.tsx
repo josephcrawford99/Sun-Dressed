@@ -8,9 +8,10 @@ import {
   Alert,
 } from 'react-native';
 import { useTheme } from '../utils/ThemeContext';
+import { useSettings } from '../utils/SettingsContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { saveLocation, getLocation, savePreferences, getPreferences, UserPreferences } from '../utils/storage';
+import { saveLocation, getLocation } from '../utils/storage';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -21,24 +22,18 @@ type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Set
 
 const SettingsScreen: React.FC = () => {
   const [location, setLocation] = useState('');
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    temperatureUnit: 'celsius',
-    notificationsEnabled: false
-  });
   const { theme } = useTheme();
   const { colors, typography, spacing, effects } = theme;
   const navigation = useNavigation<SettingsScreenNavigationProp>();
+  const { temperatureUnit, windSpeedUnit, toggleTemperatureUnit, toggleWindSpeedUnit } = useSettings();
 
-  // Load saved settings
+  // Load saved location
   useEffect(() => {
     const loadSettings = async () => {
       const savedLocation = await getLocation();
       if (savedLocation) {
         setLocation(savedLocation);
       }
-
-      const savedPreferences = await getPreferences();
-      setPreferences(savedPreferences);
     };
 
     loadSettings();
@@ -49,26 +44,10 @@ const SettingsScreen: React.FC = () => {
       if (location.trim()) {
         await saveLocation(location.trim());
       }
-
-      await savePreferences(preferences);
       Alert.alert('Success', 'Settings saved successfully!');
     } catch (error) {
       Alert.alert('Error', 'Failed to save settings. Please try again.');
     }
-  };
-
-  const toggleTemperatureUnit = () => {
-    setPreferences(prev => ({
-      ...prev,
-      temperatureUnit: prev.temperatureUnit === 'celsius' ? 'fahrenheit' : 'celsius'
-    }));
-  };
-
-  const toggleNotifications = () => {
-    setPreferences(prev => ({
-      ...prev,
-      notificationsEnabled: !prev.notificationsEnabled
-    }));
   };
 
   const navigateToLocationScreen = () => {
@@ -188,37 +167,27 @@ const SettingsScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Preferences</Text>
             <View style={styles.switchRow}>
               <Text style={styles.label}>
-                Temperature Unit ({preferences.temperatureUnit === 'celsius' ? '°C' : '°F'})
+                Temperature Unit ({temperatureUnit === 'C' ? '°C' : '°F'})
               </Text>
               <Switch
-                value={preferences.temperatureUnit === 'fahrenheit'}
+                value={temperatureUnit === 'F'}
                 onValueChange={toggleTemperatureUnit}
                 trackColor={{ false: 'rgba(0,0,0,0.1)', true: colors.primary }}
                 thumbColor="white"
               />
             </View>
             <View style={styles.switchRow}>
-              <Text style={styles.label}>Enable Notifications</Text>
+              <Text style={styles.label}>
+                Wind Speed Unit ({windSpeedUnit === 'ms' ? 'm/s' : 'mph'})
+              </Text>
               <Switch
-                value={preferences.notificationsEnabled}
-                onValueChange={toggleNotifications}
+                value={windSpeedUnit === 'mph'}
+                onValueChange={toggleWindSpeedUnit}
                 trackColor={{ false: 'rgba(0,0,0,0.1)', true: colors.primary }}
                 thumbColor="white"
               />
             </View>
-            <Text style={styles.infoText}>
-              Get daily clothing suggestions based on the weather forecast.
-            </Text>
           </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About Climate Closet</Text>
-            <Text style={styles.infoText}>
-              Climate Closet helps you dress appropriately for the weather. We provide clothing recommendations based on current weather and forecast data throughout the day.
-            </Text>
-          </View>
-          <Button onPress={handleSaveSettings}>
-            Save Settings
-          </Button>
         </ScrollView>
       </LinearGradient>
     </View>

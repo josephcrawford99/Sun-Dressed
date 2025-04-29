@@ -22,8 +22,9 @@ export const formatTemperature = (
 };
 
 /**
- * Get appropriate weather icon based on OpenWeatherMap icon code
- * Uses the OpenWeatherMap icon set
+ * Get the URL for a weather icon from OpenWeatherMap
+ * @param iconCode The icon code from the OpenWeatherMap API
+ * @returns The URL to the weather icon
  */
 export const getWeatherIconUrl = (iconCode: string): string => {
   return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;

@@ -5,6 +5,8 @@
     "baseUrl": "./",
     "jsx": "react-native",
     "lib": ["ES2015", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "node",
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
