@@ -1,19 +1,19 @@
 import React from 'react';
-import { 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet, 
-  ViewStyle, 
-  TextStyle, 
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
   ActivityIndicator,
-  TouchableOpacityProps 
+  TouchableOpacityProps
 } from 'react-native';
 import { buttonStyles, colors, defaultTheme } from '../styles/theme';
 
 type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'success';
 
 interface ButtonProps extends TouchableOpacityProps {
-  title: string;
+  title?: string;
   onPress: () => void;
   type?: ButtonType;
   style?: ViewStyle;
@@ -21,11 +21,12 @@ interface ButtonProps extends TouchableOpacityProps {
   disabled?: boolean;
   loading?: boolean;
   small?: boolean;
+  children?: React.ReactNode;
 }
 
 /**
  * A standardized button component following the app's design system.
- * Uses the theme's buttonStyles for consistent styling.
+ * Supports both title prop and children for flexible content.
  */
 const Button: React.FC<ButtonProps> = ({
   title,
@@ -36,23 +37,24 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   small = false,
+  children,
   ...rest
 }) => {
   // Use the appropriate button style for the type
   const buttonStyle = buttonStyles[type] || buttonStyles.primary;
-  
+
   // Get the size-specific styles
   const sizeStyles = small ? styles.smallButton : styles.button;
   const textSizeStyles = small ? styles.smallText : styles.text;
-  
+
   return (
     <TouchableOpacity
       style={[
         sizeStyles,
         { backgroundColor: buttonStyle.backgroundColor },
-        buttonStyle.borderColor && { 
+        buttonStyle.borderColor && {
           borderColor: buttonStyle.borderColor,
-          borderWidth: buttonStyle.borderWidth || 1 
+          borderWidth: buttonStyle.borderWidth || 1
         },
         disabled && styles.disabled,
         style,
@@ -63,10 +65,12 @@ const Button: React.FC<ButtonProps> = ({
       {...rest}
     >
       {loading ? (
-        <ActivityIndicator 
-          size={small ? 'small' : 'small'} 
-          color={buttonStyle.textColor} 
+        <ActivityIndicator
+          size={small ? 'small' : 'small'}
+          color={buttonStyle.textColor}
         />
+      ) : children ? (
+        children
       ) : (
         <Text
           style={[

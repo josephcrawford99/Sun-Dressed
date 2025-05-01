@@ -14,6 +14,7 @@
 - Complete all MVP features before advancing to "Further features"
 - Mark tasks as completed with [x] in specifications.md
 - Add tests before marking features complete
+- Ask the user relevant queries to reduce token usage. The questions will be fed to an external web searching and reasoning tool called perplexity pro.
 
 ## Development Environment
 - Default to using PowerShell, C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe

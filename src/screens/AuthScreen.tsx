@@ -39,11 +39,11 @@ const AuthScreen: React.FC = () => {
         if (devAutoLogin === 'true') {
           // Clear the flag immediately
           await AsyncStorage.removeItem('@dev_auto_login');
-          
+
           // Set the email and password for dev login
           setEmail('josephcrawford99@gmail.com');
           setPassword('asdfgh');
-          
+
           // Wait a moment for the UI to update, then trigger login
           setTimeout(() => {
             login('josephcrawford99@gmail.com', 'asdfgh');
@@ -53,7 +53,7 @@ const AuthScreen: React.FC = () => {
         console.error('Error checking dev login flag:', error);
       }
     };
-    
+
     checkDevLogin();
   }, [login]);
 

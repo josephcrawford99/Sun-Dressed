@@ -138,9 +138,17 @@ const HomeScreen: React.FC = () => {
   const renderTodayButton = (): JSX.Element => {
     if (isLoading) {
       return (
-        <Button style={styles.todayButton}>
+        <Button
+          type="primary"
+          onPress={() => {}}
+          style={styles.todayButton}
+        >
           <View style={styles.todayButtonContent}>
-            <Ionicons name="sunny-outline" size={20} color="#FFF" style={styles.weatherIconWhite} />
+            <WeatherIcon
+              weatherCode="01d"
+              size={20}
+              color="#FFF"
+            />
             <Text style={styles.todayTempWhite}>--°</Text>
           </View>
         </Button>
@@ -150,14 +158,18 @@ const HomeScreen: React.FC = () => {
     const temperature = weatherData ? convertTemperature(weatherData.temperature, temperatureUnit) : '--';
 
     return (
-      <Button style={styles.todayButton} onPress={flipCard}>
+      <Button
+        type="primary"
+        onPress={flipCard}
+        style={styles.todayButton}
+      >
         <View style={styles.todayButtonContent}>
           <WeatherIcon
             weatherCode={weatherData?.icon as WeatherCode || '01d'}
             size={20}
             color="#FFF"
           />
-          <Text style={styles.todayTempWhite}>{temperature}°</Text>
+          <Text style={styles.todayTempWhite}>{temperature}°{temperatureUnit}</Text>
         </View>
       </Button>
     );
@@ -319,13 +331,15 @@ const styles = StyleSheet.create({
   todayButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '100%',
+    height: '100%',
     paddingHorizontal: 6,
   },
   weatherIconWhite: {
     width: 20,
     height: 20,
+    color: '#FFF',
   },
   datesRow: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 12 },
   dateCell: { alignItems: 'center', justifyContent: 'center', width: 44, height: 51, backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#F5F5F5', marginHorizontal: 2 },
@@ -462,7 +476,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '400',
     fontFamily: 'LibreBaskerville_400Regular',
-    marginLeft: 'auto',
+    marginLeft: 8,
+    textAlignVertical: 'center',
   },
 });
 

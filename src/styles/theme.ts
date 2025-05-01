@@ -31,9 +31,16 @@ interface ColorPalette {
 }
 
 // Button styles for consistent UI
-export const buttonStyles = {
+interface ButtonStyle {
+  backgroundColor: string;
+  textColor: string;
+  borderColor?: string;
+  borderWidth?: number;
+}
+
+export const buttonStyles: Record<string, ButtonStyle> = {
   primary: {
-    backgroundColor: colors.black, // Changed from colors.primary to colors.black
+    backgroundColor: colors.black,
     textColor: colors.white,
   },
   secondary: {
@@ -43,7 +50,7 @@ export const buttonStyles = {
     borderWidth: 1,
   },
   tertiary: {
-    backgroundColor: colors.yellow, // Use sparingly for small elements only
+    backgroundColor: colors.yellow,
     textColor: colors.white,
   },
   danger: {
