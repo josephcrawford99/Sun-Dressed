@@ -8,6 +8,7 @@ export interface WeatherData {
   wind_speed: number;
   description: string;
   icon: string;
+  time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night';
   sunset?: number; // Unix timestamp
 }
 
@@ -18,7 +19,7 @@ export interface DailyForecast {
   date: string;
 }
 
-class WeatherError extends Error {
+export class WeatherError extends Error {
   constructor(message: string, public code?: string) {
     super(message);
     this.name = 'WeatherError';
@@ -85,19 +86,49 @@ export const getForecast = async (
     });
 
     // Process the forecast data
-    // This is a simplified example - actual implementation would be more complex
-    const forecastData: DailyForecast[] = [];
+    const forecastList = response.data.list;
+    const forecastByDay: Record<string, any[]> = {};
 
-    // Process the data and return formatted forecasts
-    // ...
+    // Group forecast data by day
+    forecastList.forEach((item: any) => {
+      const date = new Date(item.dt * 1000);
+      const dateStr = date.toISOString().split('T')[0];
 
-    return forecastData;
+      if (!forecastByDay[dateStr]) {
+        forecastByDay[dateStr] = [];
+      }
+
+      forecastByDay[dateStr].push(item);
+    });
+
+    // Create DailyForecast objects for each day
+    const dailyForecasts: DailyForecast[] = Object.keys(forecastByDay).map(date => {
+      const dayData = forecastByDay[date];
+
+      // Find forecast items closest to morning, afternoon, evening times
+      const morning = findClosestForecast(dayData, TIME_RANGES.MORNING.start + 2); // 7 AM
+      const afternoon = findClosestForecast(dayData, TIME_RANGES.AFTERNOON.start + 2); // 2 PM
+      const evening = findClosestForecast(dayData, TIME_RANGES.EVENING.start + 2); // 7 PM
+
+      return {
+        date,
+        morning: formatForecast(morning),
+        afternoon: formatForecast(afternoon),
+        evening: formatForecast(evening)
+      };
+    });
+
+    return dailyForecasts.slice(0, 5); // Return 5-day forecast
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
         throw new WeatherError('Invalid API key. Please check your configuration.', 'INVALID_API_KEY');
       } else if (error.response?.status === 404) {
         throw new WeatherError(`Location "${location}" not found. Please check the city name.`, 'LOCATION_NOT_FOUND');
+      } else if (error.response?.status === 429) {
+        throw new WeatherError('API rate limit exceeded. Please try again later.', 'RATE_LIMIT');
+      } else if (!error.response) {
+        throw new WeatherError('Network error. Please check your connection.', 'NETWORK_ERROR');
       }
     }
     throw new WeatherError('Failed to fetch forecast data. Please try again.', 'UNKNOWN_ERROR');
@@ -105,17 +136,60 @@ export const getForecast = async (
 };
 
 /**
+ * Helper function to find the forecast closest to a specific hour
+ */
+const findClosestForecast = (forecasts: any[], targetHour: number): any => {
+  return forecasts.reduce((closest, current) => {
+    const currentHour = new Date(current.dt * 1000).getHours();
+    const closestHour = closest ? new Date(closest.dt * 1000).getHours() : -1;
+
+    const currentDiff = Math.abs(currentHour - targetHour);
+    const closestDiff = closest ? Math.abs(closestHour - targetHour) : Infinity;
+
+    return currentDiff < closestDiff ? current : closest;
+  }, null);
+};
+
+/**
+ * Format forecast data into WeatherData
+ */
+const formatForecast = (forecastItem: any): WeatherData => {
+  if (!forecastItem) {
+    // Provide a default object if no forecast is available for the time
+    return {
+      temperature: 0,
+      feels_like: 0,
+      humidity: 0,
+      wind_speed: 0,
+      description: 'No data',
+      icon: '01d'
+    };
+  }
+
+  return {
+    temperature: Math.round(forecastItem.main.temp),
+    feels_like: Math.round(forecastItem.main.feels_like),
+    humidity: forecastItem.main.humidity,
+    description: forecastItem.weather[0].description,
+    icon: forecastItem.weather[0].icon,
+    wind_speed: forecastItem.wind.speed
+  };
+};
+
+/**
  * Determine the time of day based on current hour
  */
-const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' => {
+const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
   const hour = new Date().getHours();
 
   if (hour >= TIME_RANGES.MORNING.start && hour <= TIME_RANGES.MORNING.end) {
     return 'morning';
   } else if (hour >= TIME_RANGES.AFTERNOON.start && hour <= TIME_RANGES.AFTERNOON.end) {
     return 'afternoon';
-  } else {
+  } else if (hour >= TIME_RANGES.EVENING.start && hour <= TIME_RANGES.EVENING.end) {
     return 'evening';
+  } else {
+    return 'night';
   }
 };
 

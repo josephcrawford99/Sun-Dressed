@@ -32,6 +32,7 @@ import Button from '../components/Button';
 import TabBar from '../components/TabBar';
 import { getTimeOfDay, getGreeting, TimeOfDay } from '../services/timeService';
 import { LocationInput } from '../components/LocationInput';
+import DevClearDataHeader from '../components/DevClearDataHeader';
 
 const mockOutfit = {
   top: require('../assets/mock/top.png'),
@@ -238,6 +239,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <DevClearDataHeader isAuthScreen={false} />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.greetingRow}>
           <View>

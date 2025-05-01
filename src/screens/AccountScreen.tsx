@@ -9,6 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import TabBar from '../components/TabBar';
 import { Ionicons } from '@expo/vector-icons';
+import DevClearDataHeader from '../components/DevClearDataHeader';
 
 const AccountScreen: React.FC = () => {
   const { user, logout, isLoading, updateUserName } = useAuth();
@@ -42,6 +43,7 @@ const AccountScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <DevClearDataHeader isAuthScreen={false} navigation={navigation} />
       <View style={styles.mainContent}>
         <Text style={typography.heading}>Account</Text>
         <View style={styles.settingsContainer}>

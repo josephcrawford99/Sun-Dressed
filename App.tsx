@@ -50,6 +50,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
 
 function Main() {
   const { user, isLoading } = useAuth();
+  
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -57,10 +58,10 @@ function Main() {
       </View>
     );
   }
-  if (!user) {
-    return <AuthScreen />;
-  }
-  return <AppNavigator />;
+  
+  // Both authenticated and unauthenticated states use AppNavigator
+  // This ensures everything is inside NavigationContainer
+  return <AppNavigator initialRoute={user ? 'Home' : 'Auth'} />;
 }
 
 export default function App() {
@@ -85,7 +86,6 @@ export default function App() {
         <AuthProvider>
           <SettingsProvider>
             <SafeAreaProvider>
-              <DevClearDataHeader />
               <Main />
               <StatusBar style="auto" />
             </SafeAreaProvider>

@@ -1,5 +1,19 @@
 export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy' | 'snowy' | 'night';
 
+// Common colors (used across all themes)
+export const colors = {
+  primary: '#4285F4',
+  secondary: '#FFFFFF',
+  black: '#000000',
+  white: '#FFFFFF',
+  yellow: '#FFCC00', // Use sparingly for small elements only
+  lightGray: '#E0E0E0',
+  error: '#FF3B30',
+  success: '#4CAF50',
+  warning: '#FF9500',
+  info: '#0A84FF',
+};
+
 interface ColorPalette {
   primary: string;
   secondary: string;
@@ -10,7 +24,55 @@ interface ColorPalette {
   textSecondary: string;
   statusBar: 'light' | 'dark';
   gradient: string[];
+  error: string;
+  success: string;
+  warning: string;
+  info: string;
 }
+
+// Button styles for consistent UI
+export const buttonStyles = {
+  primary: {
+    backgroundColor: colors.black, // Changed from colors.primary to colors.black
+    textColor: colors.white,
+  },
+  secondary: {
+    backgroundColor: colors.white,
+    textColor: colors.black,
+    borderColor: colors.lightGray,
+    borderWidth: 1,
+  },
+  tertiary: {
+    backgroundColor: colors.yellow, // Use sparingly for small elements only
+    textColor: colors.white,
+  },
+  danger: {
+    backgroundColor: colors.error,
+    textColor: colors.white,
+  },
+  success: {
+    backgroundColor: colors.success,
+    textColor: colors.white,
+  },
+};
+
+// Input styles for text fields
+export const inputStyles = {
+  standard: {
+    backgroundColor: colors.white,
+    textColor: colors.black,
+    borderColor: colors.lightGray,
+    placeholderColor: '#AAAAAA',
+    errorColor: colors.error,
+  },
+  inverted: {
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    textColor: colors.black,
+    borderColor: 'transparent',
+    placeholderColor: '#888888',
+    errorColor: colors.error,
+  },
+};
 
 // Weather-specific color palettes
 const weatherPalettes: Record<WeatherCondition, ColorPalette> = {
@@ -23,7 +85,11 @@ const weatherPalettes: Record<WeatherCondition, ColorPalette> = {
     text: '#3A3A3A',
     textSecondary: '#666666',
     statusBar: 'dark',
-    gradient: ['#FFDE82', '#FF9B71']
+    gradient: ['#FFDE82', '#FF9B71'],
+    error: colors.error,
+    success: colors.success,
+    warning: colors.warning,
+    info: colors.info,
   },
   cloudy: {
     primary: '#D1D5DB',
@@ -34,7 +100,11 @@ const weatherPalettes: Record<WeatherCondition, ColorPalette> = {
     text: '#37474F',
     textSecondary: '#607D8B',
     statusBar: 'dark',
-    gradient: ['#D1D5DB', '#C0C5CE']
+    gradient: ['#D1D5DB', '#C0C5CE'],
+    error: colors.error,
+    success: colors.success,
+    warning: colors.warning,
+    info: colors.info,
   },
   rainy: {
     primary: '#64B6AC',
@@ -45,7 +115,11 @@ const weatherPalettes: Record<WeatherCondition, ColorPalette> = {
     text: '#263238',
     textSecondary: '#455A64',
     statusBar: 'dark',
-    gradient: ['#64B6AC', '#5591A9']
+    gradient: ['#64B6AC', '#5591A9'],
+    error: colors.error,
+    success: colors.success,
+    warning: colors.warning,
+    info: colors.info,
   },
   snowy: {
     primary: '#E1E5F2',
@@ -56,7 +130,11 @@ const weatherPalettes: Record<WeatherCondition, ColorPalette> = {
     text: '#2C3E50',
     textSecondary: '#5D6D7E',
     statusBar: 'dark',
-    gradient: ['#FFFFFF', '#E1E5F2']
+    gradient: ['#FFFFFF', '#E1E5F2'],
+    error: colors.error,
+    success: colors.success,
+    warning: colors.warning,
+    info: colors.info,
   },
   night: {
     primary: '#0D1B2A',
@@ -67,7 +145,11 @@ const weatherPalettes: Record<WeatherCondition, ColorPalette> = {
     text: '#E1E5F2',
     textSecondary: '#B0BEC5',
     statusBar: 'light',
-    gradient: ['#0D1B2A', '#48466D']
+    gradient: ['#0D1B2A', '#48466D'],
+    error: colors.error,
+    success: colors.success,
+    warning: colors.warning,
+    info: colors.info,
   }
 };
 
@@ -153,7 +235,9 @@ export const createTheme = (condition: WeatherCondition = 'sunny') => {
     typography,
     spacing,
     effects,
-    animation
+    animation,
+    buttonStyles,
+    inputStyles,
   };
 };
 
@@ -180,3 +264,7 @@ export const getWeatherCondition = (
 
   return 'sunny';
 };
+
+// Export a default theme
+export type Theme = ReturnType<typeof createTheme>;
+export const defaultTheme = createTheme('sunny');

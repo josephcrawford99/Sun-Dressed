@@ -1,42 +1,114 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { typography } from '../styles/typography';
-import { createTheme } from '../styles/theme';
+import { 
+  TouchableOpacity, 
+  Text, 
+  StyleSheet, 
+  ViewStyle, 
+  TextStyle, 
+  ActivityIndicator,
+  TouchableOpacityProps 
+} from 'react-native';
+import { buttonStyles, colors, defaultTheme } from '../styles/theme';
 
-const theme = createTheme();
+type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'success';
 
-interface ButtonProps {
-  children: React.ReactNode;
+interface ButtonProps extends TouchableOpacityProps {
+  title: string;
   onPress: () => void;
+  type?: ButtonType;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
   disabled?: boolean;
-  style?: StyleProp<ViewStyle>;
+  loading?: boolean;
+  small?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, onPress, disabled, style }) => {
+/**
+ * A standardized button component following the app's design system.
+ * Uses the theme's buttonStyles for consistent styling.
+ */
+const Button: React.FC<ButtonProps> = ({
+  title,
+  onPress,
+  type = 'primary',
+  style,
+  textStyle,
+  disabled = false,
+  loading = false,
+  small = false,
+  ...rest
+}) => {
+  // Use the appropriate button style for the type
+  const buttonStyle = buttonStyles[type] || buttonStyles.primary;
+  
+  // Get the size-specific styles
+  const sizeStyles = small ? styles.smallButton : styles.button;
+  const textSizeStyles = small ? styles.smallText : styles.text;
+  
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.buttonDisabled, style]}
+      style={[
+        sizeStyles,
+        { backgroundColor: buttonStyle.backgroundColor },
+        buttonStyle.borderColor && { 
+          borderColor: buttonStyle.borderColor,
+          borderWidth: buttonStyle.borderWidth || 1 
+        },
+        disabled && styles.disabled,
+        style,
+      ]}
       onPress={onPress}
-      disabled={disabled}
-      activeOpacity={0.8}
+      disabled={disabled || loading}
+      activeOpacity={0.7}
+      {...rest}
     >
-      <Text style={typography.button}>{children}</Text>
+      {loading ? (
+        <ActivityIndicator 
+          size={small ? 'small' : 'small'} 
+          color={buttonStyle.textColor} 
+        />
+      ) : (
+        <Text
+          style={[
+            textSizeStyles,
+            { color: buttonStyle.textColor },
+            textStyle,
+          ]}
+        >
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    height: 48,
+    padding: 12,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 8,
+    minWidth: 120,
+    ...defaultTheme.effects.shadow.light,
   },
-  buttonDisabled: {
-    backgroundColor: theme.colors.textSecondary,
-    opacity: 0.5,
+  smallButton: {
+    padding: 8,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+    ...defaultTheme.effects.shadow.light,
+  },
+  text: {
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  smallText: {
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  disabled: {
+    opacity: 0.6,
   },
 });
 

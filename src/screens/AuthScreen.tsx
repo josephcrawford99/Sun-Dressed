@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,11 @@ import { typography } from '../styles/typography';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import Divider from '../components/Divider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DevClearDataHeader from '../components/DevClearDataHeader';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 const AuthScreen: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -24,6 +29,33 @@ const AuthScreen: React.FC = () => {
   const { login, signup, isLoading, error } = useAuth();
   const [localError, setLocalError] = useState<string | null>(null);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+  // Check for dev auto-login flag
+  useEffect(() => {
+    const checkDevLogin = async () => {
+      try {
+        const devAutoLogin = await AsyncStorage.getItem('@dev_auto_login');
+        if (devAutoLogin === 'true') {
+          // Clear the flag immediately
+          await AsyncStorage.removeItem('@dev_auto_login');
+          
+          // Set the email and password for dev login
+          setEmail('josephcrawford99@gmail.com');
+          setPassword('asdfgh');
+          
+          // Wait a moment for the UI to update, then trigger login
+          setTimeout(() => {
+            login('josephcrawford99@gmail.com', 'asdfgh');
+          }, 500);
+        }
+      } catch (error) {
+        console.error('Error checking dev login flag:', error);
+      }
+    };
+    
+    checkDevLogin();
+  }, [login]);
 
   const handleMockAuth = async (provider: 'apple' | 'google') => {
     Alert.alert('Success', 'Signed in as Amanda (mock)');
@@ -48,6 +80,7 @@ const AuthScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <DevClearDataHeader isAuthScreen={true} />
       <KeyboardAvoidingView
         style={styles.flex1}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -97,7 +130,7 @@ const AuthScreen: React.FC = () => {
             <Text style={styles.errorText}>{localError || error}</Text>
           )}
           <Button onPress={handleSubmit} disabled={isLoading}>
-            {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={typography.button}>{mode === 'login' ? 'Log In' : 'Sign Up'}</Text>}
+            {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={[typography.button, { color: '#fff' }]}>{mode === 'login' ? 'Log In' : 'Sign Up'}</Text>}
           </Button>
           <Button
             onPress={() => {

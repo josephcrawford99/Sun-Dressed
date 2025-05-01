@@ -1,12 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { typography } from '../styles/typography';
+import { navigate, isNavigationReady, getCurrentRouteName } from '../navigation/navigationRef';
 
 const DEV_MODE = true; // Set to false before deployment
 
-const DevClearDataHeader: React.FC = () => {
+interface DevClearDataHeaderProps {
+  isAuthScreen?: boolean;
+}
+
+/**
+ * Development header with utilities for debugging and testing the app
+ * Shows different buttons based on whether we're on the auth screen or not
+ * Uses navigationRef for navigation instead of props or hooks
+ */
+const DevClearDataHeader: React.FC<DevClearDataHeaderProps> = ({ 
+  isAuthScreen = false 
+}) => {
+  const [navigationAvailable, setNavigationAvailable] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState<string | null>(null);
+  
+  // Check navigation status periodically
+  useEffect(() => {
+    // Initial check
+    checkNavigationStatus();
+    
+    // Set up periodic checking
+    const intervalId = setInterval(checkNavigationStatus, 1000);
+    
+    // Clean up on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // Function to check navigation status
+  const checkNavigationStatus = () => {
+    const navReady = isNavigationReady();
+    setNavigationAvailable(navReady);
+    
+    if (navReady) {
+      setCurrentRoute(getCurrentRouteName());
+    }
+  };
+
   if (!DEV_MODE) return null;
+
+  // Use the current route to determine if we're on the auth screen
+  // This overrides the prop if navigation is available
+  const isActuallyAuthScreen = navigationAvailable ? 
+    (currentRoute === 'Auth' || currentRoute === null) : 
+    isAuthScreen;
 
   const handleClear = async () => {
     try {
@@ -43,17 +85,61 @@ const DevClearDataHeader: React.FC = () => {
       Alert.alert('Error', 'Failed to read AsyncStorage');
     }
   };
+  
+  const handleDevLogin = () => {
+    // Set a flag to auto-login with dev credentials
+    AsyncStorage.setItem('@dev_auto_login', 'true')
+      .then(() => {
+        Alert.alert('Dev Login', 'Will auto-login as josephcrawford99@gmail.com');
+      })
+      .catch(err => {
+        console.error('Failed to set dev login flag:', err);
+      });
+  };
+  
+  const handleDevLogout = () => {
+    // Check if navigation is ready before trying to navigate
+    if (navigationAvailable) {
+      // Navigate to Account screen where we can trigger the logout
+      const success = navigate('Account');
+      
+      if (!success) {
+        Alert.alert('Dev Mode', 'Navigation failed. Try again in a moment.');
+      }
+    } else {
+      // Fallback for when navigation is not available
+      Alert.alert('Dev Mode', 'Navigation to Account screen not available yet. Please try again in a moment.');
+    }
+  };
 
   return (
     <View style={styles.header}>
-      <Text style={styles.headerText}>DEV MODE</Text>
+      <Text style={styles.headerText}>
+        DEV MODE {currentRoute ? `(${currentRoute})` : ''}
+      </Text>
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.button} onPress={handleViewData}>
-          <Text style={styles.buttonText}>View All Data</Text>
+          <Text style={styles.buttonText}>View Data</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleClear}>
-          <Text style={styles.buttonText}>Clear All Data</Text>
+          <Text style={styles.buttonText}>Clear Data</Text>
         </TouchableOpacity>
+        
+        {isActuallyAuthScreen ? (
+          <TouchableOpacity 
+            style={[styles.button, styles.loginButton]} 
+            onPress={handleDevLogin}
+          >
+            <Text style={styles.buttonText}>Dev Login</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity 
+            style={[styles.button, styles.logoutButton]} 
+            onPress={handleDevLogout}
+          >
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -91,6 +177,12 @@ const styles = StyleSheet.create({
     color: '#222',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  loginButton: {
+    backgroundColor: '#4CAF50', // Green color for login
+  },
+  logoutButton: {
+    backgroundColor: '#F44336', // Red color for logout
   },
 });
 
