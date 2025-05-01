@@ -1,186 +1,92 @@
-# Climate Closet
+# Sun Dressed
 
-A mobile application that suggests what to wear based on the weather forecast.
+A mobile application that suggests what to wear based on weather conditions.
 
 ## Overview
 
-Climate Closet is designed to help users decide what to wear based on current and forecasted weather conditions. The app provides clothing recommendations for different times of the day (morning, afternoon, and evening) to ensure you're prepared for changing weather conditions.
-
-## How to Run the Mock App Demo
-
-This guide will help you run the interactive mockup of the Climate Closet app on your computer.
-
-### Prerequisites (One-time setup)
-
-1. **Install Node.js**:
-   - Download and install Node.js from [https://nodejs.org/](https://nodejs.org/) (Download the "LTS" version)
-   - This includes npm (Node Package Manager), which we'll use to install dependencies and run the app
-
-2. **Verify Installation**:
-   - After installation, open Command Prompt (Windows) or Terminal (Mac/Linux)
-   - Type these commands to verify installation:
-     ```
-     node --version
-     npm --version
-     ```
-   - Both should display version numbers if installed correctly
-
-### Running the Mock App Demo
-
-1. **Download the Project**:
-   - If you received the project as a ZIP file: Extract it to a folder on your computer
-   - If using GitHub: Clone the repository to your local machine
-
-2. **Open Command Prompt or Terminal**:
-   - Navigate to the project folder:
-     ```
-     cd path/to/climate-closet
-     ```
-   - Replace "path/to/climate-closet" with the actual path to the folder
-
-3. **Install Dependencies**:
-   - Run this command to install all required packages:
-     ```
-     npm install --legacy-peer-deps
-     ```
-   - This may take a few minutes to complete
-
-4. **Start the Web Demo**:
-   - Run this command to start the mockup in web mode:
-     ```
-     npm run web
-     ```
-   - The app will automatically open in your default web browser
-   - If it doesn't open automatically, try visiting: http://localhost:19006
-
-5. **Interact with the Mock App**:
-   - Use the weather icons at the top to switch between different weather conditions
-   - Observe how the UI adapts with different themes and clothing suggestions
-   - Navigate to different screens using the buttons/menu items
-
-6. **Stopping the App**:
-   - To stop the app, return to the Command Prompt/Terminal window
-   - Press Ctrl+C, then confirm with Y if prompted
-
-### Troubleshooting
-
-1. **"npm not recognized" error**:
-   - Make sure Node.js is installed correctly
-   - Try restarting your computer and opening a new Command Prompt/Terminal
-
-2. **Errors during installation**:
-   - Try running the install command with administrator privileges
-   - On Windows: Right-click Command Prompt and select "Run as administrator"
-   - On Mac/Linux: Use `sudo npm install --legacy-peer-deps`
-
-3. **Browser shows blank page**:
-   - Try manually navigating to http://localhost:19006
-   - Check if there are any error messages in the Command Prompt/Terminal
-
-4. **App won't start**:
-   - Try running: `npx expo-cli start --web` instead
-
-If you encounter any issues not covered here, please contact the development team for assistance.
+Sun Dressed is designed to help users decide what to wear based on current and forecasted weather conditions. The app provides clothing recommendations tailored to the weather, making it easier to prepare for your day.
 
 ## Features
 
-- **Weather Information**: View current weather conditions and forecasts
-- **Clothing Suggestions**: Receive personalized clothing recommendations based on weather conditions
-- **Location Settings**: Set and save your location for accurate weather data
-- **User Preferences**: Customize your experience with preference settings
-- **Weather-Responsive UI**: Interface adapts to current weather conditions
+- **Real-time Weather Data**: Current weather conditions from OpenWeatherMap API
+- **Clothing Recommendations**: Suggested outfits based on weather conditions
+- **Location Management**: Set and save your preferred locations
+- **User Authentication**: Secure account system with Supabase
+- **Responsive Design**: UI adapts to different weather conditions
+- **Offline Support**: Caching for when you're not connected
 
-## Mock Mode (Development)
+## How to Run the App
 
-The current version includes a special mock mode for testing and development:
+### Prerequisites
 
-- Simulated weather conditions (sunny, rainy, cloudy, snowy, night)
-- Test weather selector to switch between different conditions
-- Mock clothing suggestions based on weather data
-- Adaptive UI that changes based on weather conditions
+1. **Install Node.js and npm**:
+   - Download and install Node.js from [https://nodejs.org/](https://nodejs.org/) (LTS version recommended)
+   - This includes npm (Node Package Manager)
 
-## Testing With Mock Data
-
-To test the app with mock data:
-
-### Testing on Web (Recommended for Development)
-
-1. **Launch the App in Web Mode**:
+2. **Verify Installation**:
    ```
-   npm run web
+   node --version
+   npm --version
    ```
 
-2. **Testing the Mock Weather UI**:
-   - The app will open in your default browser at localhost:19006
-   - Use the weather icons at the top to test different weather conditions
-   - Observe theme changes and clothing suggestions
+### Setup and Installation
 
-### Testing on Android
-
-1. **Setup Android Studio**:
-   - Install Android Studio
-   - Configure an Android Virtual Device (AVD) with API level 29+
-   - Start the emulator
-
-2. **Launch the App**:
+1. **Clone the Repository**:
    ```
-   npm run android
+   git clone <repository-url>
+   cd sun-dressed
    ```
 
-3. **Testing the Mock Weather UI**:
-   - On the home screen, use the weather icons at the top to switch between weather conditions
-   - The UI will automatically update with:
-     - New color scheme based on weather
-     - Weather information display
-     - Appropriate clothing suggestions
-
-### Testing on iOS (macOS only)
-
-1. **Setup Xcode**:
-   - Install Xcode from the Mac App Store
-   - Open Xcode and set up a simulator (iPhone 11 or later recommended)
-
-2. **Launch the App**:
+2. **Install Dependencies**:
    ```
-   npm run ios
+   npm install --legacy-peer-deps
+   ```
+   The `--legacy-peer-deps` flag is required to resolve dependency conflicts.
+
+3. **Create Environment Variables** (if needed):
+   - Create a `.env` file in the root directory
+   - Add your API keys and configuration (refer to .env.example if available)
+
+### Running the App
+
+#### Development Mode
+
+1. **Start the Development Server**:
+   ```
+   npm start
+   ```
+   This will start the Expo development server.
+
+2. **Run on Different Platforms**:
+   - Web: `npm run web`
+   - Android: `npm run android`
+   - iOS: `npm run ios`
+
+#### Using Expo Go App
+
+1. Install the Expo Go app on your mobile device
+2. Run `npm start` to start the development server
+3. Scan the QR code with your device (Android) or the Camera app (iOS)
+
+### Building for Production
+
+1. **Web**:
+   ```
+   npm run build:web
    ```
 
-3. **Testing the Mock Weather UI**:
-   - Follow the same steps as Android testing
+2. **Native Apps**:
+   ```
+   expo build:android
+   expo build:ios
+   ```
+   Note: iOS builds require an Apple Developer account.
 
-### Test Scenarios
+## Development Guide
 
-1. **Weather Toggle Test**:
-   - Tap the sun icon to view the sunny weather theme with light clothing suggestions
-   - Tap the rain icon to see waterproof clothing and accessories
-   - Tap the cloud icon to check cloudy weather recommendations
-   - Tap the snow icon to view winter clothing suggestions
-   - Tap the moon icon to see the night theme
+### Project Structure
 
-2. **Settings Test**:
-   - Navigate to Settings screen by tapping the gear icon
-   - Enter a location (e.g., "New York") and save
-   - Toggle temperature unit between Celsius and Fahrenheit
-   - Enable notifications and save settings
-   - Return to home screen to verify changes were applied
-
-3. **UI Adaptation Test**:
-   - Observe how the UI adapts to each weather condition
-   - Verify color schemes change appropriately
-   - Confirm clothing suggestions match the weather conditions
-
-## Technology Stack
-
-- React Native / Expo
-- TypeScript
-- React Navigation
-- OpenWeatherMap API (will be integrated in next phase)
-- AsyncStorage for local data persistence
-- Jest and React Testing Library for testing
-
-## Project Structure
-
-The application follows a modular architecture with the following structure:
+The application follows a modular architecture:
 
 - **src/components/**: UI components following atomic design principles
 - **src/screens/**: Main application screens
@@ -191,40 +97,37 @@ The application follows a modular architecture with the following structure:
 - **src/__tests__/**: Test suites for components
 - **src/__mocks__/**: Mock data for testing
 
-## Getting Started (For Developers)
+See `STRUCTURE.md` for more detailed information about the project structure.
 
-### Prerequisites
+### Key Development Guidelines
 
-- Node.js and npm/yarn
-- Expo CLI
-- Android Studio or Xcode (for emulators)
+1. **Follow the MVP First Approach**:
+   - Complete all core features before moving to advanced features
+   - Reference `specifications.md` for feature tracking
+   - Mark tasks as completed with [x] in specifications.md
 
-### Installation
+2. **Component Development**:
+   - Use functional components with hooks
+   - Follow atomic design pattern
+   - Keep components under 150 lines
+   - Provide TypeScript interfaces for all props
 
-1. Clone the repository
-2. Install dependencies:
-   ```
-   npm install --legacy-peer-deps
-   ```
-   The `--legacy-peer-deps` flag is needed to resolve dependency conflicts with React versions.
+3. **Styling**:
+   - Use React Native StyleSheet for styling
+   - Define theme constants in a central location
+   - Support both light and dark modes
 
-3. Start the application:
-   ```
-   npm start
-   ```
-   or for web:
-   ```
-   npm run web
-   ```
+4. **Testing**:
+   - Add tests before marking features complete
+   - Run tests with: `npm test`
 
-4. Run on Android or iOS:
-   ```
-   npm run android
-   ```
-   or
-   ```
-   npm run ios
-   ```
+### Git Workflow
+
+- Main branch: stable releases only
+- Develop branch: integration branch
+- Feature branches: named feature/[feature-name]
+- Test branches: named test/[feature-name]
+- Commit message format: "[Feature/Fix/Refactor]: Brief description"
 
 ## Testing
 
@@ -234,32 +137,54 @@ Run tests with:
 npm test
 ```
 
+### Test Scenarios
+
+1. **Weather Integration**:
+   - Test with different locations
+   - Verify weather data display
+   - Check error handling and fallbacks
+
+2. **Clothing Recommendations**:
+   - Verify recommendations match weather conditions
+   - Test different temperature ranges
+   - Check for appropriate seasonal suggestions
+
+3. **Authentication Flow**:
+   - User registration
+   - Login
+   - Session persistence
+
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Missing module errors**:
-   - Run `npm install --legacy-peer-deps` to install dependencies with compatibility mode
+1. **Dependency Errors**:
+   - Run `npm install --legacy-peer-deps`
+   - Check node_modules is in .gitignore
 
-2. **React Native Web Issues**:
-   - If web mode doesn't work, run `npm install react-native-web react-dom @expo/webpack-config@^18.0.1 --legacy-peer-deps`
+2. **API Issues**:
+   - Verify your API keys are correct
+   - Check rate limits on OpenWeatherMap API
+   - Use mock data for development if needed
 
-3. **Expo CLI Not Found**:
-   - We're using `npx` in the package.json scripts, which doesn't require global installation
+3. **Expo/React Native Issues**:
+   - Clear cache: `expo r -c`
+   - Update Expo CLI: `npm install -g expo-cli`
+   - Check Expo status page for service disruptions
 
-4. **Type Errors**:
-   - Type errors in development mode won't prevent the app from running
-   - Install missing type definitions: `npm install --save-dev @types/react @types/react-native`
+4. **TypeScript Errors**:
+   - Run `npx tsc --noEmit` to find type issues
+   - Install missing type definitions: `npm install --save-dev @types/package-name`
 
-## Development Status
+## Contribution Guidelines
 
-This project is currently in MVP development with focus on implementing core features:
-- [x] Project setup and structure
-- [x] Weather-responsive UI with mock data
-- [~] User can specify their location
-- [~] User can see the weather forecast for the day
-- [~] User sees a list of clothing suggestions for each time of day
+1. Create a feature branch from develop
+2. Implement your changes with appropriate tests
+3. Submit a pull request with a clear description
+4. Ensure all tests pass
+5. Reference any related issues in your PR description
+
+## License
 
 © 2025 Joey Crawford. All Rights Reserved.
 This code is proprietary and confidential. Unauthorized copying, transfer, or use is strictly prohibited.
-

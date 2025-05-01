@@ -1,4 +1,28 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+// Web polyfill for AsyncStorage
+if (Platform.OS === 'web') {
+  // Simple localStorage fallback for web
+  class LocalStoragePolyfill {
+    getItem = async (key: string): Promise<string | null> => {
+      return localStorage.getItem(key);
+    };
+
+    setItem = async (key: string, value: string): Promise<void> => {
+      localStorage.setItem(key, value);
+    };
+
+    removeItem = async (key: string): Promise<void> => {
+      localStorage.removeItem(key);
+    };
+  }
+
+  // Override AsyncStorage with localStorage implementation if not available
+  if (!AsyncStorage) {
+    (global as any).AsyncStorage = new LocalStoragePolyfill();
+  }
+}
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -8,15 +32,19 @@ const STORAGE_KEYS = {
   FREQUENT_LOCATIONS: 'climate_closet_frequent_locations',
 };
 
+// Location constants
+const LOCATION_KEY = 'user_location';
+const FREQUENT_LOCATIONS_KEY = 'frequent_locations';
+
 /**
  * Save user's location
  */
 export const saveLocation = async (location: string): Promise<void> => {
   try {
-    await AsyncStorage.setItem(STORAGE_KEYS.LOCATION, location);
+    await AsyncStorage.setItem(LOCATION_KEY, location);
+    await addFrequentLocation(location);
   } catch (error) {
     console.error('Error saving location:', error);
-    throw new Error('Failed to save location');
   }
 };
 
@@ -25,7 +53,7 @@ export const saveLocation = async (location: string): Promise<void> => {
  */
 export const getLocation = async (): Promise<string | null> => {
   try {
-    return await AsyncStorage.getItem(STORAGE_KEYS.LOCATION);
+    return await AsyncStorage.getItem(LOCATION_KEY);
   } catch (error) {
     console.error('Error getting location:', error);
     return null;
@@ -87,16 +115,38 @@ export const getHomeAddress = async (): Promise<string | null> => {
   return AsyncStorage.getItem(STORAGE_KEYS.HOME_ADDRESS);
 };
 
-// Frequent locations
-export const getFrequentLocations = async (): Promise<string[]> => {
-  const json = await AsyncStorage.getItem(STORAGE_KEYS.FREQUENT_LOCATIONS);
-  return json ? JSON.parse(json) : [];
+// Functions to manage frequent locations
+export const addFrequentLocation = async (location: string): Promise<void> => {
+  try {
+    const existingLocations = await getFrequentLocations();
+
+    // Don't add duplicates
+    if (!existingLocations.includes(location)) {
+      const updatedLocations = [location, ...existingLocations].slice(0, 5); // Keep only 5 most recent
+      await AsyncStorage.setItem(FREQUENT_LOCATIONS_KEY, JSON.stringify(updatedLocations));
+    }
+  } catch (error) {
+    console.error('Error adding frequent location:', error);
+  }
 };
 
-export const addFrequentLocation = async (location: string): Promise<void> => {
-  const current = await getFrequentLocations();
-  if (!current.includes(location)) {
-    const updated = [location, ...current].slice(0, 10); // keep max 10
-    await AsyncStorage.setItem(STORAGE_KEYS.FREQUENT_LOCATIONS, JSON.stringify(updated));
+export const getFrequentLocations = async (): Promise<string[]> => {
+  try {
+    const data = await AsyncStorage.getItem(FREQUENT_LOCATIONS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error getting frequent locations:', error);
+    return [];
+  }
+};
+
+// Function to clear all user data (for development purposes)
+export const clearAllData = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem(LOCATION_KEY);
+    await AsyncStorage.removeItem(FREQUENT_LOCATIONS_KEY);
+    // Add any other keys that need to be cleared
+  } catch (error) {
+    console.error('Error clearing all data:', error);
   }
 };
