@@ -86,7 +86,7 @@ const AuthScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.logoRow}>
-          <Text style={typography.logo}>Sun Dresser</Text>
+          <Text style={typography.logo}>Sun Dressed</Text>
         </View>
         <View style={styles.formContainer}>
           <Button onPress={() => handleMockAuth('apple')} disabled={isLoading} style={styles.socialButton}>

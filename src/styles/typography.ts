@@ -14,7 +14,7 @@ export const typography: { [key: string]: TextStyle } = {
     fontStyle: 'italic',
     fontWeight: '500',
     fontSize: 60,
-    letterSpacing: -3,
+    letterSpacing: -3.5,
     textAlign: 'left',
     transform: [{ scaleY: 1.3 }],
     color: '#000',

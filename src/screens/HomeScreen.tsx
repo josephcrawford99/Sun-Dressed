@@ -33,6 +33,7 @@ import TabBar from '../components/TabBar';
 import { getTimeOfDay, getGreeting, TimeOfDay } from '../services/timeService';
 import { LocationInput } from '../components/LocationInput';
 import DevClearDataHeader from '../components/DevClearDataHeader';
+import WeekCalendarStrip from '../components/weather/WeekCalendarStrip';
 
 const mockOutfit = {
   top: require('../assets/mock/top.png'),
@@ -273,17 +274,13 @@ const HomeScreen: React.FC = () => {
           />
           {renderTodayButton()}
         </View>
-
-        <View style={styles.datesRow}>
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-            <View
-              key={day}
-              style={[styles.dateCell, i === 3 && styles.dateCellActive]}
-            >
-              <Text style={StyleSheet.flatten([typography.caption, i === 3 && styles.dateDayActive])}>{day}</Text>
-              <Text style={StyleSheet.flatten([typography.body, i === 3 && styles.dateNumActive])}>{7 + i}</Text>
-            </View>
-          ))}
+        <View style={styles.calendarContainer}>
+          <WeekCalendarStrip
+            onDayPress={(date) => {
+              // To be implemented later
+              console.log('Day pressed:', date);
+            }}
+          />
         </View>
 
         <View style={styles.flipContainer}>
@@ -300,6 +297,8 @@ const HomeScreen: React.FC = () => {
             {renderWeatherContent()}
           </Animated.View>
         </View>
+
+
       </ScrollView>
       <TabBar activeTab="home" />
     </SafeAreaView>
@@ -309,8 +308,12 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   flex1: { flex: 1 },
-  container: { padding: 0, backgroundColor: '#fff' },
-  greetingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, marginBottom: 8, paddingHorizontal: 20 },
+  container: { padding: 0, backgroundColor: '#fff', gap: 0 },
+  greetingRow: { flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginVertical: 16,},
   name: { marginTop: -4 },
   bellButton: { backgroundColor: '#fff', borderRadius: 20, padding: 8, elevation: 2 },
   locationRow: {
@@ -318,8 +321,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginHorizontal: 20,
-    marginBottom: 8,
-    zIndex: 20,
+    marginBottom: 16,
   },
   todayButton: {
     borderRadius: 12,
@@ -341,12 +343,7 @@ const styles = StyleSheet.create({
     height: 20,
     color: '#FFF',
   },
-  datesRow: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 12 },
-  dateCell: { alignItems: 'center', justifyContent: 'center', width: 44, height: 51, backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#F5F5F5', marginHorizontal: 2 },
-  dateCellActive: { backgroundColor: '#000', borderColor: '#000' },
-  dateDayActive: { color: '#fff' },
-  dateNumActive: { color: '#fff' },
-  outfitHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20, marginTop: 8 },
+  outfitHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20, marginTop: 4 },
   outfitHeader: {},
   outfitHeaderItalic: {},
   actionRow: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, marginTop: 12, marginBottom: 8 },
@@ -407,12 +404,15 @@ const styles = StyleSheet.create({
   },
   weatherContainer: {
     marginHorizontal: 20,
-    marginBottom: 16,
+    marginBottom: 0,
   },
   flipContainer: {
     marginHorizontal: 20,
-    marginVertical: 10,
+    marginTop: -4,
+    marginBottom: 4,
     perspective: 1000,
+    height: 300,
+    position: 'relative',
   },
   flipCard: {
     backfaceVisibility: 'hidden',
@@ -478,6 +478,10 @@ const styles = StyleSheet.create({
     fontFamily: 'LibreBaskerville_400Regular',
     marginLeft: 8,
     textAlignVertical: 'center',
+  },
+  calendarContainer: {
+    marginHorizontal: 20,
+    marginBottom: 0,
   },
 });
 

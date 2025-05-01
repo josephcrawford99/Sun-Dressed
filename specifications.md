@@ -1,5 +1,5 @@
-# Climate Closet
-The following is a spec sheet for an app named "Climate Closet" that I would like to build for iphone and android. The app suggests clothing based on the weather. A user will most often want to see what they should wear for the day, and will open the app to see what they should wear.
+# Sun Dressed
+The following is a spec sheet for an app named "Sun Dressed" that I would like to build for iphone and android. The app suggests clothing based on the weather. A user will most often want to see what they should wear for the day, and will open the app to see what they should wear.
 
 ## Core Infrastructure (Phase 1)
 - [~] Project setup and basic structure
