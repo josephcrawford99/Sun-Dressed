@@ -7,15 +7,14 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  TextInput,
-  Platform,
   Animated,
-  Easing
+  Easing,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../utils/AuthContext';
 import { typography, fonts } from '../styles/typography';
-import Dropdown from '../components/Dropdown';
 import { getFrequentLocations, addFrequentLocation, getLocation, saveLocation } from '../utils/storage';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
@@ -34,7 +33,26 @@ import { getTimeOfDay, getGreeting, TimeOfDay } from '../services/timeService';
 import { LocationInput } from '../components/LocationInput';
 import DevClearDataHeader from '../components/DevClearDataHeader';
 import WeekCalendarStrip from '../components/weather/WeekCalendarStrip';
+import {
+  ClothingDatabase,
+  OutfitRecommendation,
+  UserPreferences,
+  WeatherData as OutfitWeatherData,
+  recommendOutfit,
+  updatePreferencesFromFeedback
+} from '../services/outfitService';
+import clothingData from '../data/clothingData.json';
+import { getClothingImage } from '../utils/clothingImages';
 
+// Default user preferences
+const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  warmthAdjustment: 0,
+  formalityPreference: 'casual',
+  avoidedItems: [],
+  favoriteItems: []
+};
+
+// Mock images for fallback
 const mockOutfit = {
   top: require('../assets/mock/top.png'),
   outerwear: require('../assets/mock/outerwear.png'),
@@ -42,16 +60,6 @@ const mockOutfit = {
   shoes: require('../assets/mock/shoes.png'),
   accessory: require('../assets/mock/accessory.png'),
 };
-
-const mockWeather = {
-  temperature: '72°',
-  icon: require('../assets/mock/sunny.png'), // Replace with your actual weather icon asset
-};
-
-const MOCK_LOCATIONS = [
-  { name: 'New York, NY', country: 'US' },
-  { name: 'Washington, DC', country: 'US' },
-];
 
 const convertTemperature = (celsius: number, unit: 'C' | 'F'): number => {
   if (unit === 'F') {
@@ -77,6 +85,11 @@ const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
   const { temperatureUnit, windSpeedUnit } = useSettings();
   const [greeting, setGreeting] = useState<string>('HELLO');
+  
+  // New state for outfit recommendations
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>(DEFAULT_USER_PREFERENCES);
+  const [outfit, setOutfit] = useState<OutfitRecommendation | null>(null);
+  const [feedbackVisible, setFeedbackVisible] = useState<{[key: string]: boolean}>({});
 
   // Load saved location on mount
   useEffect(() => {
@@ -88,6 +101,84 @@ const HomeScreen: React.FC = () => {
     };
     loadSavedLocation();
   }, []);
+
+  // Load user preferences from storage
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      try {
+        const storedPreferences = await AsyncStorage.getItem('userPreferences');
+        if (storedPreferences) {
+          setUserPreferences(JSON.parse(storedPreferences));
+        }
+      } catch (e) {
+        console.error('Failed to load user preferences:', e);
+      }
+    };
+    
+    loadUserPreferences();
+  }, []);
+
+  // Save user preferences when they change
+  useEffect(() => {
+    const saveUserPreferences = async () => {
+      try {
+        await AsyncStorage.setItem('userPreferences', JSON.stringify(userPreferences));
+      } catch (e) {
+        console.error('Failed to save user preferences:', e);
+      }
+    };
+    
+    saveUserPreferences();
+  }, [userPreferences]);
+
+  // Map weatherData to format expected by outfitService
+  const mapWeatherToOutfitFormat = (weatherData: any): OutfitWeatherData => {
+    if (!weatherData) {
+      return {
+        temperature: 20, // Default to 20°C
+        precipitation: 0,
+        isRaining: false,
+        isSunny: true
+      };
+    }
+    
+    // Extract weather conditions from icon or description
+    const isRaining = weatherData.icon.includes('rain') || 
+                     (weatherData.description && weatherData.description.toLowerCase().includes('rain'));
+    
+    const isSunny = weatherData.icon.includes('01d') || weatherData.icon.includes('01n') ||
+                   (weatherData.description && weatherData.description.toLowerCase().includes('clear'));
+    
+    // Calculate precipitation probability from weather data
+    let precipitation = 0;
+    if (isRaining) {
+      precipitation = 1; // 100% if raining
+    } else if (weatherData.icon.includes('cloud') || weatherData.clouds > 50) {
+      precipitation = 0.3; // 30% if cloudy
+    } else if (weatherData.humidity > 70) {
+      precipitation = 0.2; // 20% if humid
+    }
+    
+    return {
+      temperature: weatherData.temperature,
+      precipitation,
+      isRaining,
+      isSunny
+    };
+  };
+
+  // Generate outfit recommendation when weather data changes
+  useEffect(() => {
+    if (weatherData) {
+      const mappedWeatherData = mapWeatherToOutfitFormat(weatherData);
+      const recommendedOutfit = recommendOutfit(
+        clothingData as unknown as ClothingDatabase,
+        mappedWeatherData,
+        userPreferences
+      );
+      setOutfit(recommendedOutfit);
+    }
+  }, [weatherData, userPreferences]);
 
   useEffect(() => {
     const updateGreeting = async () => {
@@ -134,6 +225,45 @@ const HomeScreen: React.FC = () => {
 
   const backAnimatedStyle = {
     transform: [{ rotateY: backInterpolate }],
+  };
+
+  // Handle user feedback for temperature
+  const handleTemperatureFeedback = (feedback: 'too_cold' | 'too_hot' | 'just_right') => {
+    const updatedPreferences = updatePreferencesFromFeedback(
+      feedback,
+      'outfit', // Using 'outfit' as a general ID for whole outfit feedback
+      userPreferences
+    );
+    setUserPreferences(updatedPreferences);
+    Alert.alert('Feedback Saved', 'Your temperature preference has been updated. Future recommendations will be adjusted.');
+  };
+
+  // Handle feedback for specific clothing items
+  const handleItemFeedback = (feedback: 'dislike' | 'just_right', itemId: string) => {
+    const updatedPreferences = updatePreferencesFromFeedback(
+      feedback,
+      itemId,
+      userPreferences
+    );
+    setUserPreferences(updatedPreferences);
+    
+    // Hide the feedback UI
+    setFeedbackVisible(prev => ({
+      ...prev,
+      [itemId]: false
+    }));
+    
+    Alert.alert('Item Preference Saved', feedback === 'just_right' ? 
+      'This item has been added to your favorites.' : 
+      'This item won\'t be recommended as often.');
+  };
+
+  // Toggle feedback visibility for an item
+  const toggleFeedback = (itemId: string) => {
+    setFeedbackVisible(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
   };
 
   const renderTodayButton = (): JSX.Element => {
@@ -217,33 +347,162 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
-  const renderOutfitContent = () => (
-    <View style={styles.outfitContent}>
-      <View style={styles.outfitHeaderRow}>
-        <Text style={StyleSheet.flatten([typography.subheading, styles.outfitHeader])}>
-          TODAY'S <Text style={StyleSheet.flatten([typography.heading, styles.outfitHeaderItalic])}>Outfit</Text>
-        </Text>
+  // Render an individual clothing item in the bento box
+  const renderClothingItem = (item: any, category: 'top' | 'bottom' | 'dress' | 'outerwear' | 'shoes' | 'accessory') => {
+    if (!item) return null;
+    
+    // Get the appropriate image for this item
+    const itemImage = getClothingImage(item.id, category);
+    
+    return (
+      <View style={styles.bentoCellOuter}>
+        <TouchableOpacity 
+          style={styles.bentoCell} 
+          onPress={() => toggleFeedback(item.id)}
+          activeOpacity={0.7}
+        >
+          <Image source={itemImage} style={styles.clothingImg} resizeMode="contain" />
+          <Text 
+            style={StyleSheet.flatten([typography.label, styles.bentoLabel])} 
+            ellipsizeMode="tail" 
+            numberOfLines={1}
+          >
+            {item.name}
+          </Text>
+          
+          {/* Feedback UI */}
+          {feedbackVisible[item.id] && (
+            <View style={styles.itemFeedback}>
+              <TouchableOpacity
+                style={styles.itemFeedbackButton}
+                onPress={() => handleItemFeedback('dislike', item.id)}
+              >
+                <Ionicons name="thumbs-down" size={20} color="#FF4757" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.itemFeedbackButton}
+                onPress={() => handleItemFeedback('just_right', item.id)}
+              >
+                <Ionicons name="thumbs-up" size={20} color="#2ED573" />
+              </TouchableOpacity>
+            </View>
+          )}
+          
+          {/* Favorite/Avoided indicators */}
+          {userPreferences.favoriteItems.includes(item.id) && (
+            <View style={styles.favoriteIndicator}>
+              <Ionicons name="heart" size={16} color="#FF6B81" />
+            </View>
+          )}
+          {userPreferences.avoidedItems.includes(item.id) && (
+            <View style={styles.avoidedIndicator}>
+              <Ionicons name="close-circle" size={16} color="#FF4757" />
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
-      <View style={styles.actionRow}>
-        <TouchableOpacity style={styles.actionButton}><Text style={typography.button}>EDIT</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}><Text style={typography.button}>SAVE</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}><Text style={typography.button}>SHARE</Text></TouchableOpacity>
-      </View>
-      <View style={styles.bentoBox}>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{ flex: 1, gap: 10 }}>
-            <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.top} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])} ellipsizeMode="tail" numberOfLines={1}>Top</Text></View></View>
-            <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.bottoms} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])} ellipsizeMode="tail" numberOfLines={1}>Bottoms</Text></View></View>
+    );
+  };
+
+  const renderOutfitContent = () => {
+    // Show loading state if outfit data isn't ready
+    if (!outfit) {
+      return (
+        <View style={styles.outfitContent}>
+          <View style={styles.outfitHeaderRow}>
+            <Text style={StyleSheet.flatten([typography.subheading, styles.outfitHeader])}>
+              TODAY'S <Text style={StyleSheet.flatten([typography.heading, styles.outfitHeaderItalic])}>Outfit</Text>
+            </Text>
           </View>
-          <View style={{ flex: 1, gap: 10 }}>
-            <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.outerwear} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])} ellipsizeMode="tail" numberOfLines={1}>Outerwear</Text><Text style={StyleSheet.flatten([typography.caption, styles.sponsored])}>sponsored</Text></View></View>
-            <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.accessory} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])} ellipsizeMode="tail" numberOfLines={1}>Accessory</Text></View></View>
-            <View style={styles.bentoCellOuter}><View style={styles.bentoCell}><Image source={mockOutfit.shoes} style={styles.clothingImg} resizeMode="contain" /><Text style={StyleSheet.flatten([typography.label, styles.bentoLabel])} ellipsizeMode="tail" numberOfLines={1}>Shoes</Text></View></View>
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading outfit recommendations...</Text>
           </View>
         </View>
+      );
+    }
+    
+    return (
+      <View style={styles.outfitContent}>
+        <View style={styles.outfitHeaderRow}>
+          <Text style={StyleSheet.flatten([typography.subheading, styles.outfitHeader])}>
+            TODAY'S <Text style={StyleSheet.flatten([typography.heading, styles.outfitHeaderItalic])}>Outfit</Text>
+          </Text>
+        </View>
+        
+        {/* Temperature feedback controls */}
+        <View style={styles.feedbackControls}>
+          <Text style={styles.feedbackTitle}>How does this outfit feel?</Text>
+          <View style={styles.feedbackButtons}>
+            <TouchableOpacity
+              style={[styles.feedbackButton, styles.coldButton]}
+              onPress={() => handleTemperatureFeedback('too_cold')}
+            >
+              <Ionicons name="snow-outline" size={16} color="#000" />
+              <Text style={styles.feedbackButtonText}>Too Cold</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.feedbackButton, styles.justRightButton]}
+              onPress={() => handleTemperatureFeedback('just_right')}
+            >
+              <Ionicons name="checkmark-circle-outline" size={16} color="#000" />
+              <Text style={styles.feedbackButtonText}>Just Right</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.feedbackButton, styles.hotButton]}
+              onPress={() => handleTemperatureFeedback('too_hot')}
+            >
+              <Ionicons name="flame-outline" size={16} color="#000" />
+              <Text style={styles.feedbackButtonText}>Too Hot</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        <View style={styles.bentoBox}>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1, gap: 10 }}>
+              {/* Either render dress OR top+bottom */}
+              {outfit.dress ? (
+                renderClothingItem(outfit.dress, 'dress')
+              ) : (
+                <>
+                  {renderClothingItem(outfit.top, 'top')}
+                  {renderClothingItem(outfit.bottom, 'bottom')}
+                </>
+              )}
+            </View>
+            <View style={{ flex: 1, gap: 10 }}>
+              {renderClothingItem(outfit.outerwear, 'outerwear')}
+              {/* Show first accessory */}
+              {outfit.accessories && outfit.accessories.length > 0 && 
+                renderClothingItem(outfit.accessories[0], 'accessory')}
+              {renderClothingItem(outfit.shoes, 'shoes')}
+            </View>
+          </View>
+        </View>
+        
+        <View style={styles.actionRow}>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => Alert.alert('Coming Soon', 'Edit feature will be available in a future update.')}
+          >
+            <Text style={typography.button}>EDIT</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => Alert.alert('Coming Soon', 'Save feature will be available in a future update.')}
+          >
+            <Text style={typography.button}>SAVE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => Alert.alert('Coming Soon', 'Share feature will be available in a future update.')}
+          >
+            <Text style={typography.button}>SHARE</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const handleLocationSelect = async (newLocation: string) => {
     setLocation(newLocation);
@@ -297,8 +556,6 @@ const HomeScreen: React.FC = () => {
             {renderWeatherContent()}
           </Animated.View>
         </View>
-
-
       </ScrollView>
       <TabBar activeTab="home" />
     </SafeAreaView>
@@ -308,7 +565,12 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   flex1: { flex: 1 },
-  container: { padding: 0, backgroundColor: '#fff', gap: 0 },
+  container: { 
+    padding: 0, 
+    backgroundColor: '#fff', 
+    gap: 0,
+    position: 'relative', // Ensures proper stacking context for z-index
+  },
   greetingRow: { flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -322,6 +584,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: 20,
     marginBottom: 16,
+    zIndex: 10, // Ensure dropdown appears on top
   },
   todayButton: {
     borderRadius: 12,
@@ -411,7 +674,7 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginBottom: 4,
     perspective: 1000,
-    height: 300,
+    height: 370, // Increased height to accommodate feedback controls
     position: 'relative',
   },
   flipCard: {
@@ -429,11 +692,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     borderRadius: 16,
     padding: 20,
-    minHeight: 300,
+    minHeight: 370,
   },
   outfitContent: {
     backgroundColor: '#FFF',
-    minHeight: 300,
+    minHeight: 370,
   },
   weatherDetails: {
     alignItems: 'center',
@@ -482,6 +745,85 @@ const styles = StyleSheet.create({
   calendarContainer: {
     marginHorizontal: 20,
     marginBottom: 0,
+    zIndex: -1, // Ensure it stays below dropdown
+  },
+  // New styles for outfit recommendation
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 300,
+  },
+  loadingText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#666',
+  },
+  itemFeedback: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 12,
+    padding: 4,
+  },
+  itemFeedbackButton: {
+    padding: 4,
+    marginHorizontal: 4,
+  },
+  favoriteIndicator: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
+    padding: 4,
+  },
+  avoidedIndicator: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
+    padding: 4,
+  },
+  feedbackControls: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  feedbackTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  feedbackButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  feedbackButton: {
+    padding: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginHorizontal: 4,
+    flexDirection: 'row',
+  },
+  feedbackButtonText: {
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  coldButton: {
+    backgroundColor: '#a8daff',
+  },
+  justRightButton: {
+    backgroundColor: '#a8ffb0',
+  },
+  hotButton: {
+    backgroundColor: '#ffa8a8',
   },
 });
 

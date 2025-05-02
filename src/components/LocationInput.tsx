@@ -241,7 +241,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    zIndex: 1,
+    zIndex: 1000, // Increased to ensure dropdown appears above other elements
     flex: 1,
   },
   inputContainer: {

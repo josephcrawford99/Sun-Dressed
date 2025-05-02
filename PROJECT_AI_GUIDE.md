@@ -29,15 +29,18 @@ The project follows a modular architecture:
 ```
 src/
 ├── assets/             # Static assets (images, fonts)
+│   ├── mock/           # Mock images for development
+│   └── clothing/       # Clothing images for outfit recommendations
 ├── components/         # Reusable UI components
-├── screens/           # Main application screens
-├── services/          # API integration services
-├── utils/             # Helper functions, context providers
-├── navigation/        # Navigation configuration
-├── types/             # TypeScript interfaces and types
-├── styles/            # Global styles and themes
-├── __tests__/         # Test files
-└── __mocks__/         # Mock data for testing
+├── screens/            # Main application screens
+├── services/           # API integration services
+├── utils/              # Helper functions, context providers
+├── navigation/         # Navigation configuration
+├── types/              # TypeScript interfaces and types
+├── styles/             # Global styles and themes
+├── data/               # JSON data files (e.g., clothingData.json)
+├── __tests__/          # Test files
+└── __mocks__/          # Mock data for testing
 ```
 
 ## Development Status (Based on specifications.md)
@@ -49,22 +52,48 @@ src/
 - [ ] Database schema design (not started)
 
 ### Phase 2 (Weather Integration): In Progress
-- [~] Weather API integration (basic implementation)
-- [~] Location specification
-- [~] Weather forecast display
+- [x] Weather API integration (implemented)
+- [x] User can specify their location
+- [x] User can see the weather forecast for the day (weather view)
 
-### Phase 3 (Clothing Recommendation): Partially Started
-- [x] Mock clothing suggestions
-- [ ] Recommendation algorithm (not implemented)
+### Phase 3 (Clothing Recommendation): Implemented
+- [x] User sees a list of clothing suggestions for entire day from generic json
+- [x] Create algorithm for matching weather conditions to appropriate clothing
+- [~] Implement caching for offline access to recent suggestions (partially implemented)
 
-### Phases 4-8: Not Yet Started
+### Phase 4 (User Feedback Loop): Implemented
+- [x] User can rate day's outfit for factors such as too cold or hot
+- [x] Store and process user feedback to improve future recommendations
+- [ ] Implement analytics tracking for feature usage and app performance (not started)
+
+### Phases 5-8: Not Yet Started
 
 ## Key Files Quick Reference
 
 - **App.tsx**: Entry point with basic app setup
 - **src/navigation/AppNavigator.tsx**: Main navigation structure
-- **src/screens/HomeScreen.tsx**: Main screen with weather and outfit display
-- **src/services/weatherService.ts**: Weather API integration (in progress)
+- **src/screens/HomeScreen.tsx**: Main screen with weather and outfit display, now includes outfit recommendations
+- **src/services/weatherService.ts**: Weather API integration
+- **src/services/outfitService.ts**: Clothing recommendation logic
+- **src/data/clothingData.json**: Database of clothing items with weather suitability
+- **src/utils/clothingImages.ts**: Helper for mapping clothing items to images
+- **src/assets/clothing/README.md**: Documentation for adding clothing images
+
+## Clothing Recommendation System
+
+The clothing recommendation system is now integrated into HomeScreen.tsx. Key features include:
+
+1. **Weather-based Recommendations**: Outfits are recommended based on current weather conditions
+2. **User Preferences**: System adjusts recommendations based on user's temperature comfort
+3. **Feedback Mechanisms**: 
+   - Temperature feedback (Too Cold, Just Right, Too Hot)
+   - Item-specific feedback (Like/Dislike)
+4. **Persistence**: User preferences are stored in AsyncStorage
+5. **Image System**: Modular system for clothing images in src/assets/clothing/
+
+To add new clothing images:
+1. Place images in the appropriate subfolder in src/assets/clothing/
+2. Update the mapping in src/utils/clothingImages.ts
 
 ## Development Guidelines
 
@@ -107,6 +136,12 @@ src/
 - Caching implementation is planned
 - Default units are metric (Celsius)
 
+### Outfit Recommendations
+- Initial outfit recommendations use the mock images (src/assets/mock/)
+- Add real clothing images to src/assets/clothing/ subfolders
+- Reference new images in src/utils/clothingImages.ts
+- The system handles both top+bottom combinations and dresses
+
 ### Styling Challenges
 - Theme consistency is being established
 - Goal is to centralize all styles
@@ -128,6 +163,7 @@ When developing a new feature, follow this sequence:
 - specifications.md: Feature tracking and requirements
 - STRUCTURE.md: Detailed project structure
 - README.md: User-facing documentation and setup
+- src/assets/clothing/README.md: Guidelines for clothing images
 
 ## Development Best Practices
 
