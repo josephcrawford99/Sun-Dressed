@@ -1,0 +1,594 @@
+{
+  "tops": [
+    {
+      "id": "strapless_top",
+      "name": "Strapless top",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "tank_top",
+      "name": "Tank top",
+      "warmthLevel": 2,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "tshirt",
+      "name": "T-shirt",
+      "warmthLevel": 3,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "sweater_vest",
+      "name": "Sweater vest",
+      "warmthLevel": 4,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "long_sleeve_shirt",
+      "name": "Long sleeve cotton shirt",
+      "warmthLevel": 5,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "button_up_long_sleeve",
+      "name": "Button up long sleeve",
+      "warmthLevel": 5,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "sweater",
+      "name": "Sweater",
+      "warmthLevel": 6,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "polo_shirt",
+      "name": "Polo shirt",
+      "warmthLevel": 3,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "masculine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "henley_shirt",
+      "name": "Henley shirt",
+      "warmthLevel": 4,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "masculine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    }
+  ],
+  "dresses": [
+    {
+      "id": "athletic_mini_dress",
+      "name": "Athletic mini dress",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "mini_sun_dress",
+      "name": "Mini sun dress",
+      "warmthLevel": 2,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "maxi_sun_dress",
+      "name": "Maxi sun dress",
+      "warmthLevel": 3,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "maxi_dress",
+      "name": "Maxi dress",
+      "warmthLevel": 4,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "sweater_dress",
+      "name": "Sweater dress",
+      "warmthLevel": 5,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    }
+  ],
+  "bottoms": [
+    {
+      "id": "shorts_jean",
+      "name": "Jean shorts",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "shorts_athletic",
+      "name": "Athletic shorts",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "mini_skirt",
+      "name": "Mini skirt",
+      "warmthLevel": 2,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "linen_pants",
+      "name": "Linen pants",
+      "warmthLevel": 3,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "midi_skirt",
+      "name": "Midi skirt",
+      "warmthLevel": 4,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "maxi_skirt",
+      "name": "Maxi skirt",
+      "warmthLevel": 5,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "jeans",
+      "name": "Jeans",
+      "warmthLevel": 6,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "sweatpants",
+      "name": "Sweatpants",
+      "warmthLevel": 7,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "chinos",
+      "name": "Chinos",
+      "warmthLevel": 5,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "masculine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "dress_pants",
+      "name": "Dress pants",
+      "warmthLevel": 5,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    }
+  ],
+  "outerwear": [
+    {
+      "id": "short_sleeve_button_up",
+      "name": "Short sleeve button up",
+      "warmthLevel": 1,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "long_sleeve_button_up_outer",
+      "name": "Long sleeve button up (outer layer)",
+      "warmthLevel": 2,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "cardigan",
+      "name": "Cardigan",
+      "warmthLevel": 3,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "vest_outer",
+      "name": "Vest (outerwear)",
+      "warmthLevel": 4,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "jean_jacket",
+      "name": "Jean jacket",
+      "warmthLevel": 5,
+      "formality": "casual",
+      "rainSuitable": false,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "rain_coat",
+      "name": "Rain coat",
+      "warmthLevel": 6,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": true,
+      "sunSpecific": false
+    },
+    {
+      "id": "sweatshirt",
+      "name": "Sweatshirt",
+      "warmthLevel": 7,
+      "formality": "casual",
+      "rainSuitable": false,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "leather_jacket",
+      "name": "Leather jacket",
+      "warmthLevel": 8,
+      "formality": "smart_casual",
+      "rainSuitable": false,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "fur_coat",
+      "name": "Fur coat",
+      "warmthLevel": 9,
+      "formality": "formal",
+      "rainSuitable": false,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "short_winter_coat",
+      "name": "Short winter coat",
+      "warmthLevel": 10,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "long_winter_coat",
+      "name": "Long winter coat",
+      "warmthLevel": 11,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "blazer",
+      "name": "Blazer",
+      "warmthLevel": 4,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    }
+  ],
+  "shoes": [
+    {
+      "id": "flip_flops",
+      "name": "Flip flops",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": false,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "sandals",
+      "name": "Sandals",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": false,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "open_toed_heels",
+      "name": "Open toed heels",
+      "warmthLevel": 2,
+      "formality": "formal",
+      "rainSuitable": false,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "sneakers",
+      "name": "Sneakers",
+      "warmthLevel": 3,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "closed_toed_heels",
+      "name": "Closed toed heels",
+      "warmthLevel": 3,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "booties",
+      "name": "Booties",
+      "warmthLevel": 4,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "tall_boots",
+      "name": "Tall boots",
+      "warmthLevel": 5,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "ugg_boots",
+      "name": "Ugg boots",
+      "warmthLevel": 5,
+      "formality": "casual",
+      "rainSuitable": false,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "rain_boots",
+      "name": "Rain boots",
+      "warmthLevel": 4,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": true,
+      "sunSpecific": false
+    },
+    {
+      "id": "dress_shoes",
+      "name": "Dress shoes",
+      "warmthLevel": 3,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "masculine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "loafers",
+      "name": "Loafers",
+      "warmthLevel": 3,
+      "formality": "smart_casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    }
+  ],
+  "accessories": [
+    {
+      "id": "sunglasses",
+      "name": "Sunglasses",
+      "warmthLevel": 1,
+      "formality": "any",
+      "rainSuitable": false,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "sun_hat",
+      "name": "Sun hat",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": false,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "baseball_cap",
+      "name": "Baseball cap",
+      "warmthLevel": 1,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": true
+    },
+    {
+      "id": "scarf",
+      "name": "Scarf",
+      "warmthLevel": 6,
+      "formality": "any",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "wool_socks",
+      "name": "Wool socks",
+      "warmthLevel": 5,
+      "formality": "any",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "gloves",
+      "name": "Gloves",
+      "warmthLevel": 7,
+      "formality": "any",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "tights",
+      "name": "Tights",
+      "warmthLevel": 4,
+      "formality": "any",
+      "rainSuitable": true,
+      "gender": "feminine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "umbrella",
+      "name": "Umbrella",
+      "warmthLevel": 1,
+      "formality": "any",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": true,
+      "sunSpecific": false
+    },
+    {
+      "id": "beanie",
+      "name": "Beanie",
+      "warmthLevel": 6,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "winter_hat",
+      "name": "Winter hat",
+      "warmthLevel": 7,
+      "formality": "casual",
+      "rainSuitable": true,
+      "gender": "neutral",
+      "rainSpecific": false,
+      "sunSpecific": false
+    },
+    {
+      "id": "tie",
+      "name": "Tie",
+      "warmthLevel": 1,
+      "formality": "formal",
+      "rainSuitable": true,
+      "gender": "masculine",
+      "rainSpecific": false,
+      "sunSpecific": false
+    }
+  ]
+}
