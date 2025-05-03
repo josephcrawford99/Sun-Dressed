@@ -25,13 +25,11 @@ interface ClothingImageMap {
 const topImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.top,
-  
+
   // Actual images we found in the directory
   strapless_top: require('../assets/clothing/tops/Strapless_top.png'),
   tshirt: require('../assets/clothing/tops/T_shirt.png'),
-  
-  // Add more tops as you add images
-  // tank_top: require('../assets/clothing/tops/tank_top.png'),
+  tank_top: require('../assets/clothing/tops/tank_top.png'),
   // long_sleeve_shirt: require('../assets/clothing/tops/long_sleeve_shirt.png'),
   // sweater: require('../assets/clothing/tops/sweater.png'),
   // polo_shirt: require('../assets/clothing/tops/polo_shirt.png'),
@@ -42,10 +40,10 @@ const topImages: ClothingImageMap = {
 const bottomImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.bottom,
-  
+
   // Actual images we found in the directory
   jeans: require('../assets/clothing/bottoms/Jeans.png'),
-  
+
   // Add more bottoms as you add images
   // shorts_jean: require('../assets/clothing/bottoms/shorts_jean.png'),
   // shorts_athletic: require('../assets/clothing/bottoms/shorts_athletic.png'),
@@ -59,10 +57,10 @@ const bottomImages: ClothingImageMap = {
 const dressImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.dress,
-  
+
   // Actual images we found in the directory
   maxi_dress: require('../assets/clothing/dresses/Maxi_dress.png'),
-  
+
   // Add more dresses as you add images
   // athletic_mini_dress: require('../assets/clothing/dresses/athletic_mini_dress.png'),
   // mini_sun_dress: require('../assets/clothing/dresses/mini_sun_dress.png'),
@@ -73,12 +71,12 @@ const dressImages: ClothingImageMap = {
 const outerwearImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.outerwear,
-  
+
   // Add more outerwear as you add images
   // short_sleeve_button_up: require('../assets/clothing/outerwear/short_sleeve_button_up.png'),
   // cardigan: require('../assets/clothing/outerwear/cardigan.png'),
   // jean_jacket: require('../assets/clothing/outerwear/jean_jacket.png'),
-  // rain_coat: require('../assets/clothing/outerwear/rain_coat.png'),
+  rain_coat: require('../assets/clothing/outerwear/Raincoat.png'),
   // sweatshirt: require('../assets/clothing/outerwear/sweatshirt.png'),
   // leather_jacket: require('../assets/clothing/outerwear/leather_jacket.png'),
   // blazer: require('../assets/clothing/outerwear/blazer.png'),
@@ -88,11 +86,12 @@ const outerwearImages: ClothingImageMap = {
 const shoesImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.shoes,
-  
+
   // Add more shoes as you add images
+  sneakers: require('../assets/clothing/shoes/Sneakers.png'),
+
   // flip_flops: require('../assets/clothing/shoes/flip_flops.png'),
   // sandals: require('../assets/clothing/shoes/sandals.png'),
-  // sneakers: require('../assets/clothing/shoes/sneakers.png'),
   // boots: require('../assets/clothing/shoes/boots.png'),
   // heels: require('../assets/clothing/shoes/heels.png'),
   // rain_boots: require('../assets/clothing/shoes/rain_boots.png'),
@@ -103,12 +102,12 @@ const shoesImages: ClothingImageMap = {
 const accessoryImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.accessory,
-  
+
   // Actual images we found in the directory
   umbrella: require('../assets/clothing/accessories/Umbrella.png'),
-  
+
   // Add more accessories as you add images
-  // sunglasses: require('../assets/clothing/accessories/sunglasses.png'),
+  sunglasses: require('../assets/clothing/accessories/sunglasses.png'),
   // sun_hat: require('../assets/clothing/accessories/sun_hat.png'),
   // baseball_cap: require('../assets/clothing/accessories/baseball_cap.png'),
   // scarf: require('../assets/clothing/accessories/scarf.png'),
@@ -128,7 +127,7 @@ const accessoryImages: ClothingImageMap = {
 export function getClothingImage(itemId: string, category: 'top' | 'bottom' | 'dress' | 'outerwear' | 'shoes' | 'accessory'): ImageSourcePropType {
   // Select the appropriate image map based on category
   let imageMap: ClothingImageMap;
-  
+
   switch (category) {
     case 'top':
       imageMap = topImages;
@@ -151,7 +150,7 @@ export function getClothingImage(itemId: string, category: 'top' | 'bottom' | 'd
     default:
       return defaultImages.top; // Fallback for unknown category
   }
-  
+
   // Return the specific image if available, otherwise return the default for that category
   return imageMap[itemId] || imageMap.default;
 }
