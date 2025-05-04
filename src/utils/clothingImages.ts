@@ -26,11 +26,10 @@ const topImages: ClothingImageMap = {
   // Default fallback
   default: defaultImages.top,
 
-  // Actual images we found in the directory
   strapless_top: require('../assets/clothing/tops/Strapless_top.png'),
   tshirt: require('../assets/clothing/tops/T_shirt.png'),
   tank_top: require('../assets/clothing/tops/tank_top.png'),
-  // long_sleeve_shirt: require('../assets/clothing/tops/long_sleeve_shirt.png'),
+  long_sleeve_shirt: require('../assets/clothing/tops/long_sleeve_shirt.png'),
   // sweater: require('../assets/clothing/tops/sweater.png'),
   // polo_shirt: require('../assets/clothing/tops/polo_shirt.png'),
   // henley_shirt: require('../assets/clothing/tops/henley_shirt.png'),
