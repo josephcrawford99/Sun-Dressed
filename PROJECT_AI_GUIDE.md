@@ -1,178 +1,215 @@
-# Sun Dressed (formerly Climate Closet) - AI Assistant Guide
+# Sun Dressed - Implementation Guide
 
-This document is designed to help AI assistants quickly understand and work with the Sun Dressed application. It contains essential information about project structure, development status, and guidelines for efficient assistance.
+This document serves as the comprehensive guiding reference for AI agents working on the Sun Dressed weather-based outfit recommendation app. It outlines the current implementation status, code organization, development standards, and future implementation plans.
 
 ## Project Overview
 
-Sun Dressed is a mobile application that suggests clothing based on weather conditions. The app integrates with OpenWeatherMap API to fetch weather data and provides personalized outfit recommendations. It's built with React Native/Expo and TypeScript.
+Sun Dressed is a React Native app built with Expo that provides weather-appropriate outfit recommendations. The app was previously implemented but is being refactored from scratch for improved code organization and maintainability. The old implementation in `C:\Users\NCWDG_Developer\Desktop\WeatherApp\Old` should only be used as a visual style reference, not for implementation or file structure guidance.
 
-## Project Evolution
+## Development Standards
 
-- Original Name: "Climate Closet"
-- Current Name: "Sun Dressed"
-- This is an important detail as code, files, and references may still use the older name
+- **Component Organization**: Each screen is implemented as a standalone .tsx file
+- **Type Management**: Component-specific types are co-located within component files; shared types are in the types directory
+- **Styling**: Avoid inline styles in favor of StyleSheet objects
+- **Error Handling**: Comprehensive input validation and structured error handling in all API interfaces
+- **Testing**: Unit tests for core algorithm functions, component snapshot tests, integration tests for flows, and mock API tests
 
-## Technology Stack
+## Implementation Progress
 
-- **Frontend**: React Native/Expo, TypeScript
-- **State Management**: Context API (planned)
-- **Navigation**: React Navigation
-- **Weather API**: OpenWeatherMap API
-- **Storage**: AsyncStorage (local storage)
-- **Authentication**: In development
-- **Styling**: React Native StyleSheet
+### Phase 1: Core Infrastructure (COMPLETED)
+1. ✅ App.tsx - Main entry point with error boundary and font loading
+2. ✅ HomeScreen.tsx - Main screen with weather display and clothing recommendations
+3. ✅ FlipContainer.tsx - Component that flips between weather and outfit views
+4. ✅ WeatherCustomButton.tsx - Button that triggers the flip animation
+5. ✅ LocationBar.tsx - Simple location input (to be enhanced later)
+6. ✅ CalendarStrip.tsx - Calendar strip component showing days of the week
 
-## Code Structure
+### Context Management (COMPLETED)
+1. ✅ AuthContext.tsx - Basic authentication context with mock user
+2. ✅ SettingsContext.tsx - Settings for temperature and wind units
 
-The project follows a modular architecture:
+### Utility Files (COMPLETED)
+1. ✅ weatherIcons.ts - Maps weather codes to icons
+2. ✅ timeService.ts - Handles time-of-day based greetings
+3. ✅ useWeather.ts - Mock weather service (to be connected to real API in Phase 2)
+4. ✅ typography.ts - Typography styles
+5. ✅ theme.ts - Theme constants for colors and spacing
+6. ✅ outfitAlgorithm.ts - Outfit suggestion algorithm
+7. ✅ clothingData.json - Sample clothing data for testing
+
+## Component Hierarchy
 
 ```
-src/
-├── assets/             # Static assets (images, fonts)
-│   ├── mock/           # Mock images for development
-│   └── clothing/       # Clothing images for outfit recommendations
-├── components/         # Reusable UI components
-├── screens/            # Main application screens
-├── services/           # API integration services
-├── utils/              # Helper functions, context providers
-├── navigation/         # Navigation configuration
-├── types/              # TypeScript interfaces and types
-├── styles/             # Global styles and themes
-├── data/               # JSON data files (e.g., clothingData.json)
-├── __tests__/          # Test files
-└── __mocks__/          # Mock data for testing
+App
+├── Navigation
+│   └── NavBar (on multiple screens)
+├── Screens
+│   ├── AuthScreen
+│   ├── SignUpScreen
+│   ├── HomeScreen
+│   │   ├── LocationBar ✅
+│   │   ├── WeatherCustomButton ✅
+│   │   ├── FlipContainer ✅
+│   │   │   ├── WeatherCard
+│   │   │   └── CardContainer
+│   │   │       └── BentoBoxCard
+│   │   │           └── BentoBoxElement
+│   │   ├── CalendarStrip ✅
+│   ├── SettingsScreen
+│   ├── AccountScreen
+│   ├── LoadingScreen
+│   ├── HangerScreen (future implementation)
+│   └── SocialScreen (future implementation)
+├── Contexts
+    ├── AuthContext ✅
+    └── SettingsContext ✅
 ```
 
-## Development Status (Based on specifications.md)
+## Next Atomic Step
 
-### Phase 1 (Core Infrastructure): In Progress
-- [x] Project setup and basic structure
-- [~] User authentication system (partially implemented)
-- [x] Primary view with placeholder data
-- [ ] Database schema design (not started)
+The next atomic implementation step is to create the BentoBoxCard and BentoBoxElement components that will display outfit recommendations from the outfit algorithm:
 
-### Phase 2 (Weather Integration): In Progress
-- [x] Weather API integration (implemented)
-- [x] User can specify their location
-- [x] User can see the weather forecast for the day (weather view)
+1. Create `src/components/BentoBoxElement.tsx` - Individual clothing item display
+2. Create `src/components/BentoBoxCard.tsx` - Container for outfit elements
+3. Create `src/components/CardContainer.tsx` - Swipeable container for multiple outfit cards
+4. Update `FlipContainer.tsx` to include the CardContainer component
+5. Connect the outfit algorithm to these UI components
 
-### Phase 3 (Clothing Recommendation): Implemented
-- [x] User sees a list of clothing suggestions for entire day from generic json
-- [x] Create algorithm for matching weather conditions to appropriate clothing
-- [~] Implement caching for offline access to recent suggestions (partially implemented)
+## Screen Implementations
 
-### Phase 4 (User Feedback Loop): Implemented
-- [x] User can rate day's outfit for factors such as too cold or hot
-- [x] Store and process user feedback to improve future recommendations
-- [ ] Implement analytics tracking for feature usage and app performance (not started)
+### HomeScreen (Currently Implemented)
+- Displays greeting based on time of day
+- Shows LocationBar with current location
+- Contains WeatherCustomButton to flip between weather and outfit views
+- Includes CalendarStrip for date selection
+- Will display outfit recommendations using BentoBox components
 
-### Phases 5-8: Not Yet Started
+### AuthScreen (To be Implemented)
+- Will provide sign-in with Google and Apple options
+- Email and password entry fields
+- Option to navigate to SignUpScreen
+- Will connect to AuthContext for authentication
 
-## Key Files Quick Reference
+### SignUpScreen (To be Implemented)
+- Email and password entry with validation
+- Style preference selection (masculine/feminine/neutral)
+- Preferred units selection (°F/°C, mph/km/h)
+- Will connect to AuthContext for user creation
 
-- **App.tsx**: Entry point with basic app setup
-- **src/navigation/AppNavigator.tsx**: Main navigation structure
-- **src/screens/HomeScreen.tsx**: Main screen with weather and outfit display, now includes outfit recommendations
-- **src/services/weatherService.ts**: Weather API integration
-- **src/services/outfitService.ts**: Clothing recommendation logic
-- **src/data/clothingData.json**: Database of clothing items with weather suitability
-- **src/utils/clothingImages.ts**: Helper for mapping clothing items to images
-- **src/assets/clothing/README.md**: Documentation for adding clothing images
+### SettingsScreen (To be Implemented)
+- Temperature unit selection (°F/°C)
+- Wind speed unit selection (mph/km/h)
+- Style preference selection
+- Other customization options
 
-## Clothing Recommendation System
+### AccountScreen (To be Implemented)
+- User profile management
+- Update name, email, password
+- Preferences management
 
-The clothing recommendation system is now integrated into HomeScreen.tsx. Key features include:
+### LoadingScreen (To be Implemented)
+- Skeleton screens for loading states longer than 300ms
+- Full-screen loader with app logo for authentication
+- Inline component loading states for data refreshes
 
-1. **Weather-based Recommendations**: Outfits are recommended based on current weather conditions
-2. **User Preferences**: System adjusts recommendations based on user's temperature comfort
-3. **Feedback Mechanisms**: 
-   - Temperature feedback (Too Cold, Just Right, Too Hot)
-   - Item-specific feedback (Like/Dislike)
-4. **Persistence**: User preferences are stored in AsyncStorage
-5. **Image System**: Modular system for clothing images in src/assets/clothing/
+## Components to Implement
 
-To add new clothing images:
-1. Place images in the appropriate subfolder in src/assets/clothing/
-2. Update the mapping in src/utils/clothingImages.ts
+### NavBar
+- Bottom navigation between HomeScreen, HangerScreen, SocialScreen, and AccountScreen
+- Highlights current active screen
+- Simple button-based navigation
 
-## Development Guidelines
+### WeatherCard (To be Implemented)
+- Shows current weather conditions
+- Displays temperature, "feels like" temperature, wind speed, and precipitation
+- May include hourly forecast in future iterations
 
-### Code Style Guidelines
-1. **Styling Priority**:
-   - Use centralized themes and styles
-   - Avoid inline styles when possible
-   - Reuse style constants
+### BentoBoxCard (To be Implemented)
+- Displays a complete outfit recommendation
+- Contains BentoBoxElements arranged in a grid
+- Shows warnings if outfit may be inadequate for weather
 
-2. **Component Standards**:
-   - Use functional components with hooks
-   - Follow atomic design pattern
-   - Extract complex logic to custom hooks
-   - Use TypeScript interfaces for all props
+### BentoBoxElement (To be Implemented)
+- Displays individual clothing items
+- Expands when clicked to show item details
+- Includes thumbs up/down for user feedback
+- Expandable feedback for "too hot," "too cold," or "don't want to wear"
 
-3. **Performance Considerations**:
-   - Use React.memo for performance-critical components
-   - Implement FlatList for long lists
-   - Handle loading states appropriately
+## Outfit Suggestion Algorithm (Implemented)
 
-### Git Workflow
-- **Main Branch**: Stable releases only
-- **Develop Branch**: Integration branch
-- **Feature Branches**: Named `feature/[feature-name]`
-- **Test Branches**: Named `test/[feature-name]`
-- **Commit Message Format**: "[Feature/Fix/Refactor]: Brief description"
+The outfit suggestion algorithm has been implemented in:
 
-### Testing Requirements
-- Each completed feature requires:
-  - Unit tests for core functionality
-  - Integration tests for user flows
-  - Manual verification on both iOS and Android
-  - Cross-device testing on at least 2 screen sizes
+1. `src/types/clothing.ts` - TypeScript interfaces for clothing data
+2. `src/mocks/clothingData.json` - Sample clothing data with 32 items across categories
+3. `src/utils/outfitAlgorithm.ts` - Main algorithm implementation
+4. `src/utils/outfitAlgorithmTest.ts` - Test utility
+5. `src/test/outfitSuggestionTest.js` - Test demonstrations
 
-## Common Issues & Solutions
+The algorithm:
+- Filters clothing based on style preference and seasonal appropriateness
+- Generates outfits based on temperature and weather conditions
+- Scores outfits based on temperature appropriateness (40%), weather protection (15%), user preference (25%), style cohesion (10%), and recency (10%)
+- Adapts to user feedback by updating item properties
 
-### Weather Data
-- OpenWeatherMap API has rate limiting
-- The API key used is: 55c56ace4bd5079cdbcfa7b8804a5562
-- Caching implementation is planned
-- Default units are metric (Celsius)
+## API Interfaces to Implement
 
-### Outfit Recommendations
-- Initial outfit recommendations use the mock images (src/assets/mock/)
-- Add real clothing images to src/assets/clothing/ subfolders
-- Reference new images in src/utils/clothingImages.ts
-- The system handles both top+bottom combinations and dresses
+### Weather API Integration
+- Connect to OpenWeatherMap API in useWeather.ts
+- Implement error handling for API failures
+- Add caching for reduced API calls
 
-### Styling Challenges
-- Theme consistency is being established
-- Goal is to centralize all styles
-- Current implementation has scattered styles
+### Supabase API (Future Implementation)
+- Authentication (login, registration)
+- User data persistence
+- Settings storage
+- Outfit preferences
 
-## Quick Navigation Tips
+### Local Storage Implementation
+- Cache username and password for auto-login
+- Store settings and preferences
+- Save location history
+- Implement cache invalidation and refresh mechanisms
 
-When developing a new feature, follow this sequence:
-1. Check specifications.md to understand requirements
-2. Review relevant existing components
-3. Ask the user relevant queries to reduce token usage. The questions will be fed to an external web searching and reasoning tool.
-4. Update or create components following the atomic design pattern
-5. Add to the appropriate screen
-6. Add tests
-7. Update specifications.md
+## Styles
 
-## Documentation References
+Currently implemented styles:
+- **Fonts**: Libre Baskerville and Montserrat
+- **BorderRadius**: 8px for buttons and UI elements
+- **Colors**:
+  - `#000`: Full black for buttons with white text, outlines, and primary text
+  - `#757575`: Gray for box components like BentoBoxElements
+  - `#fff`: Full white for most backgrounds
+  - `#FFEE8C`: Yellow as accent color (use sparingly)
 
-- specifications.md: Feature tracking and requirements
-- STRUCTURE.md: Detailed project structure
-- README.md: User-facing documentation and setup
-- src/assets/clothing/README.md: Guidelines for clothing images
+## Testing Strategy
 
-## Development Best Practices
+- Unit tests for core algorithm functions
+- Component snapshot tests for UI elements
+- Integration tests for authentication flow
+- Mock API tests for weather data handling
 
-- **Code Changes**: Make one type of change at a time
-- **Testing**: Test each change on both iOS and Android simulators when possible
-- **Commit Strategy**: Make atomic commits that focus on a single improvement
-- **Documentation**: Update comments and documentation as you implement fixes
-- **Rate Limits**: Be mindful of API rate limits during development and testing
+## Branching Strategy
 
----
+Feature branches named `feature/feature-name` that merge into `develop`, with proper testing before merging to `main`. Each feature has its own branch to isolate changes.
 
-This document is designed for AI assistants working on the Sun Dressed app. Always refer to the actual code for the most up-to-date implementation details. The goal is to write high-quality, maintainable code that follows the established patterns while optimizing for reuse and performance.
+## Additional Resources
+
+### Clothing Data
+The clothingData.json file contains 32 clothing items across categories:
+- 6 tops (varying warmth levels)
+- 5 dresses (varying styles and warmth)
+- 7 bottoms (from shorts to sweatpants)
+- 7 shoes (from flip-flops to winter boots)
+- 7 accessories (sun protection, rain protection, and warmth items)
+
+Each item has properties for warmth, style, formality, seasonal appropriateness, weather protection, and cohesion with other items.
+
+## Running the Tests
+
+To test the outfit suggestion algorithm:
+```
+cd C:\Users\NCWDG_Developer\Desktop\WeatherApp
+node src/test/outfitSuggestionTest.js
+```
+
+This runs scenarios for different weather conditions and shows the recommended outfits.

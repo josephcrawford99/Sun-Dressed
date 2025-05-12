@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider } from './src/utils/ThemeContext';
-import AppNavigator from './src/navigation/AppNavigator';
-import { View, Text, ActivityIndicator, Platform } from 'react-native';
-import { AuthProvider, useAuth } from './src/utils/AuthContext';
-import { SettingsProvider } from './src/utils/SettingsContext';
-import AuthScreen from './src/screens/AuthScreen';
-import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
-import { useFonts as useLibre, LibreBaskerville_400Regular, LibreBaskerville_700Bold, LibreBaskerville_400Regular_Italic } from '@expo-google-fonts/libre-baskerville';
-import DevClearDataHeader from './src/components/DevClearDataHeader';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  useFonts,
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  Montserrat_700Bold
+} from '@expo-google-fonts/montserrat';
+import {
+  LibreBaskerville_400Regular,
+  LibreBaskerville_700Bold,
+  LibreBaskerville_400Regular_Italic
+} from '@expo-google-fonts/libre-baskerville';
 
-// Web platform polyfill for AsyncStorage
-if (Platform.OS === 'web') {
-  require('react-native-web');
-}
+// Import providers
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { SettingsProvider } from './src/contexts/SettingsContext';
 
-// Simple error boundary component
+// Import screens
+import HomeScreen from './src/screens/HomeScreen';
+
+// Error boundary component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
   constructor(props: {children: React.ReactNode}) {
     super(props);
@@ -34,11 +39,11 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Something went wrong</Text>
-          <Text>An error occurred in the application. Please reload.</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTitle}>Something went wrong</Text>
+          <Text style={styles.errorMessage}>An error occurred in the application. Please reload.</Text>
           {__DEV__ && this.state.error && (
-            <Text style={{ marginTop: 10, color: 'red' }}>{this.state.error.toString()}</Text>
+            <Text style={styles.errorDetails}>{this.state.error.toString()}</Text>
           )}
         </View>
       );
@@ -48,50 +53,83 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 }
 
-function Main() {
+// Main content component
+const MainContent = () => {
   const { user, isLoading } = useAuth();
   
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     );
   }
   
-  // Both authenticated and unauthenticated states use AppNavigator
-  // This ensures everything is inside NavigationContainer
-  return <AppNavigator initialRoute={user ? 'Home' : 'Auth'} />;
-}
+  // For Phase 1, we're only implementing HomeScreen
+  return <HomeScreen />;
+};
 
+// Main App component
 export default function App() {
-  const [montserratLoaded] = useMontserrat({
+  // Load fonts
+  const [fontsLoaded] = useFonts({
     Montserrat_400Regular,
     Montserrat_500Medium,
     Montserrat_700Bold,
-  });
-  const [libreLoaded] = useLibre({
     LibreBaskerville_400Regular,
     LibreBaskerville_700Bold,
     LibreBaskerville_400Regular_Italic,
   });
 
-  if (!montserratLoaded || !libreLoaded) {
-    return null; // or a loading spinner
+  // Show loading screen while fonts are loading
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
   }
 
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <SettingsProvider>
-            <SafeAreaProvider>
-              <Main />
-              <StatusBar style="auto" />
-            </SafeAreaProvider>
-          </SettingsProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <SettingsProvider>
+          <SafeAreaProvider>
+            <MainContent />
+            <StatusBar style="auto" />
+          </SafeAreaProvider>
+        </SettingsProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  errorMessage: {
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  errorDetails: {
+    marginTop: 10,
+    color: 'red',
+    textAlign: 'center',
+  },
+});

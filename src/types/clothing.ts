@@ -1,68 +1,106 @@
 /**
- * Clothing data types for the Sun Dressed app
+ * Types and interfaces for the outfit suggestion algorithm
+ * These define the data structures used for clothing items, outfits,
+ * and related concepts in the Sun Dressed app.
  */
 
+// Style preference options
+export type StylePreference = 'masculine' | 'feminine' | 'neutral';
+
+// Clothing category types
+export type ClothingCategory = 'Top' | 'Bottom' | 'Shoes' | 'Dress' | 'Outerwear' | 'Accessory' | 'Hat';
+
+// Activity types for clothing items
+export type ActivityType = 'workout' | 'outdoors' | 'formal' | 'casual' | 'work';
+
+// Seasons for clothing seasonality
+export type Season = 'spring' | 'summer' | 'fall' | 'winter';
+
+/**
+ * Interface for clothing item properties
+ * This represents a single piece of clothing in the user's inventory
+ */
 export interface ClothingItem {
+  // Basic Properties
   id: string;
   name: string;
   category: ClothingCategory;
-  imageUri: string;
-  weatherMinTemp?: number;
-  weatherMaxTemp?: number;
-  weatherConditions?: string[];
-  seasons?: Season[];
-  formal?: boolean;
-  colors?: string[];
-  tags?: string[];
+  imageUrl: string;
+  
+  // Weather Properties
+  warmthFactor: number; // Scale indicating how warm the item is
+  rainDeterring: boolean; // Whether the item protects from rain
+  sunDeterring: boolean; // Whether the item protects from sun
+  windDeterring: boolean; // Whether the item protects from wind
+  
+  // Style Properties
+  style: StylePreference;
+  formality: number; // Scale from 1-10 for occasion appropriateness
+  activityTypes: ActivityType[]; // Activities this item is suitable for
+  seasonality: Season[]; // Seasons this item is appropriate for
+  
+  // User Interaction Properties
+  userPreference: number; // Score adjusted based on feedback history
+  recency: number; // Days since last worn
+  exclude: boolean; // Flag to completely remove from suggestions
+  cohesionScores: Record<string, number>; // Mapping to other item IDs with pairing scores
 }
 
-export type ClothingCategory = 
-  | 'top' 
-  | 'bottoms' 
-  | 'outerwear' 
-  | 'shoes' 
-  | 'accessory';
-
-export type Season = 
-  | 'spring' 
-  | 'summer' 
-  | 'fall' 
-  | 'winter';
-
+/**
+ * Interface for a complete outfit
+ * An outfit consists of multiple clothing items arranged by category
+ */
 export interface Outfit {
-  id?: string;
-  top: ClothingItem | null;
-  bottoms: ClothingItem | null;
-  outerwear: ClothingItem | null;
-  shoes: ClothingItem | null;
-  accessory: ClothingItem | null;
-  date?: string;
-  weatherData?: any; // Reference to the weather at time of creation
-  rating?: number;
-  notes?: string;
+  id: string;
+  top?: ClothingItem; // Optional because dresses don't need tops
+  bottom?: ClothingItem; // Optional because dresses don't need bottoms
+  shoes: ClothingItem; // Required for all outfits
+  dress?: ClothingItem; // Optional, mutually exclusive with top+bottom
+  outerwear?: ClothingItem[]; // Optional layers for colder weather
+  accessories?: ClothingItem[]; // Optional accessories
+  hat?: ClothingItem; // Optional headwear
+  score?: number; // The calculated score of this outfit (used internally)
 }
 
-export interface OutfitRecommendation {
-  outfit: Outfit;
-  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night';
-  description?: string;
-  confidence?: number; // How confident the algorithm is in this recommendation
+/**
+ * Interface for weather data required by the outfit algorithm
+ * This is a subset of the full WeatherData interface from useWeather.ts
+ */
+export interface OutfitWeatherData {
+  temperature: number; // Current temperature
+  feels_like: number; // "Feels like" temperature
+  wind_speed: number; // Wind speed
+  chance_of_rain?: number; // Probability of precipitation (0-100)
+  icon?: string; // Weather condition icon code
 }
 
-// Temperature ranges for clothing recommendations
-export interface TemperatureRange {
-  min: number;
-  max: number;
-  description: string;
+/**
+ * Outfit template types for different scenarios
+ */
+export type OutfitTemplate = 'default' | 'workout' | 'outdoors' | 'formal' | 'work';
+
+/**
+ * Interface for outfit algorithm function parameters
+ */
+export interface OutfitAlgorithmParams {
+  weatherData: OutfitWeatherData;
+  stylePreference: StylePreference;
+  clothingItems: ClothingItem[];
+  includeItems?: string[]; // IDs of items to include (thumbs-up)
+  excludeItems?: string[]; // IDs of items to exclude (thumbs-down)
+  template?: OutfitTemplate; // Optional template to prioritize
 }
 
-export interface ClothingRecommendationRule {
-  tempRange: TemperatureRange;
-  weatherCondition?: string[];
-  recommendedCategories: {
-    [key in ClothingCategory]?: {
-      required: boolean;
-      tags?: string[];
-    };
-  };
+/**
+ * Interface for user feedback on suggested outfits
+ */
+export interface OutfitFeedback {
+  outfitId: string;
+  temperatureFeedback?: 'too_hot' | 'too_cold' | 'just_right';
+  itemFeedback?: {
+    itemId: string;
+    liked: boolean;
+  }[];
+  timestamp: number; // Unix timestamp of when feedback was given
+  temperature: number; // Temperature at the time of feedback
 }

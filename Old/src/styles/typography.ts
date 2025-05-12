@@ -1,17 +1,16 @@
 import { TextStyle } from 'react-native';
 
 export const fonts = {
-  primary: 'LibreBaskerville_400Regular',
-  primaryItalic: 'LibreBaskerville_400Regular_Italic',
+  primary: 'LibreBaskerville_400Regular_Italic', // For branding, logo, special headings
   primaryBold: 'LibreBaskerville_700Bold',
-  secondary: 'Montserrat_400Regular',
+  secondary: 'Montserrat_400Regular',     // For body, buttons, labels, etc.
   secondaryMedium: 'Montserrat_500Medium',
   secondaryBold: 'Montserrat_700Bold',
 };
 
 export const typography: { [key: string]: TextStyle } = {
   logo: {
-    fontFamily: fonts.primaryItalic,
+    fontFamily: fonts.primary,
     fontStyle: 'italic',
     fontWeight: '500',
     fontSize: 60,
@@ -22,15 +21,8 @@ export const typography: { [key: string]: TextStyle } = {
   },
   heading: {
     fontFamily: fonts.primaryBold,
-    fontWeight: '700',
-    letterSpacing: -1.25,
-    fontSize: 28,
-    color: '#000',
-  },
-  headingItalic: {
-    fontFamily: fonts.primaryItalic,
     fontStyle: 'italic',
-    fontWeight: '400',
+    fontWeight: '700',
     letterSpacing: -1.25,
     fontSize: 28,
     color: '#000',
@@ -66,7 +58,7 @@ export const typography: { [key: string]: TextStyle } = {
     color: '#757575',
   },
   tempButton: {
-    fontFamily: fonts.primary,
+    fontFamily: fonts.primary, // Libre Baskerville
     fontWeight: '400',
     fontSize: 18,
     color: '#FFF',
