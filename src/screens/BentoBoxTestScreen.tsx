@@ -287,10 +287,10 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
   },
   bentoBoxContainer: {
-    minHeight: 400,
+    height: 440,
     marginBottom: theme.spacing.md,
     borderRadius: theme.borderRadius.large,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     overflow: 'hidden',
   },
   infoContainer: {

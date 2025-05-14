@@ -182,7 +182,9 @@ const HomeScreen: React.FC = () => {
         </Text>
       </View>
 
-      <BentoBox outfitData={mockOutfitData} />
+      <View style={styles.bentoBoxWrapper}>
+        <BentoBox outfitData={mockOutfitData} />
+      </View>
     </View>
   );
 
@@ -306,6 +308,10 @@ const styles = StyleSheet.create({
   outfitContent: {
     flex: 1,
     minHeight: 370,
+  },
+  bentoBoxWrapper: {
+    flex: 1,
+    padding: theme.spacing.xs,
   },
   weatherMain: {
     flexDirection: 'row',
