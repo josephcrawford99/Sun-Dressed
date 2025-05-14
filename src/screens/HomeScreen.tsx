@@ -27,7 +27,7 @@ const DEFAULT_LOCATION = 'New York, NY';
 
 // Mock outfit data for testing BentoBox
 const mockOutfitData: OutfitData = {
-  id: 'outfit-1',
+  id: 'outfit-regular',
   top: {
     id: 'top-1',
     type: 'top',
@@ -44,23 +44,13 @@ const mockOutfitData: OutfitData = {
       type: 'outerwear',
       name: 'Light Jacket',
     },
-    {
-      id: 'outerwear-2',
-      type: 'outerwear',
-      name: 'Cardigan',
-    }
   ],
   accessories: [
     {
       id: 'accessory-1',
       type: 'accessory',
-      name: 'Scarf',
+      name: 'Watch',
     },
-    {
-      id: 'accessory-2',
-      type: 'accessory',
-      name: 'Beanie',
-    }
   ],
   shoes: {
     id: 'shoes-1',
@@ -173,7 +163,7 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
-  // Render outfit content for the flip container (placeholder for Phase 1)
+  // Render outfit content for the flip container
   const renderOutfitContent = () => (
     <View style={styles.outfitContent}>
       <View style={styles.headerRow}>
@@ -182,7 +172,8 @@ const HomeScreen: React.FC = () => {
         </Text>
       </View>
 
-      <View style={styles.bentoBoxWrapper}>
+      {/* Direct container for BentoBox with full height */}
+      <View style={styles.bentoBoxContainer}>
         <BentoBox outfitData={mockOutfitData} />
       </View>
     </View>
@@ -222,7 +213,7 @@ const HomeScreen: React.FC = () => {
         {/* Calendar Strip */}
         <View style={styles.calendarContainer}>
           <CalendarStrip
-            onDayPress={(date) => {
+            onDayPress={(date: string) => {
               console.log('Selected date:', date);
               // To be implemented in later phases
             }}
@@ -292,6 +283,9 @@ const styles = StyleSheet.create({
   flipContainerWrapper: {
     marginHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.md,
+    height: 440,
+    borderRadius: theme.borderRadius.large,
+    overflow: 'hidden',
   },
   headerRow: {
     flexDirection: 'row',
@@ -303,15 +297,24 @@ const styles = StyleSheet.create({
   },
   weatherContent: {
     flex: 1,
-    minHeight: 370,
+    height: 440,
+    backgroundColor: '#fff',
+    borderRadius: theme.borderRadius.large,
+    overflow: 'hidden',
   },
   outfitContent: {
     flex: 1,
-    minHeight: 370,
+    height: 440,
+    backgroundColor: '#fff',
+    borderRadius: theme.borderRadius.large,
+    overflow: 'hidden',
   },
-  bentoBoxWrapper: {
+  bentoBoxContainer: {
     flex: 1,
-    padding: theme.spacing.xs,
+    height: 400, // Nearly full height of the parent (440px minus header)
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.medium,
+    overflow: 'hidden',
   },
   weatherMain: {
     flexDirection: 'row',

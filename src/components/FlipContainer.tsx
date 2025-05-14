@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  Animated, 
-  Easing 
+import {
+  View,
+  StyleSheet,
+  Animated,
+  Easing
 } from 'react-native';
 import { theme } from '../styles/theme';
 
@@ -23,7 +23,7 @@ const FlipContainer: React.FC<FlipContainerProps> = ({
   containerStyle = {}
 }) => {
   const flipAnimation = useRef(new Animated.Value(isFlipped ? 1 : 0)).current;
-  
+
   React.useEffect(() => {
     Animated.timing(flipAnimation, {
       toValue: isFlipped ? 1 : 0,
@@ -63,21 +63,21 @@ const FlipContainer: React.FC<FlipContainerProps> = ({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <Animated.View 
+      <Animated.View
         style={[
-          styles.card, 
-          frontAnimatedStyle, 
+          styles.card,
+          frontAnimatedStyle,
           { opacity: frontOpacity },
           styles.frontCard
         ]}
       >
         {frontContent}
       </Animated.View>
-      <Animated.View 
+      <Animated.View
         style={[
-          styles.card, 
-          styles.backCard, 
-          backAnimatedStyle, 
+          styles.card,
+          styles.backCard,
+          backAnimatedStyle,
           { opacity: backOpacity }
         ]}
       >
@@ -90,7 +90,7 @@ const FlipContainer: React.FC<FlipContainerProps> = ({
 const styles = StyleSheet.create({
   container: {
     perspective: 1000,
-    height: 370, 
+    height: 440,
     position: 'relative',
   },
   card: {
@@ -99,6 +99,8 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    bottom: 0,
+    height: '100%',
     borderRadius: theme.borderRadius.large,
   },
   frontCard: {

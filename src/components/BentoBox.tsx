@@ -1,24 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
-  Animated,
-  Easing,
-  LayoutAnimation,
-  Platform,
-  UIManager
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle
 } from 'react-native';
 import { theme } from '../styles/theme';
 import { fonts } from '../styles/typography';
-
-// Enable LayoutAnimation for Android
-if (Platform.OS === 'android') {
-  if (UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
-}
 
 // Mock data interface
 export interface OutfitItemData {
@@ -37,170 +27,128 @@ export interface OutfitData {
   shoes: OutfitItemData;
 }
 
-// OutfitElement component
-const OutfitElement: React.FC<{
+// OutfitElement component to display individual clothing items
+interface OutfitElementProps {
   data: OutfitItemData;
-  expanded: boolean;
-  onToggle: () => void;
-  style?: any;
-}> = ({ data, expanded, onToggle, style }) => {
-  // Animation refs
-  const heightAnimation = useRef(new Animated.Value(expanded ? 1 : 0)).current;
-  const rotationAnimation = useRef(new Animated.Value(expanded ? 0 : 1)).current;
+  style?: StyleProp<ViewStyle>;
+}
 
-  useEffect(() => {
-    // Configure animations
-    Animated.parallel([
-      Animated.timing(heightAnimation, {
-        toValue: expanded ? 1 : 0,
-        duration: 300,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false,
-      }),
-      Animated.timing(rotationAnimation, {
-        toValue: expanded ? 0 : 1,
-        duration: 300,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [expanded, heightAnimation, rotationAnimation]);
-
-  // Interpolate height based on element type
-  const getHeightInterpolation = () => {
-    const baseHeight = 100;
-    const expandedHeight = 180;
-
-    switch (data.type) {
-      case 'outerwear':
-      case 'accessory':
-        return {
-          inputRange: [0, 1],
-          outputRange: [baseHeight, expandedHeight],
-        };
-      case 'shoes':
-        return {
-          inputRange: [0, 1],
-          outputRange: [baseHeight, expandedHeight],
-        };
-      default:
-        return {
-          inputRange: [0, 1],
-          outputRange: [baseHeight, expandedHeight],
-        };
-    }
-  };
-
-  const height = heightAnimation.interpolate(getHeightInterpolation());
-
-  const rotation = rotationAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '-90deg'],
-  });
-
+const OutfitElement = ({ data, style }: OutfitElementProps): React.ReactElement => {
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={onToggle}
-      style={[styles.elementTouchable, style]}
-    >
-      <Animated.View
-        style={[
-          styles.elementContainer,
-          { height },
-          expanded && styles.expandedElement,
-        ]}
-      >
-        <Animated.Text
-          style={[
-            styles.elementLabel,
-            {
-              transform: [{ rotate: rotation }],
-              left: expanded ? null : -25,
-              bottom: expanded ? 10 : expanded ? null : 40,
-              width: expanded ? null : 80,
-            },
-          ]}
-        >
-          {data.name}
-        </Animated.Text>
-      </Animated.View>
-    </TouchableOpacity>
+    <View style={[styles.elementContainer, style]}>
+      <View style={styles.labelContainer}>
+        <Text style={styles.elementLabel}>{data.name}</Text>
+      </View>
+      <Text style={styles.elementName}>{data.type}</Text>
+    </View>
   );
 };
 
-// OutfitGrid component
-const OutfitGrid: React.FC<{
+// The main grid layout component
+interface OutfitGridProps {
   outfitData: OutfitData;
-  expandedElement: string | null;
-  onToggleElement: (id: string) => void;
-}> = ({ outfitData, expandedElement, onToggleElement }) => {
+}
+
+const OutfitGrid = ({ outfitData }: OutfitGridProps): React.ReactElement => {
   return (
     <View style={styles.gridContainer}>
-      {/* Left Column */}
+      {/* Left Column - Contains Top/Bottom or Dress */}
       <View style={styles.leftColumn}>
         {outfitData.dress ? (
           <OutfitElement
             data={outfitData.dress}
-            expanded={expandedElement === outfitData.dress.id}
-            onToggle={() => onToggleElement(outfitData.dress!.id)}
             style={styles.dressElement}
           />
         ) : (
           <>
-            {outfitData.top && (
-              <OutfitElement
-                data={outfitData.top}
-                expanded={expandedElement === outfitData.top.id}
-                onToggle={() => onToggleElement(outfitData.top!.id)}
-                style={styles.topElement}
-              />
-            )}
-            {outfitData.bottom && (
-              <OutfitElement
-                data={outfitData.bottom}
-                expanded={expandedElement === outfitData.bottom.id}
-                onToggle={() => onToggleElement(outfitData.bottom!.id)}
-                style={styles.bottomElement}
-              />
-            )}
+            <OutfitElement
+              data={outfitData.top || {
+                id: 'empty-top',
+                type: 'top',
+                name: 'No Top'
+              }}
+              style={styles.topElement}
+            />
+            <OutfitElement
+              data={outfitData.bottom || {
+                id: 'empty-bottom',
+                type: 'bottom',
+                name: 'No Bottom'
+              }}
+              style={styles.bottomElement}
+            />
           </>
         )}
       </View>
 
       {/* Right Column */}
       <View style={styles.rightColumn}>
-        {/* Outerwear Section */}
+        {/* Outerwear Section - Items display side by side */}
         <View style={styles.outerwearContainer}>
-          {outfitData.outerwear.map((item) => (
+          {outfitData.outerwear.length > 0 ? (
+            outfitData.outerwear.map((item: OutfitItemData, index: number) => (
+              <OutfitElement
+                key={item.id}
+                data={item}
+                style={[
+                  styles.outerwearElement,
+                  {
+                    width: `${100 / Math.max(outfitData.outerwear.length, 1) - (outfitData.outerwear.length > 1 ? 2 : 0)}%`,
+                  }
+                ]}
+              />
+            ))
+          ) : (
             <OutfitElement
-              key={item.id}
-              data={item}
-              expanded={expandedElement === item.id}
-              onToggle={() => onToggleElement(item.id)}
+              data={{
+                id: 'empty-outerwear',
+                type: 'outerwear',
+                name: 'No Outerwear'
+              }}
               style={styles.outerwearElement}
             />
-          ))}
+          )}
         </View>
 
         {/* Accessories Section */}
         <View style={styles.accessoriesContainer}>
-          {outfitData.accessories.map((item) => (
+          {outfitData.accessories.length > 0 ? (
+            outfitData.accessories.map((item: OutfitItemData, index: number) => (
+              <OutfitElement
+                key={item.id}
+                data={item}
+                style={[
+                  styles.accessoryElement,
+                  {
+                    height: outfitData.accessories.length > 2
+                      ? 80 / Math.min(outfitData.accessories.length, 3)
+                      : undefined,
+                    width: outfitData.accessories.length <= 2
+                      ? `${100 / Math.max(outfitData.accessories.length, 1) - (outfitData.accessories.length > 1 ? 2 : 0)}%`
+                      : `${100 / Math.min(outfitData.accessories.length, 2) - 2}%`,
+                  }
+                ]}
+              />
+            ))
+          ) : (
             <OutfitElement
-              key={item.id}
-              data={item}
-              expanded={expandedElement === item.id}
-              onToggle={() => onToggleElement(item.id)}
+              data={{
+                id: 'empty-accessory',
+                type: 'accessory',
+                name: 'No Accessories'
+              }}
               style={styles.accessoryElement}
             />
-          ))}
+          )}
         </View>
 
         {/* Shoes Section */}
         <OutfitElement
-          data={outfitData.shoes}
-          expanded={expandedElement === outfitData.shoes.id}
-          onToggle={() => onToggleElement(outfitData.shoes.id)}
+          data={outfitData.shoes || {
+            id: 'empty-shoes',
+            type: 'shoes',
+            name: 'No Shoes'
+          }}
           style={styles.shoesElement}
         />
       </View>
@@ -208,26 +156,16 @@ const OutfitGrid: React.FC<{
   );
 };
 
-// Main BentoBox component
-const BentoBox: React.FC<{
+// Main BentoBox component props
+interface BentoBoxProps {
   outfitData: OutfitData;
-}> = ({ outfitData }) => {
-  const [expandedElement, setExpandedElement] = useState<string | null>(null);
+}
 
-  const handleToggle = (elementId: string) => {
-    // Configure LayoutAnimation for smoother transitions
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    setExpandedElement(expandedElement === elementId ? null : elementId);
-  };
-
+// Main BentoBox component
+const BentoBox = ({ outfitData }: BentoBoxProps): React.ReactElement => {
   return (
     <View style={styles.bentoContainer}>
-      <OutfitGrid
-        outfitData={outfitData}
-        expandedElement={expandedElement}
-        onToggleElement={handleToggle}
-      />
+      <OutfitGrid outfitData={outfitData} />
     </View>
   );
 };
@@ -238,46 +176,62 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.large,
     padding: theme.spacing.sm,
     flex: 1,
+    width: '100%',
+    height: '100%',
   },
   gridContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
     gap: 10,
+    width: '100%',
+    height: '100%',
   },
   leftColumn: {
     flex: 2,
-    marginRight: 0,
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   rightColumn: {
     flex: 3,
-    marginLeft: 0,
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
   outerwearContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
     gap: 10,
+    flex: 3,
+    minHeight: 110,
   },
   accessoriesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 10,
     gap: 10,
-  },
-  elementTouchable: {
-    marginBottom: 0,
+    flex: 3,
+    minHeight: 110,
+    marginVertical: 10,
   },
   elementContainer: {
     backgroundColor: '#F5F5F5',
     borderRadius: theme.borderRadius.medium,
-    padding: theme.spacing.sm,
+    padding: theme.spacing.md,
     justifyContent: 'center',
+    alignItems: 'center',
     position: 'relative',
+    minHeight: 80,
   },
-  expandedElement: {
-    backgroundColor: '#E5E5E5',
+  labelContainer: {
+    position: 'absolute',
+    left: 5,
+    top: 5,
+    width: 24,
+    height: 80,
+    zIndex: 2,
   },
   elementLabel: {
     position: 'absolute',
@@ -285,26 +239,44 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 14,
     color: '#757575',
+    transform: [{ rotate: '-90deg' }],
+    transformOrigin: '0% 0%', // This works for web
+    left: 0,
+    bottom: 0,
+    width: 80,
+  },
+  elementName: {
+    fontFamily: fonts.secondary,
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginTop: 20,
   },
   // Specific element styles
   topElement: {
-    flex: 1,
+    flex: 1, // This will make it take up available space
     marginBottom: 10,
   },
   bottomElement: {
-    flex: 1,
+    flex: 1, // This will make it take up available space
+    // Remove the height: '49%'
   },
   dressElement: {
     flex: 1,
+    height: '100%',
+    minHeight: 250,
   },
   outerwearElement: {
-    width: '48%',
+    // Width is calculated dynamically
+    minHeight: 100,
   },
   accessoryElement: {
-    width: '48%',
+    // Width and height are calculated dynamically
+    minHeight: 100,
   },
   shoesElement: {
-    marginTop: 10,
+    flex: 3,
+    minHeight: 100,
   },
 });
 
@@ -395,7 +367,7 @@ export const BentoBoxTest: React.FC = () => {
     },
   };
 
-  const [currentOutfit, setCurrentOutfit] = useState<'regular' | 'dress'>('regular');
+  const [currentOutfit, setCurrentOutfit] = React.useState<'regular' | 'dress'>('regular');
 
   const toggleOutfitType = () => {
     setCurrentOutfit(currentOutfit === 'regular' ? 'dress' : 'regular');
@@ -417,7 +389,7 @@ export const BentoBoxTest: React.FC = () => {
       />
 
       <Text style={testStyles.instructions}>
-        Tap on any element to expand/collapse it
+        This is a static BentoBox display
       </Text>
     </View>
   );
