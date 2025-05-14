@@ -20,9 +20,54 @@ import CalendarStrip from '../components/CalendarStrip';
 import FlipContainer from '../components/FlipContainer';
 import { WeatherIcon } from '../components/WeatherIcon';
 import { WeatherCode } from '../utils/weatherIcons';
+import BentoBox, { OutfitData } from '../components/BentoBox';
 
 // For Phase 1, we'll use a default location
 const DEFAULT_LOCATION = 'New York, NY';
+
+// Mock outfit data for testing BentoBox
+const mockOutfitData: OutfitData = {
+  id: 'outfit-1',
+  top: {
+    id: 'top-1',
+    type: 'top',
+    name: 'T-Shirt',
+  },
+  bottom: {
+    id: 'bottom-1',
+    type: 'bottom',
+    name: 'Jeans',
+  },
+  outerwear: [
+    {
+      id: 'outerwear-1',
+      type: 'outerwear',
+      name: 'Light Jacket',
+    },
+    {
+      id: 'outerwear-2',
+      type: 'outerwear',
+      name: 'Cardigan',
+    }
+  ],
+  accessories: [
+    {
+      id: 'accessory-1',
+      type: 'accessory',
+      name: 'Scarf',
+    },
+    {
+      id: 'accessory-2',
+      type: 'accessory',
+      name: 'Beanie',
+    }
+  ],
+  shoes: {
+    id: 'shoes-1',
+    type: 'shoes',
+    name: 'Sneakers',
+  },
+};
 
 // Helper functions for temperature conversion
 const convertTemperature = (celsius: number, unit: 'C' | 'F'): number => {
@@ -137,11 +182,7 @@ const HomeScreen: React.FC = () => {
         </Text>
       </View>
 
-      <View style={styles.outfitPlaceholder}>
-        <Text style={styles.placeholderText}>
-          Outfit recommendations will be implemented in Phase 2
-        </Text>
-      </View>
+      <BentoBox outfitData={mockOutfitData} />
     </View>
   );
 
