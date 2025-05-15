@@ -23,6 +23,7 @@ Sun Dressed is a React Native app built with Expo that provides weather-appropri
 4. ✅ WeatherCustomButton.tsx - Button that triggers the flip animation
 5. ✅ LocationBar.tsx - Simple location input (to be enhanced later)
 6. ✅ CalendarStrip.tsx - Calendar strip component showing days of the week
+7. ✅ NavBar.tsx - Bottom navigation component with tab switching
 
 ### Context Management (COMPLETED)
 1. ✅ AuthContext.tsx - Basic authentication context with mock user
@@ -82,6 +83,8 @@ The next atomic implementation step is to create the BentoBoxCard and BentoBoxEl
 - Shows LocationBar with current location
 - Contains WeatherCustomButton to flip between weather and outfit views
 - Includes CalendarStrip for date selection
+- Uses ScrollView with dynamic bottom padding to accommodate the NavBar
+- Calculates NavBar height including safe area insets to ensure content is not hidden
 - Will display outfit recommendations using BentoBox components
 
 ### AuthScreen (To be Implemented)
@@ -114,10 +117,15 @@ The next atomic implementation step is to create the BentoBoxCard and BentoBoxEl
 
 ## Components to Implement
 
-### NavBar
+### NavBar (Implemented)
 - Bottom navigation between HomeScreen, HangerScreen, SocialScreen, and AccountScreen
-- Highlights current active screen
-- Simple button-based navigation
+- Fixed at the bottom of the screen with proper safe area handling
+- Uses Ionicons for tab icons ("partly-sunny-outline", "shirt-outline", "globe-outline", "person-outline")
+- Highlights active screen with black icons (vs. gray for inactive)
+- Only Home tab is currently connected to navigation
+- Exports TAB_BAR_CONTENT_HEIGHT constant (60px) for layout calculations
+- Works with SafeAreaView for proper display on devices with notches/home bars
+- Implemented with controlled/uncontrolled component pattern for flexibility
 
 ### WeatherCard (To be Implemented)
 - Shows current weather conditions
@@ -175,6 +183,33 @@ The algorithm:
 - Store settings and preferences
 - Save location history
 - Implement cache invalidation and refresh mechanisms
+
+## Mobile App Layout Implementation
+
+The app follows a common mobile app layout pattern with a fixed bottom navigation bar and scrollable content. Key implementation details:
+
+### Fixed Bottom Navigation
+- The NavBar component is positioned absolutely at the bottom of the screen
+- Uses SafeAreaView with `edges={['bottom']}` to handle device-specific insets
+- Exports a constant `TAB_BAR_CONTENT_HEIGHT` that can be imported by other components
+- Maintains a consistent visual style regardless of screen content
+
+### Content Area
+- HomeScreen uses a ScrollView with dynamic bottom padding
+- The bottom padding is calculated as `TAB_BAR_CONTENT_HEIGHT + insets.bottom`
+- This ensures the last item in the ScrollView is not hidden behind the NavBar
+- Content only scrolls when it doesn't fit in the available screen space
+
+### App Navigation
+- App.tsx maintains an `activeUITab` state to track the current tab
+- Uses a switch statement to render the appropriate screen component based on active tab
+- Tab highlighting is controlled through the `activeTab` prop passed to NavBar
+
+This implementation ensures:
+1. Content is never hidden behind the navigation bar
+2. The UI maintains consistency across different device sizes
+3. The app follows standard mobile design patterns
+4. Scrolling behavior feels natural to users
 
 ## Styles
 

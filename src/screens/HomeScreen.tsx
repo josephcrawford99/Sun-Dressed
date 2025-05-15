@@ -3,13 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
+  SafeAreaView as OuterSafeAreaView,
   TouchableOpacity,
   ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/AuthContext';
-import { useSettings } from '../contexts/SettingsContext';
 import { typography, fonts } from '../styles/typography';
 import { theme } from '../styles/theme';
 import { useWeather } from '../utils/useWeather';
@@ -22,10 +20,11 @@ import { WeatherIcon } from '../components/WeatherIcon';
 import { WeatherCode } from '../utils/weatherIcons';
 import BentoBox, { OutfitData } from '../components/BentoBox';
 
-// For Phase 1, we'll use a default location
+import NavBar, { TAB_BAR_CONTENT_HEIGHT } from '../components/NavBar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 const DEFAULT_LOCATION = 'New York, NY';
 
-// Mock outfit data for testing BentoBox
 const mockOutfitData: OutfitData = {
   id: 'outfit-regular',
   top: {
@@ -59,7 +58,6 @@ const mockOutfitData: OutfitData = {
   },
 };
 
-// Helper functions for temperature conversion
 const convertTemperature = (celsius: number, unit: 'C' | 'F'): number => {
   if (unit === 'F') {
     return Math.round(celsius * 9/5 + 32);
@@ -75,14 +73,17 @@ const convertWindSpeed = (ms: number, unit: 'ms' | 'mph'): string => {
 };
 
 const HomeScreen: React.FC = () => {
-  const { user } = useAuth();
-  const { temperatureUnit, windSpeedUnit } = useSettings();
+  const user = { name: 'User Name' };
+  const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
+  const [windSpeedUnit, setWindSpeedUnit] = useState<'ms' | 'mph'>('ms');
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const { weatherData, isLoading, error } = useWeather(location);
   const [showingWeather, setShowingWeather] = useState(false);
   const [greeting, setGreeting] = useState<string>('HELLO');
 
-  // Update greeting based on time of day
+  const insets = useSafeAreaInsets();
+  const navBarTotalHeight = TAB_BAR_CONTENT_HEIGHT + insets.bottom;
+
   useEffect(() => {
     const updateGreeting = async () => {
       try {
@@ -90,27 +91,23 @@ const HomeScreen: React.FC = () => {
         setGreeting(getGreeting(timeOfDay));
       } catch (error) {
         console.warn('Error updating greeting:', error);
-        setGreeting('HELLO'); // Fallback greeting
+        setGreeting('HELLO');
       }
     };
 
     updateGreeting();
-    // Update greeting every minute
     const interval = setInterval(updateGreeting, 60000);
     return () => clearInterval(interval);
   }, [location]);
 
-  // Handle location change
   const handleLocationSelect = (newLocation: string) => {
     setLocation(newLocation);
   };
 
-  // Toggle between weather and outfit views
   const toggleWeatherView = () => {
     setShowingWeather(!showingWeather);
   };
 
-  // Render weather content for the flip container
   const renderWeatherContent = () => (
     <View style={styles.weatherContent}>
       <View style={styles.headerRow}>
@@ -163,7 +160,6 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
-  // Render outfit content for the flip container
   const renderOutfitContent = () => (
     <View style={styles.outfitContent}>
       <View style={styles.headerRow}>
@@ -171,8 +167,6 @@ const HomeScreen: React.FC = () => {
           TODAY'S <Text style={typography.headingItalic}>Outfit</Text>
         </Text>
       </View>
-
-      {/* Direct container for BentoBox with full height */}
       <View style={styles.bentoBoxContainer}>
         <BentoBox outfitData={mockOutfitData} />
       </View>
@@ -180,9 +174,16 @@ const HomeScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Greeting Section */}
+    <OuterSafeAreaView style={styles.outerSafeArea}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContentContainer,
+          { paddingBottom: navBarTotalHeight }
+        ]}
+        showsVerticalScrollIndicator={false}
+        alwaysBounceVertical={false}
+      >
         <View style={styles.greetingRow}>
           <View>
             <Text style={typography.label}>{greeting},</Text>
@@ -193,7 +194,6 @@ const HomeScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Location and Weather Button Row */}
         <View style={styles.locationRow}>
           <LocationBar
             value={location}
@@ -210,17 +210,14 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Calendar Strip */}
         <View style={styles.calendarContainer}>
           <CalendarStrip
-            onDayPress={(date: string) => {
+            onDayPress={(date: Date) => {
               console.log('Selected date:', date);
-              // To be implemented in later phases
             }}
           />
         </View>
 
-        {/* Flip Container */}
         <View style={styles.flipContainerWrapper}>
           <FlipContainer
             frontContent={renderOutfitContent()}
@@ -230,17 +227,19 @@ const HomeScreen: React.FC = () => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </OuterSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  outerSafeArea: {
     flex: 1,
     backgroundColor: theme.colors.white,
   },
-  container: {
-    padding: 0,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContentContainer: {
     backgroundColor: theme.colors.white,
   },
   greetingRow: {
@@ -248,7 +247,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: theme.spacing.md,
-    marginVertical: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   name: {
     ...typography.heading,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   flipContainerWrapper: {
     marginHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.xs,
     height: 440,
     borderRadius: theme.borderRadius.large,
     overflow: 'hidden',
@@ -297,24 +297,19 @@ const styles = StyleSheet.create({
   },
   weatherContent: {
     flex: 1,
-    height: 440,
     backgroundColor: '#fff',
-    borderRadius: theme.borderRadius.large,
-    overflow: 'hidden',
   },
   outfitContent: {
     flex: 1,
-    height: 440,
     backgroundColor: '#fff',
-    borderRadius: theme.borderRadius.large,
-    overflow: 'hidden',
   },
   bentoBoxContainer: {
     flex: 1,
-    height: 400, // Nearly full height of the parent (440px minus header)
     backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.medium,
     overflow: 'hidden',
+    marginHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   weatherMain: {
     flexDirection: 'row',
@@ -353,17 +348,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...typography.body,
-    color: theme.colors.gray,
-  },
-  outfitPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-  },
-  placeholderText: {
-    ...typography.body,
-    textAlign: 'center',
     color: theme.colors.gray,
   },
 });
