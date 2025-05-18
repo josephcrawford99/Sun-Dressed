@@ -1,0 +1,26 @@
+---
+description: 
+globs: feature-roadmap.mdc,ai-implementation-guide.mdc
+alwaysApply: false
+---
+For when you are adding new features or ideating on next steps for the app. Planning. Try to add one at a time to [feature-roadmap.mdc](mdc:.cursor/rules/feature-roadmap.mdc) and implement it before pulling in too many future features
+
+- Free trial period and 10-20$ paywall
+- Trip planning feature that allows you to select range of dates and get a packing list. 
+- Add variations on defined clothing (ex if there is wool sweater you can clone to make blue warm wool sweater with different properties but same parent clothing items.)
+- Suggestions on where and what items to buy if you want more of a clothing item (possible sponsor integration)
+- minimal custom clothing icons (like you can change color and tag it but not add new pics)
+- Share packing list
+- Share outfit of the day
+- "Liked" Outfits that boost cohesionon score
+- Social tab for viewing nearby outfits people picked
+- Copy someone elses outfit from social into your own outfit
+- There will either be separation for free or paid features or all features will be paywalled
+- Organize clothing items on axes like ordering them hottest to coolest
+- change stats on clothing (not rain protective or not wind protective enough)
+- AI overview of outfit with a blurb on the bottom
+- AI overview of the weather with a blurb in the weather card
+- Different outfit for All Day versus afternoon and evening specific
+- Button to make outfit more formal or casual or better for certain activities in a limited list
+- Some machine learning integration for outfit choice
+- 
