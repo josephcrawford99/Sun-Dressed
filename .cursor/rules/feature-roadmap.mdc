@@ -1,0 +1,158 @@
+---
+description: In  the beginning planning phases, to determine whether a feature should be made. When planning to add stub functions that can be implemented later. When unsure what the next step should be.
+globs: 
+alwaysApply: false
+---
+# Sun Dressed: Feature Roadmap & MVP Definition
+
+**Version:** 1.0
+**Last Updated:** 18MAY2025
+
+**Purpose:** This document outlines the strategic feature roadmap for the Sun Dressed application. It distinguishes between Minimum Viable Product (MVP) features crucial for the initial launch and Post-MVP enhancements for future development. The roadmap also defines the development priority and status for MVP features.
+
+## I. Minimum Viable Product (MVP) Features
+
+The MVP aims to deliver a core, reliable experience enabling users to receive weather-appropriate outfit suggestions using a default clothing set, alongside essential user management and settings.
+
+**Legend for Status:**
+*   **[ ] To Do:** Feature implementation has not started.
+*   **[~] In Progress:** Feature is currently under development.
+*   **[x] Done:** Feature is implemented and tested.
+
+**Core MVP Features (Ordered by Implementation Priority):**
+
+1.  **User Authentication**
+    *   **Status:** [ ] To Do
+    *   **Description:** Enable user sign-up, sign-in, sign-out, and session management.
+    *   **Foundation:** Utilizes existing Supabase integration.
+    *   **Details:**
+        *   Email/Password based Sign-Up.
+        *   Secure Sign-In.
+        *   Clear Sign-Out mechanism.
+        *   Robust Session Management.
+    *   **Reference:** [authentication.mdc](mdc:.cursor/rules/authentication.mdc)
+
+2.  **Persistent User Settings**
+    *   **Status:** [ ] To Do
+    *   **Description:** Allow users to define and persist their preferences.
+    *   **Foundation:** Leverages existing `SettingsContext` and AsyncStorage for persistence.
+    *   **Details:**
+        *   Temperature unit selection (Celsius/Fahrenheit).
+        *   Wind speed unit selection (m/s, mph).
+        *   Style preference (masculine, feminine, neutral).
+    *   **Reference:** [settings.mdc](mdc:.cursor/rules/settings.mdc), [api-data.mdc](mdc:.cursor/rules/api-data.mdc)
+
+3.  **Weather Integration & Display**
+    *   **Status:** [ ] To Do
+    *   **Description:** Fetch and display current weather information relevant for outfit choices.
+    *   **Foundation:** Utilizes existing OpenWeatherAPI integration.
+    *   **Details:**
+        *   Fetch weather based on user\'s location (manual input on homescreen or device GPS).
+        *   Display: Temperature, "Feels Like" temperature, precipitation, wind speed, UV index.
+    *   **Reference:** [weather-integration.mdc](mdc:.cursor/rules/weather-integration.mdc)
+
+4.  **Default User Clothing Data Management (MVP Scope)**
+    *   **Status:** [ ] To Do
+    *   **Description:** Establish and manage a default set of clothing items for the MVP. Users will not add/edit their own clothes in the MVP.
+    *   **Details:**
+        *   Data structure based on `src/mocks/clothingData.json`.
+        *   Initialized with a predefined default clothing set.
+        *   Persistence of this default set via Supabase (e.g., in a `default_clothing_items` table or similar).
+        *   User-specific modifications or additions are Post-MVP.
+
+5.  **Outfit Suggestion Algorithm**
+    *   **Status:** [ ] To Do
+    *   **Description:** Generate outfit suggestions based on weather, default clothing, and user settings.
+    *   **Foundation:** Builds upon the existing `outfitAlgorithm.ts`.
+    *   **Details:**
+        *   Algorithm considers: current weather, the default clothing inventory, and user\'s style preferences (from `SettingsContext`).
+        *   Display the suggested outfit (e.g., within `@BentoBox.tsx`).
+    *   **Reference:** [outfit-algorithm.mdc](mdc:.cursor/rules/outfit-algorithm.mdc)
+
+6.  **Outfit Suggestion Adjustments & Feedback (MVP Scope)**
+    *   **Status:** [ ] To Do
+    *   **Description:** Allow users to provide basic feedback on suggested outfits to refine current and future suggestions.
+    *   **Details:**
+        *   **Thumb Up:** "Padlocks" the item, ensuring its inclusion in the outfit for the current day.
+        *   **Thumb Down:**
+            *   Highlights a "Generate New Outfit" button (appears at the bottom) to trigger a revised recommendation. This action helps update preference scores internally.
+            *   Prompts the user with buttons on the item: "Too Hot," "Too Cold," "Not Dry," or "Not the Vibe." This feedback updates `clothingData` (or its equivalent for the default set) and informs the algorithm.
+        *   Algorithm considers this feedback for immediate (revised outfit) and basic future suggestions.
+    *   **Note:** A button for manually replacing an item is a Post-MVP feature.
+    *   **Dependencies:** Relies on implemented Outfit Suggestion Algorithm (Feature #5).
+
+7.  **Basic Error Handling & UI Polish (Ongoing)**
+    *   **Status:** [ ] To Do (to be addressed iteratively with each feature)
+    *   **Description:** Implement consistent error handling and ensure a usable, visually coherent UI.
+    *   **Details:**
+        *   User-friendly error messages for common issues (network errors, data fetching failures).
+        *   Adherence to defined styles for a consistent look and feel.
+
+8.  **Outfit History (Cloud Sync - Low Priority for MVP)**
+    *   **Status:** [ ] To Do
+    *   **Description:** Persist suggested/worn outfits and user feedback to Supabase for MVP. Full viewing history is Post-MVP.
+    *   **Details:** Basic storage of outfit compositions and feedback data.
+    *   **Reference:** Relates to [api-data.mdc](mdc:.cursor/rules/api-data.mdc)
+
+## II. Post-MVP Features
+
+These features are planned for development after the successful launch and validation of the MVP. Their prioritization will be based on user feedback, business objectives, and resource availability.
+
+**A. Core Functionality Enhancements:**
+*   **User-Managed Clothing Inventory:**
+    *   Allow users to add, edit, and delete their own clothing items.
+    *   Expansion of the `HangarScreen` for clothing management.
+    *   Detailed clothing attributes (material, brand, purchase date, custom tags).
+    *   Image upload for clothing items (Supabase Storage).
+    *   Barcode scanning to add clothes.
+*   **Manual Outfit Item Replacement:**
+    *   Button to manually replace a "thumbed-down" item.
+    *   Presents a list of suitable replacement items, ordered by algorithm score, with warnings (e.g., "too warm," "not for rain").
+*   **View Outfit History:**
+    *   Allow users to browse their past suggested and worn outfits.
+*   **Advanced Outfit Recommendations & Algorithm Improvements:**
+    *   Machine Learning integration for deeper personalization.
+    *   More nuanced user feedback options (e.g., "too formal/casual", specific item dislike).
+    *   Consideration of user\'s activity/occasion (e.g., work, sport, casual).
+    *   Color coordination and advanced style matching algorithms.
+*   **Pre-defined Outfits/Looks:**
+    *   Ability for users to create and manage their own pre-set outfits.
+
+**B. User Experience & Engagement:**
+*   **Expanded User Settings & Preferences:**
+    *   More granular style preferences (e.g., favorite colors, disliked patterns).
+    *   Notification preferences (e.g., daily outfit suggestion, severe weather alerts).
+    *   Theme customization (e.g., dark mode).
+*   **Social Features (Low Priority - Requires Careful Privacy Consideration):**
+    *   Option to share outfits with friends.
+    *   Community features (e.g., popular outfits, style inspiration boards).
+*   **Offline Support:**
+    *   Access to cached weather data and basic outfit suggestion functionality when offline.
+    *   Robust local caching of user clothing data with Supabase synchronization.
+
+**C. Technical Debt & Refinements:**
+*   **BentoBox Component Simplification/Refactor:**
+    *   Address technical debt and improve maintainability as outlined in [bentobox-component.mdc](mdc:.cursor/rules/bentobox-component.mdc).
+*   **Advanced Performance Optimizations:**
+    *   Implement advanced performance strategies (e.g., code splitting, extensive list virtualization if UI performance dictates).
+    *   Refer to [project-structure.mdc](mdc:.cursor/rules/project-structure.mdc) and [bentobox-component.mdc](mdc:.cursor/rules/bentobox-component.mdc) for potential areas.
+*   **Expanded Error Handling & Analytics:**
+    *   More sophisticated error recovery mechanisms.
+    *   Integration with dedicated error tracking services (e.g., Sentry).
+    *   Implementation of usage analytics to understand user behavior and inform feature development.
+*   **UI/UX Enhancements:**
+    *   Advanced animations and micro-interactions for a more polished feel.
+    *   Refined visual design and potential theming options beyond dark mode.
+*   **Accessibility (A11y) Audit & Improvements:**
+    *   Conduct a comprehensive accessibility review and implement necessary enhancements to meet WCAG standards.
+*   **Cross-Device Sync for Settings:**
+    *   Ensure seamless settings synchronization across multiple devices if not fully covered by initial Supabase profile backup.
+
+**D. Testing & Infrastructure:**
+*   **Full End-to-End (E2E) Test Suite:**
+    *   Implementation and ongoing maintenance of a comprehensive E2E test suite (e.g., using Detox).
+*   **Visual Regression Testing:**
+    *   Establish automated visual regression tests to catch unintended UI changes.
+
+---
+_This roadmap is a living document and will be reviewed and updated periodically to reflect development progress, user feedback, and evolving business priorities._

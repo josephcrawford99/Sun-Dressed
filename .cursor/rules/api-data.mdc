@@ -1,0 +1,205 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# API and Data Management Guidelines
+
+## API Integration
+
+### Weather API
+1. **Interface Definition**
+   ```typescript
+   interface WeatherResponse {
+     temperature: number;
+     feels_like: number;
+     humidity: number;
+     wind_speed: number;
+     description: string;
+     icon: WeatherCode;
+   }
+   ```
+
+2. **Error Handling**
+   - Network errors
+   - Invalid responses
+   - Rate limiting
+   - Location not found
+
+3. **Caching Strategy**
+   - Cache weather data for 15 minutes
+   - Store last known location
+   - Implement offline support
+   - Handle cache invalidation
+
+### Authentication API
+1. **Interface Definition**
+   ```typescript
+   interface AuthResponse {
+     user: User;
+     token: string;
+     preferences: UserPreferences;
+   }
+   ```
+
+2. **Error Handling**
+   - Invalid credentials
+   - Network errors
+   - Token expiration
+   - Account locked
+
+3. **Session Management**
+   - Token storage
+   - Auto-refresh
+   - Session timeout
+   - Logout handling
+
+## Data Management
+
+### Outfit Algorithm
+1. **Scoring System**
+   ```typescript
+   interface OutfitScore {
+     temperatureScore: number;    // 40%
+     weatherProtection: number;   // 15%
+     userPreference: number;      // 25%
+     styleCohesion: number;       // 10%
+     recency: number;            // 10%
+   }
+   ```
+
+2. **Data Transformation**
+   - Weather data to outfit requirements
+   - User preferences to scoring
+   - Historical data to recency score
+   - Style matching calculations
+
+3. **State Management**
+   - User preferences
+   - Outfit history
+   - Weather data
+   - Location data
+
+### Local Storage
+1. **Cached Data**
+   ```typescript
+   interface CacheData {
+     user: User;
+     settings: Settings;
+     location: Location;
+     preferences: UserPreferences;
+   }
+   ```
+
+2. **Storage Strategy**
+   - AsyncStorage for persistence
+   - Memory cache for performance
+   - Cache invalidation rules
+   - Data synchronization
+
+3. **Error Recovery**
+   - Data corruption handling
+   - Cache clearing
+   - Data restoration
+   - Conflict resolution
+
+## Data Flow
+
+### Component Data Flow
+1. **Context Providers**
+   - AuthContext
+   - SettingsContext
+   - WeatherContext
+   - OutfitContext
+
+2. **State Updates**
+   - Optimistic updates
+   - Error handling
+   - Loading states
+   - Data persistence
+
+3. **Data Transformation**
+   - API to UI format
+   - User input validation
+   - Data normalization
+   - Error formatting
+
+### API Integration Flow
+1. **Request Flow**
+   - Input validation
+   - Request formatting
+   - Error handling
+   - Response processing
+
+2. **Response Flow**
+   - Data validation
+   - Error handling
+   - Cache updates
+   - UI updates
+
+3. **Error Flow**
+   - Error categorization
+   - User feedback
+   - Recovery actions
+   - Logging
+
+## General API Principles
+- **Centralized Services**: API calls should be managed through dedicated service files (e.g., `src/services/weatherService.ts`, `src/services/userService.ts`).
+- **Clear Interfaces**: Define TypeScript interfaces for API request payloads and response data to ensure type safety.
+- **Input Validation**: Validate input data before making API requests where appropriate.
+- **Loading States**: Implement and manage loading states in the UI for all asynchronous data operations.
+
+## Weather API (OpenWeatherMap)
+- Refer to [weather-integration.mdc](mdc:.cursor/rules/weather-integration.mdc) for detailed guidelines on weather API usage.
+
+## User Data API (Supabase)
+- **Purpose**: Supabase will be used for backend services including user authentication, user profile storage, clothing inventory, and outfit history.
+- **Client**: Utilize the Supabase client library for interactions.
+- **Authentication**: User authentication will be handled by Supabase Auth. See [authentication.mdc](mdc:.cursor/rules/authentication.mdc).
+- **Database Tables (Examples - to be defined further)**:
+  - `profiles`: Stores user-specific information (name, preferences linked to `SettingsContext`).
+  - `clothing_items`: Stores user-uploaded clothing items, similar in structure to `src/mocks/clothingData.json` but user-specific.
+  - `outfit_history`: Stores outfits suggested to/worn by the user, including user feedback.
+
+## Data Persistence Strategy
+
+### 1. User Settings
+- **Storage**: AsyncStorage.
+- **Management**: Through `SettingsContext.tsx`.
+- **Scope**: User-configurable preferences (units, style, notification settings).
+- **Sync**: Primarily local, could be backed up to Supabase user profile if needed for cross-device consistency post-MVP.
+
+### 2. User Clothing Inventory
+- **Storage**: Supabase Database (e.g., `clothing_items` table).
+- **Format**: Structured data for each clothing item including properties like name, category, warmthFactor, style, imageUrl (potentially stored in Supabase Storage), etc. This will replace the local `src/mocks/clothingData.json` for actual user data.
+- **Management**: Functions within a `userService.ts` or `clothingService.ts` to add, edit, delete, and fetch clothing items.
+- **Local Cache (Optional/Post-MVP)**: Consider a local cache (e.g., using AsyncStorage or a local DB like WatermelonDB/SQLite) for faster access and offline capabilities, synchronized with Supabase.
+
+### 3. Outfit History
+- **Storage**: Supabase Database (e.g., `outfit_history` table).
+- **Scope**: Records of suggested outfits, user feedback (liked, disliked, worn), date, and relevant weather conditions.
+- **Purpose**: Enables features like viewing past outfits and provides data for improving future recommendations.
+- **Management**: Service functions to save and retrieve outfit history.
+
+### 4. Mock Data (`src/mocks/clothingData.json`)
+- **Purpose**: For development and initial testing before user-specific data is populated.
+- **Usage**: Should only be used if no user-specific clothing data is available or for specific testing scenarios.
+- **Local Storage of this file**: The `clothingData.json` file itself is part of the app bundle. User-specific clothing data (point 2 above) is what needs persistent storage.
+
+## Error Handling
+- **Consistent Implementation**: Ensure error handling is consistently implemented for all API calls and asynchronous operations.
+- **User Feedback**: Provide clear, user-friendly error messages in the UI.
+  - Use toast notifications, inline messages, or dedicated error screens as appropriate.
+- **Logging**: Implement error logging (e.g., to Sentry or a similar service post-MVP) for debugging and monitoring.
+- **Specific Error Types**:
+  - Network errors (no internet connection).
+  - API errors (server errors, invalid requests, rate limiting).
+  - Data validation errors.
+  - Authentication errors.
+- **Graceful Degradation**: Application should handle errors gracefully, allowing users to continue using unaffected parts of the app where possible.
+- **Expansion Post-MVP**: More sophisticated error recovery mechanisms, detailed error analytics, and user-facing error reporting tools can be considered after the MVP.
+
+## Caching Strategies
+- **Weather Data**: Implement caching for weather API responses to reduce API calls and improve performance. See [weather-integration.mdc](mdc:.cursor/rules/weather-integration.mdc).
+- **User Settings**: Persisted via `SettingsContext` using AsyncStorage.
+- **Other Data**: Evaluate caching needs for other frequently accessed data (e.g., user profile) on a case-by-case basis.

@@ -1,0 +1,207 @@
+---
+description: When performing git commands only
+globs: 
+alwaysApply: false
+---
+# Git Commands
+
+## Normal Use Case
+
+When committing a feature to remote, cd to the directory enclosing the app and do the following:
+```bash
+git add .
+git commit -m "<commit message>"
+git push origin <branch>
+```
+## Basic Commands
+
+### Repository Setup
+```bash
+# Clone repository
+git clone <repository-url>
+
+# Initialize repository
+git init
+
+# Add remote
+git remote add origin <repository-url>
+```
+
+### Basic Operations
+```bash
+# Check status
+git status
+
+# Add files
+git add <file>
+git add .
+
+# Commit changes
+git commit -m "type(scope): description"
+
+# Push changes
+git push origin <branch>
+
+# Pull changes
+git pull origin <branch>
+```
+
+## Branch Management
+
+### Branch Operations
+```bash
+# List branches
+git branch
+git branch -a
+
+# Create branch
+git checkout -b <branch-name>
+
+# Switch branch
+git checkout <branch-name>
+
+# Delete branch
+git branch -d <branch-name>
+git branch -D <branch-name>  # Force delete
+```
+
+### Branch Updates
+```bash
+# Update local branch
+git fetch origin
+git merge origin/<branch>
+
+# Rebase branch
+git rebase origin/<branch>
+
+# Push branch
+git push origin <branch>
+git push -u origin <branch>  # Set upstream
+```
+
+## Commit Management
+
+### Commit Operations
+```bash
+# Amend commit
+git commit --amend
+
+# Reset commit
+git reset --soft HEAD~1
+git reset --hard HEAD~1
+
+# Revert commit
+git revert <commit-hash>
+```
+
+### Commit History
+```bash
+# View history
+git log
+git log --oneline
+git log --graph
+
+# View changes
+git diff
+git diff <commit>
+git diff <branch1>..<branch2>
+```
+
+## Stash Management
+
+### Stash Operations
+```bash
+# Save changes
+git stash save "description"
+
+# List stashes
+git stash list
+
+# Apply stash
+git stash apply
+git stash pop
+
+# Drop stash
+git stash drop
+git stash clear
+```
+
+## Merge Management
+
+### Merge Operations
+```bash
+# Merge branch
+git merge <branch>
+
+# Abort merge
+git merge --abort
+
+# Resolve conflicts
+git status  # Check conflicts
+# Edit files
+git add <resolved-files>
+git commit
+```
+
+## Tag Management
+
+### Tag Operations
+```bash
+# Create tag
+git tag <tag-name>
+git tag -a <tag-name> -m "message"
+
+# List tags
+git tag
+git tag -l "v1.*"
+
+# Push tags
+git push origin <tag-name>
+git push origin --tags
+```
+
+## Configuration
+
+### Git Config
+```bash
+# Set user info
+git config --global user.name "Name"
+git config --global user.email "email"
+
+# Set editor
+git config --global core.editor "vim"
+
+# Set aliases
+git config --global alias.st status
+git config --global alias.co checkout
+```
+
+## Best Practices
+
+### Commit Messages
+- Use conventional commits
+- Be descriptive
+- Reference issues
+- Keep messages concise
+- Use present tense
+
+### Branch Management
+- Use feature branches
+- Keep branches short-lived
+- Regular updates from main
+- Clean up old branches
+- Follow naming conventions
+
+### Workflow
+- Regular commits
+- Pull before push
+- Review changes
+- Test before commit
+- Keep history clean
+
+### Security
+- Don't commit secrets
+- Use .gitignore
+- Review sensitive data
+- Use SSH keys
+- Regular updates

@@ -1,0 +1,167 @@
+---
+description: When pushing to git, testing, deploying, or performing code review
+globs: 
+alwaysApply: false
+---
+# Development Workflow
+
+## Git Workflow
+
+### Branch Strategy
+- `main` - Production branch
+- `develop` - Development branch
+- `refactor` - Temporary branch for a full app refactor
+- `feature/*` - Feature branches
+- `bugfix/*` - Bug fix branches
+- `release/*` - Release preparation
+
+### Branch Naming
+- Feature: `feature/description`
+- Bugfix: `bugfix/issue-description`
+- Release: `release/v1.0.0`
+- Hotfix: `hotfix/issue-description`
+
+### Commit Messages
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+Types:
+- feat: New feature
+- fix: Bug fix
+- docs: Documentation
+- style: Formatting
+- refactor: Code restructuring
+- test: Testing
+- chore: Maintenance
+
+## Development Process
+
+### Setup
+1. Clone repository
+2. Install dependencies
+3. Setup environment variables
+4. Run development server
+
+### Feature Development
+1. Create feature branch
+2. Implement feature
+3. Write tests
+4. Update documentation
+5. Create pull request
+
+### Code Review
+- Review checklist
+- Testing requirements
+- Documentation updates
+- Performance considerations
+- Security review
+
+### Testing
+- Unit tests
+- Integration tests
+- E2E tests
+- Performance tests
+- Security tests
+
+## Quality Assurance
+
+### Code Quality
+- ESLint configuration
+- Prettier formatting
+- TypeScript strict mode
+- Code coverage requirements
+- Performance benchmarks
+
+### Documentation
+- Code comments
+- API documentation
+- Component documentation
+- Setup instructions
+- Deployment guide
+
+### Security
+- Dependency updates
+- Security scanning
+- Code analysis
+- Penetration testing
+- Security review
+
+## Deployment
+
+### Environments
+- Development
+- Staging
+- Production
+
+### Deployment Process
+1. Version bump
+2. Changelog update
+3. Build process
+4. Testing
+5. Deployment
+6. Monitoring
+
+### Monitoring
+- Error tracking
+- Performance monitoring
+- User analytics
+- Security monitoring
+- Resource usage
+
+## Tools
+
+### Development
+- VS Code
+- Git
+- Node.js
+- npm/yarn
+- TypeScript
+
+### Testing
+- Jest
+- React Testing Library
+- Cypress
+- Lighthouse
+- Security scanners
+
+### CI/CD
+- GitHub Actions
+- Docker
+- AWS
+- Monitoring tools
+- Analytics
+
+## Best Practices
+
+### Code
+- Clean code principles
+- SOLID principles
+- DRY principle
+- KISS principle
+- Documentation
+
+### Git
+- Regular commits
+- Meaningful messages
+- Branch management
+- Code review
+- Conflict resolution
+
+### Testing
+- Test-driven development
+- Coverage requirements
+- Performance testing
+- Security testing
+- User testing
+
+### Documentation
+- Code documentation
+- API documentation
+- Setup guides
+- Deployment guides
+- Troubleshooting guides

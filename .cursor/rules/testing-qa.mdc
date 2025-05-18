@@ -1,0 +1,117 @@
+---
+description: for after a feature is complete and the testing phase takes place. Should be updated to add new features to test as they arise
+globs: 
+alwaysApply: false
+---
+# Testing and Quality Assurance
+
+This document outlines the testing strategy for the Sun Dressed application to ensure reliability, performance, and a positive user experience.
+
+## Guiding Principles
+- **Test Pyramid**: Focus on a strong base of unit tests, a reasonable number of integration tests, and fewer, more targeted end-to-end tests.
+- **Automation**: Automate as much of the testing process as possible, especially for regression testing.
+- **Early Testing**: Integrate testing early in the development lifecycle.
+- **Clarity**: Tests should be clear, readable, and maintainable.
+
+## Test Types and Scope
+
+### 1. Unit Testing
+- **Focus**: Test individual functions, modules, and small components in isolation.
+- **Tools**: Jest.
+- **Areas**:
+  - **Outfit Suggestion Algorithm (`outfitAlgorithm.ts`)**:
+    - Create parameterized tests for the algorithm with different weather scenarios (hot, cold, rainy, windy, different times of day).
+    - Test scoring functions independently with mock clothing items and user preferences.
+    - Verify algorithm behavior with different user feedback patterns (likes, dislikes, exclusions).
+    - Test edge cases like extreme temperatures, missing weather data, or empty clothing inventory.
+    - Test generation of warnings based on conditions.
+  - **Utility Functions** (`src/utils/*`):
+    - Test data transformation functions (e.g., weather data parsing, date/time formatting).
+    - Test helper functions for calculations or string manipulations.
+  - **Validators**: Test any input validation logic.
+
+### 2. Component Testing
+- **Focus**: Test individual React components, their rendering, and interactions.
+- **Tools**: React Native Testing Library (with Jest).
+- **Areas**:
+  - **UI Components** (`src/components/*`):
+    - Implement snapshot tests for UI components like `BentoBoxElement`, `WeatherCard`, `CalendarStrip`, `NavBar`, `LocationBar`.
+    - Test component rendering with different prop combinations and states (loading, error, empty data).
+    - Verify component behavior in different states (e.g., button presses, input changes).
+    - Test user interactions and event handling.
+  - **Animations and Transitions**:
+    - Test animations and transitions, particularly for `FlipContainer` and `BentoBox` expansion/collapse. (Note: May require specialized setup or visual regression tools for full verification).
+
+### 3. Context Testing
+- **Focus**: Test React Context providers and consumers to ensure proper state management and propagation.
+- **Tools**: React Native Testing Library (with Jest).
+- **Areas**:
+  - `AuthContext`: Test with different authentication states (logged in, logged out, loading).
+  - `SettingsContext`: Verify it properly manages, persists (e.g., to AsyncStorage), and updates user preferences.
+  - Test context providers with mock consumers to ensure values are passed correctly.
+
+### 4. Integration Testing
+- **Focus**: Test the interaction between multiple components, services, or modules.
+- **Tools**: Jest, React Native Testing Library.
+- **Areas**:
+  - **Screen Flow Testing**:
+    - Test the authentication flow (e.g., Login/Signup Screen → Auth Logic → Home Screen).
+    - Verify navigation between screens works as expected using `react-navigation` testing utilities if available.
+    - Test data persistence and state restoration between screen transitions where applicable.
+  - **API Integration (Weather & Supabase)**:
+    - Create mock API tests for weather data handling (e.g., using `msw` or Jest mocks for `fetch`/`axios`).
+    - Test different API response patterns (success, error, empty data, slow responses).
+    - Test error handling for API failures (timeouts, invalid data, server errors).
+    - Verify caching mechanisms work correctly for weather and location data.
+    - Test Supabase API integration for user data persistence (sign up, login, fetching/updating user profiles, clothing data, outfit history).
+  - **Feature-Specific Integrations**:
+    - Test how location selection integrates with weather data retrieval and outfit suggestions.
+    - Test how user feedback on outfits influences future suggestions.
+
+### 5. End-to-End (E2E) Testing
+- **Focus**: Test complete user flows through the application, simulating real user scenarios.
+- **Tools**: Consider Detox for E2E testing on actual devices/simulators.
+- **Areas**:
+  - **User Journey Testing**:
+    - Create tests for complete user journeys (e.g., Sign Up → Set Initial Preferences → Get First Outfit Recommendation → Adjust Feedback → Get New Recommendation).
+    - Test outfit recommendation adjustments based on user feedback (like/dislike).
+    - Verify location selection, weather data retrieval, and outfit display work together seamlessly.
+  - **Responsive Testing (Visual)**:
+    - Manually test (or use visual regression tools if set up) `BentoBox` layout across different screen sizes.
+    - Verify components adapt properly to orientation changes.
+  - **Accessibility Testing**: Manually verify (or use tools) features like text scaling and screen reader compatibility.
+
+## Automated Testing Infrastructure
+- **Test Runners and Frameworks**:
+  - **Jest**: Primary runner for unit, component, and integration tests.
+  - **React Native Testing Library**: For component and context testing, focusing on user-centric interactions.
+  - **Detox**: (Considered for E2E) For testing on simulators/devices.
+- **CI/CD Integration** (e.g., GitHub Actions):
+  - Set up automated test runs (unit, integration) on every commit to feature branches and before merging to `develop`/`main`.
+  - Implement test coverage reporting (e.g., using Jest's coverage reporters) and aim for a reasonable coverage threshold.
+  - Consider visual regression tests for UI components as part of the CI pipeline if feasible.
+
+## Special Testing Considerations
+
+### BentoBox Component Testing:
+- Create specialized tests for `BentoBox` layout with different clothing combinations (tops, bottoms, dresses, accessories, outerwear).
+- Test dynamic expansion/collapse animation behavior and performance.
+- Verify proper handling of multiple accessories and outerwear items displayed within or around the `BentoBox`.
+- Test empty state handling when no outfit or specific items are available.
+
+### Weather Integration Testing:
+- Test weather data transformation and normalization logic for different API responses from OpenWeatherAPI.
+- Verify outfit recommendations change appropriately and logically with varying weather conditions (temperature, precipitation, wind, UV index).
+- Test location-based weather retrieval, including handling of location permissions and errors.
+
+### Performance Testing (Manual & Automated where possible):
+- Manually assess and, where possible, automate tests for animation performance, especially for `BentoBox` expansion and `FlipContainer`.
+- Measure and optimize component render times, particularly for screens with complex UIs or lists.
+- Test API response caching effectiveness for weather data and user settings.
+
+## Quality Gates
+- All new features must include relevant unit and integration tests.
+- Critical user flows must be covered by E2E tests (if Detox is implemented).
+- Code coverage should meet a predefined target.
+- All tests must pass before merging code into `develop` or `main` branches.
+- Manual QA should be performed for new features on target devices/simulators.

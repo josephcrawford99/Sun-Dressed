@@ -1,0 +1,123 @@
+---
+description: 
+globs: SettingsContext.tsx
+alwaysApply: false
+---
+# Settings Implementation
+
+## Core Components
+
+### SettingsContext
+Implemented in [src/contexts/SettingsContext.tsx](mdc:src/contexts/SettingsContext.tsx)
+
+```typescript
+interface SettingsContextType {
+  settings: UserSettings;
+  updateSettings: (settings: Partial<UserSettings>) => Promise<void>;
+  resetSettings: () => Promise<void>;
+  isLoading: boolean;
+  error: Error | null;
+}
+```
+
+### SettingsScreen
+- Temperature unit selection
+- Wind speed unit selection
+- Style preference selection
+- Cache management
+- Notification preferences
+
+## Data Management
+
+### Settings Data
+```typescript
+interface UserSettings {
+  temperatureUnit: 'C' | 'F';
+  windSpeedUnit: 'ms' | 'mph';
+  stylePreference: 'masculine' | 'feminine' | 'neutral';
+  notifications: NotificationSettings;
+  cache: CacheSettings;
+}
+
+interface NotificationSettings {
+  dailyOutfit: boolean;
+  weatherAlerts: boolean;
+  timeOfDay: string;
+}
+
+interface CacheSettings {
+  clearOnLogout: boolean;
+  maxSize: number;
+  autoClear: boolean;
+}
+```
+
+### Storage Strategy
+- AsyncStorage for persistence
+- Context for runtime
+- Cache management
+- Settings sync
+
+## UI Components
+
+### Settings Items
+- Toggle switches
+- Radio buttons
+- Dropdown selectors
+- Sliders
+- Clear cache button
+
+### Layout
+- Grouped settings
+- Clear labels
+- Help text
+- Confirmation dialogs
+
+## Error Handling
+
+### Settings Errors
+- Storage errors
+- Validation errors
+- Sync errors
+- Cache errors
+
+### User Feedback
+- Success messages
+- Error notifications
+- Loading states
+- Confirmation dialogs
+
+## Testing Strategy
+
+### Unit Tests
+- Settings updates
+- Data persistence
+- Validation
+- Error handling
+
+### Integration Tests
+- Settings flow
+- Cache management
+- Notification system
+- Data sync
+
+## Performance
+
+### Optimization
+- Efficient storage
+- Minimal re-renders
+- Proper memoization
+- Cache management
+
+### Data Flow
+- Unidirectional updates
+- Proper state management
+- Efficient sync
+- Error recovery
+
+## Future Enhancements
+1. Advanced notification settings
+2. Theme customization
+3. Language preferences
+4. Accessibility settings
+5. Backup/restore settings

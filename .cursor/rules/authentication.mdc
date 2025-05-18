@@ -1,0 +1,110 @@
+---
+description: When developing features relating to user sign in sign up or log in
+globs: 
+alwaysApply: false
+---
+# Authentication Implementation
+
+## Core Components
+
+### AuthContext
+Implemented in [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+
+```typescript
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  error: Error | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+}
+```
+
+### AuthScreen
+- Sign in with Google and Apple
+- Email/password authentication
+- Password reset option
+- Navigation to SignUpScreen
+
+### SignUpScreen
+- Email validation
+- Password requirements
+- Style preference selection
+- Unit preferences
+
+## Data Management
+
+### User Data
+```typescript
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  preferences: UserPreferences;
+  createdAt: Date;
+  lastLogin: Date;
+}
+
+interface UserPreferences {
+  stylePreference: 'masculine' | 'feminine' | 'neutral';
+  temperatureUnit: 'C' | 'F';
+  windSpeedUnit: 'ms' | 'mph';
+}
+```
+
+### Session Management
+- Token storage
+- Auto-refresh
+- Session timeout
+- Persistent login
+
+## Security
+
+### Password Requirements
+- Minimum 8 characters
+- At least one number
+- At least one special character
+- Case sensitivity
+
+### Data Protection
+- Encrypted storage
+- Secure token handling
+- Input validation
+- XSS prevention
+
+## Error Handling
+
+### Authentication Errors
+- Invalid credentials
+- Network errors
+- Account locked
+- Email verification
+
+### User Feedback
+- Clear error messages
+- Loading states
+- Success confirmations
+- Recovery options
+
+## Testing Strategy
+
+### Unit Tests
+- Authentication flow
+- Input validation
+- Error handling
+- Session management
+
+### Integration Tests
+- End-to-end auth flow
+- Social auth integration
+- Password reset flow
+- Session persistence
+
+## Future Enhancements
+1. Two-factor authentication
+2. Biometric authentication
+3. Social auth providers
+4. Account linking
+5. Session management

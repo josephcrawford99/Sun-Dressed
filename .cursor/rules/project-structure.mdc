@@ -1,0 +1,221 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+# Project Structure and Implementation Guidelines
+
+## Directory Structure
+```
+src/
+├── components/           # Reusable UI components
+│   ├── common/          # Shared components (buttons, inputs, etc.)
+│   ├── layout/          # Layout components (NavBar, containers)
+│   └── features/        # Feature-specific components
+├── screens/             # Screen components
+├── contexts/            # React Context providers
+├── utils/               # Utility functions and hooks
+├── styles/              # Global styles and themes
+├── types/               # TypeScript type definitions
+├── mocks/               # Mock data for development
+└── test/                # Test files
+```
+
+## File Organization Rules
+1. **Screen Files**
+   - Each screen is a standalone `.tsx` file
+   - Component-specific types are co-located within screen files
+   - Shared types go in `types/` directory
+   - Follow consistent naming: `[ScreenName]Screen.tsx`
+
+2. **Component Files**
+   - One component per file
+   - Co-locate component-specific types
+   - Follow consistent naming: `[ComponentName].tsx`
+   - Group related components in feature directories
+
+3. **Utility Files**
+   - Separate files for different concerns
+   - Clear naming convention: `[purpose].ts`
+   - Include proper TypeScript interfaces
+   - Implement comprehensive error handling
+
+## Component Hierarchy
+```
+App
+├── Navigation
+│   └── NavBar
+├── Screens
+│   ├── AuthScreen
+│   ├── SignUpScreen
+│   ├── HomeScreen
+│   │   ├── LocationBar
+│   │   ├── WeatherCustomButton
+│   │   ├── FlipContainer
+│   │   │   ├── WeatherCard
+│   │   │   └── CardContainer
+│   │   │       └── BentoBoxCard
+│   │   │           └── BentoBoxElement
+│   │   ├── CalendarStrip
+│   │   ├── SettingsScreen
+│   │   ├── AccountScreen
+│   │   ├── LoadingScreen
+│   │   ├── HangerScreen
+│   │   └── SocialScreen
+│   └── Contexts
+│       ├── AuthContext
+│       └── SettingsContext
+```
+
+## Implementation Standards
+
+### Component Implementation
+1. **Layout**
+   - Use explicit height values
+   - Implement proper container sizing
+   - Use percentage-based layouts for consistency
+   - Maintain proper spacing and gaps
+
+2. **Styling**
+   - Use StyleSheet objects, avoid inline styles
+   - Follow established theme constants
+   - Use consistent spacing values
+   - Implement proper responsive design
+
+3. **Error Handling**
+   - Implement comprehensive error boundaries
+   - Use try-catch blocks for async operations
+   - Provide meaningful error messages
+   - Handle edge cases gracefully
+
+### BentoBox Implementation
+1. **Layout**
+   - FlipContainer height: 440px
+   - Consistent grid layout for accessories
+   - Proper spacing and gap values
+   - Handle empty states appropriately
+
+2. **Animation**
+   - Use Animated.Value for smooth transitions
+   - Implement proper z-index management
+   - Handle expanded states correctly
+   - Ensure smooth performance
+
+### API Integration
+1. **Weather API**
+   - TypeScript interfaces for responses
+   - Comprehensive error handling
+   - Implement caching mechanisms
+   - Handle edge cases properly
+
+2. **Data Management**
+   - Outfit algorithm scoring:
+     - Temperature: 40%
+     - Weather protection: 15%
+     - User preference: 25%
+     - Style cohesion: 10%
+     - Recency: 10%
+   - Proper state management
+   - Data transformation utilities
+
+### Testing Strategy
+1. **Unit Tests**
+   - Core algorithm functions
+   - Different weather scenarios
+   - Edge cases
+
+2. **Component Tests**
+   - Snapshot tests for UI elements
+   - Integration tests for flows
+   - Mock API tests
+
+3. **Performance**
+   - Implement proper memoization
+   - Optimize animations
+   - Efficient data caching
+
+## Best Practices
+
+### Code Organization
+1. **Component Structure**
+   - One component per file
+   - Co-locate component-specific types
+   - Keep components focused and single-responsibility
+
+2. **State Management**
+   - Use React Context for global state
+   - Local state for component-specific data
+   - Custom hooks for complex state logic
+
+3. **Styling**
+   - Use StyleSheet objects over inline styles
+   - Follow theme hierarchy:
+     - Global theme constants
+     - Screen-specific styles
+     - Component styles
+
+4. **Type Safety**
+   - Use TypeScript for all components
+   - Define interfaces for props
+   - Use strict type checking
+
+### Development Standards
+1. **Error Handling**
+   - Implement comprehensive error boundaries
+   - Use try-catch blocks for async operations
+   - Provide meaningful error messages
+
+2. **Performance**
+   - Memoize expensive computations
+   - Use React.memo for pure components
+   - Implement proper list virtualization
+
+3. **Testing**
+   - Unit tests for utilities and hooks
+   - Component tests for UI elements
+   - Integration tests for features
+
+4. **Code Quality**
+   - Follow ESLint rules
+   - Use Prettier for formatting
+   - Write meaningful comments
+   - Keep functions small and focused
+
+## Future Improvements
+1. Consider implementing:
+   - Feature-based folder structure
+   - State management library (Redux/Recoil)
+   - Component storybook
+   - E2E testing setup
+   - CI/CD pipeline
+
+2. Potential refactoring:
+   - Extract complex logic from screens
+   - Create more reusable components
+   - Implement proper error boundaries
+   - Add loading states and skeletons
+
+## State Management (Context API)
+
+- **Purpose**: Use React's Context API for managing global or shared state that needs to be accessed by multiple components at different levels of the component tree without prop drilling.
+- **Current Contexts**:
+  - `SettingsContext`: Manages user-specific settings like temperature units, style preferences, etc.
+- **Expanding Contexts (Best Practices)**:
+  - **Granularity**: Prefer creating multiple, specific contexts over a single, monolithic context. This improves separation of concerns and reduces unnecessary re-renders.
+    - Example Future Contexts: `UserPreferencesContext` (if settings become very complex), `OutfitHistoryContext` (for user's saved/worn outfits), `WeatherDataCacheContext` (for managing cached weather data), `AuthContext` (for authentication state - if not already fully covered).
+  - **Provider Scope**: Wrap only the parts of your application that need access to a specific context with its provider. This limits the scope of re-renders when the context value changes.
+  - **Optimization**: 
+    - Use `React.memo` on consumer components if they are expensive to render and only depend on parts of the context that don't change frequently.
+    - Split context values into multiple contexts if some values change more frequently than others.
+    - Optimize context usage to prevent unnecessary re-renders across the component tree. Ensure changes in one part of the app don't trigger widespread re-renders due to poorly structured contexts.
+  - **Bloat Avoidance**: Carefully consider if state truly needs to be global before adding it to a context. Local component state or lifting state up to the nearest common ancestor are often simpler and more performant solutions.
+
+## Performance Considerations (General)
+
+- **List Virtualization**: For long lists of items (e.g., outfit recommendations, clothing items in a Hangar/Closet screen), implement `FlatList` instead of `ScrollView.map`.
+  - Use `keyExtractor` and `getItemLayout` (if item heights are fixed or calculable) to optimize rendering.
+  - Consider pagination or infinite scrolling for very long lists.
+- **State Management**: Optimize context usage as described in the "State Management" section. Isolate state to ensure changes in one part of the app don't trigger unnecessary re-renders elsewhere.
+- **InteractionManager**: Use `InteractionManager.runAfterInteractions()` to schedule non-urgent tasks (e.g., expensive calculations, analytics events) to run after animations or gestures have completed, ensuring a smooth user experience.
+- **Memoization**: Use `React.memo` for functional components and `shouldComponentUpdate` or `PureComponent` for class components to prevent unnecessary re-renders when props haven't changed.
+- **`useCallback` and `useMemo`**: Use these hooks to memoize functions and values, respectively, especially when passing them as props to memoized child components.

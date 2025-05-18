@@ -1,0 +1,156 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Implementation Guide for Sun Dressed
+
+This rule summarizes the implementation guide and development standards from [AI.md](mdc:AI.md) for the Sun Dressed app.
+
+## Key Points
+- Only create files and components specified in the guide unless explicitly approved.
+- Use the old codebase in the @Old directory only for style guidance, not for implementation or file structure. This is from a version of the app before a major rewrite.
+- Use React and Expo.
+- The current goal is to create a minimum viable product (MVP) that is able to be released on the Android and Apple app stores. 
+- **The MVP will focus on core functionalities enabling users to receive weather-based outfit suggestions using a default clothing set, along with user authentication, settings persistence, and basic feedback mechanisms. For a detailed and authoritative list of MVP features, their specific scope, and prioritization, always refer to the [feature-roadmap.mdc](mdc:.cursor/rules/feature-roadmap.mdc) file.**
+- Extraneous features beyond the defined MVP scope in [feature-roadmap.mdc](mdc:.cursor/rules/feature-roadmap.mdc) should be avoided until the MVP is complete and stable.
+
+## MVP Focus and Prioritization
+- **Primary Goal**: Deliver a Minimum Viable Product (MVP) with core functionality first. **Refer to [feature-roadmap.mdc](mdc:.cursor/rules/feature-roadmap.mdc) for a detailed list of MVP features and their priorities.**
+- **Extraneous Features**: Avoid implementing features or significant UI/UX enhancements not explicitly listed as MVP in [feature-roadmap.mdc](mdc:.cursor/rules/feature-roadmap.mdc) (e.g., complex animations beyond basic usability, dark mode, extensive theming) until the MVP is complete and stable.
+- **Performance**: Implement good performance practices from the start. Advanced optimizations detailed in rules like specific BentoBox rendering improvements or extensive list virtualization strategies should be prioritized post-MVP or if critical performance bottlenecks are identified in MVP features. Refer to [feature-roadmap.mdc](mdc:.cursor/rules/feature-roadmap.mdc) for post-MVP technical refinements.
+- **Error Handling**: Implement consistent and clear basic error handling for MVP features. Advanced error recovery, detailed analytics, and sophisticated user reporting are post-MVP.
+- **Styling**: Adhere to the established visual aesthetic (fonts, colors, basic style) for the MVP. Extensive visual overhauls or new style explorations are post-MVP.
+
+## Procedure
+Follow this strict 4-phase process for each feature or fix:
+
+### Phase 1: Analyze the project as a Software Engineer
+- Examine the files of the project as a whole, keeping track of those impacted by the feature
+- consult @rules to determine what is missing
+- Map the current implementation with specific file references
+- Document component relationships @project-structure.mdc 
+- Identify technical constraints and potential issues
+- Output: Clear assessment of current code with specific file paths and code references
+
+### Phase 2: Act as a Project Manager and Specify the Feature
+- Define the feature's user-facing value
+- Outline acceptance criteria with specific user interactions
+- Specify UI behavior, animations, and state changes
+- Reference similar patterns from existing codebase
+- Output: Clear, specific feature description with success criteria
+
+### Phase 3: Plan the implementation acting as a Tech Lead
+- Break the task into modular components
+- Create pseudocode for each function needed
+- Define data structures and state management
+- Plan testing approach
+- Identify potential edge cases
+- Think incredibly heavily, only writing code once you are 95% certain it will work
+- Output: Structured pseudocode with component relationships and data flow
+
+### Phase 4: Developer Implementation
+- Create concise, focused code implementing the plan
+- Follow project architecture patterns, creating new files only when adding to the project structure
+- Use explicit error handling
+- Document code with clear comments
+- Update relevant rules files in @rules with changes made
+- Output: Production-ready code with testing considerations. Consult @git-commands.mdc when a feature is complete
+
+## Implementation Guidelines
+- Create minimal new files (1-2 max per feature) and only create when you are certain an existing file is not intended to have this functionality
+- Keep components under 150 lines
+- Follow atomic design pattern
+- Prioritize modularity over clever solutions
+- Create git commits after each significant change
+
+## Quality Control
+- Run code with expo in the web interface to show me it is operational. 
+- Test on both iOS and Android simulators
+- Verify against edge cases identified in Phase 3
+- Ensure proper TypeScript typing for all new code
+- Follow existing styling patterns in the codebase
+
+## Project Structure
+See [project-structure.mdc](mdc:.cursor/rules/project-structure.mdc) for detailed directory organization and file naming conventions.
+
+## Component Implementation
+- Each screen is a standalone .tsx file with types co-located unless shared.
+- Shared types go in a types directory.
+- Follow the provided component hierarchy and implementation phases.
+
+## Styling Guidelines
+- Use global theme constants, then screen-specific, then component styles. Avoid inline styles.
+- Fonts: Libre Baskerville and Montserrat
+- Border radius: 8
+- Colors: #fff (black), #757575 (gray), #000 (white), #FFEE8C (yellow, sparingly)
+
+## API and Data Management
+See [api-data.mdc](mdc:.cursor/rules/api-data.mdc) for:
+- API interfaces with input validation
+- Structured error handling
+- Standardized error objects for UI feedback
+- Caching strategies
+
+## Outfit Algorithm
+See [outfit-algorithm.mdc](mdc:.cursor/rules/outfit-algorithm.mdc) for:
+- Algorithm implementation details
+- Weather consideration logic
+- User preference integration
+- Warning system implementation
+
+## Weather Integration
+See [weather-integration.mdc](mdc:.cursor/rules/weather-integration.mdc) for:
+- Weather API integration
+- Data processing
+- Error handling
+- Caching strategies
+
+## Authentication
+See [authentication.mdc](mdc:.cursor/rules/authentication.mdc) for:
+- Auth flow implementation
+- Session management
+- Security measures
+- Error handling
+
+## Settings
+See [settings.mdc](mdc:.cursor/rules/settings.mdc) for:
+- User preferences
+- Cache management
+- Notification settings
+- Theme customization
+
+## Testing and Quality Assurance
+See [testing-qa.mdc](mdc:.cursor/rules/testing-qa.mdc) for:
+- Unit testing requirements
+- Integration testing
+- E2E testing
+- Performance testing
+- Security testing
+
+## Development Workflow
+See [development-workflow.mdc](mdc:.cursor/rules/development-workflow.mdc) for:
+- Development process
+- Code review guidelines
+- Testing requirements
+- Deployment process
+
+## Git Usage
+See [git-commands.mdc](mdc:.cursor/rules/git-commands.mdc) for:
+- Branch management
+- Commit conventions
+- Code review process
+- Version control best practices
+
+## Navigation
+- Auth > Home > others via NavBar
+- Sign out returns to Auth
+
+## Component-Specific Guidelines
+See [bentobox-component.mdc](mdc:.cursor/rules/bentobox-component.mdc) for:
+- Component architecture
+- State management
+- Performance optimization
+- Testing strategies
+
+Refer to individual rule files for detailed implementation guidelines and best practices.

@@ -1,0 +1,154 @@
+---
+description: 
+globs: useWeather.ts,WeatherCustomButton.tsx,WeatherIcon.tsx,FlipContainer.tsx
+alwaysApply: false
+---
+# Weather Integration Guidelines
+
+## API Integration
+
+- **Primary API**: Utilize OpenWeatherMap API for all weather data needs during the MVP phase. Ensure compliance with their terms of service, including API key management and usage limits.
+- **Endpoint Usage**: Clearly define which OpenWeatherMap endpoints are used (e.g., One Call API, Current Weather Data, Forecast API).
+
+### Weather Service
+Implemented in [src/utils/useWeather.ts](mdc:src/utils/useWeather.ts)
+
+```typescript
+interface WeatherService {
+  getCurrentWeather: (location: string) => Promise<WeatherData>;
+  getForecast: (location: string) => Promise<ForecastData>;
+  getLocationSuggestions: (query: string) => Promise<Location[]>;
+}
+```
+
+### Data Types
+```typescript
+interface WeatherData {
+  temperature: number;
+  feels_like: number;
+  humidity: number;
+  wind_speed: number;
+  description: string;
+  icon: WeatherCode;
+  chance_of_rain?: number;
+}
+
+interface ForecastData {
+  daily: WeatherData[];
+  hourly: WeatherData[];
+}
+```
+
+## Location Management
+
+### Location Service
+- Default location: New York, NY
+- Last used location storage
+- Location history
+- Current location detection
+
+### Location Search
+- Autocomplete functionality
+- Distance-based sorting
+- Recent locations first
+- Error handling for invalid locations
+
+## Weather Display
+
+### Weather Card
+- Current temperature
+- Feels like temperature
+- Weather description
+- Weather icon
+- Humidity
+- Wind speed
+
+### Weather Icons
+- Implemented in [src/utils/weatherIcons.ts](mdc:src/utils/weatherIcons.ts)
+- Maps weather codes to icons
+- Consistent styling
+- Proper scaling
+
+## Caching Strategy
+
+### Data Caching
+- Cache duration: 15 minutes
+- Offline support
+- Cache invalidation
+- Error recovery
+
+### Location Caching
+- Recent locations
+- User preferences
+- Default location
+- Cache clearing option
+
+## Error Handling
+
+### API Errors
+- Network errors
+- Invalid responses
+- Rate limiting
+- Location not found
+
+### User Feedback
+- Error messages
+- Loading states
+- Retry mechanisms
+- Fallback data
+
+## Integration Points
+
+### Weather Context
+```typescript
+interface WeatherContextType {
+  weatherData: WeatherData | null;
+  forecastData: ForecastData | null;
+  location: string;
+  isLoading: boolean;
+  error: Error | null;
+  updateLocation: (location: string) => Promise<void>;
+  refreshWeather: () => Promise<void>;
+}
+```
+
+### Component Integration
+- WeatherCard
+- LocationBar
+- WeatherCustomButton
+- FlipContainer
+
+## Testing Strategy
+
+### Unit Tests
+- API response handling
+- Data transformation
+- Error handling
+- Cache management
+
+### Integration Tests
+- Weather data flow
+- Location updates
+- Component rendering
+- Error states
+
+## Performance Optimization
+
+### API Calls
+- Minimize requests
+- Batch updates
+- Proper error handling
+- Loading states
+
+### Data Management
+- Efficient caching
+- Memory management
+- State updates
+- Error recovery
+
+## Future Enhancements
+1. Multiple weather providers
+2. Advanced forecasting
+3. Weather alerts
+4. Historical data
+5. Weather trends

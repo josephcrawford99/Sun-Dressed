@@ -1,0 +1,123 @@
+---
+description: 
+globs: BentoBox.tsx,outfitAlgorithm.ts
+alwaysApply: false
+---
+# Outfit Suggestion Algorithm
+
+## Core Implementation
+The outfit suggestion algorithm is implemented in [src/utils/outfitAlgorithm.ts](mdc:src/utils/outfitAlgorithm.ts) and follows a weighted scoring system. Note that a user should be suggested outfits outside the season or recommended thresholds if no other option is present. A warning may be shown in future iterations such as "This outfit may be too warm" or "This outfit may not protect from rain":
+
+### Scoring Weights
+- Temperature Appropriateness: 40%
+- Weather Protection: 15%
+- User Preference: 25%
+- Style Cohesion: 10%
+- Recency: 10%
+
+## Temperature Ranges
+```typescript
+const TEMP_RANGES = {
+  VERY_COLD: { min: -20, max: 0 },    // 8-10 warmth factor
+  COLD: { min: 0, max: 10 },          // 7-8 warmth factor
+  COOL: { min: 10, max: 15 },         // 5-6 warmth factor
+  MILD: { min: 15, max: 20 },         // 4-5 warmth factor
+  WARM: { min: 20, max: 25 },         // 2-3 warmth factor
+  HOT: { min: 25, max: 35 },          // 1-2 warmth factor
+  VERY_HOT: { min: 35, max: 50 }      // 0-1 warmth factor
+}
+```
+
+## Weather Thresholds
+- Rain: 30% chance or higher
+- Wind: 15 km/h or higher
+- Sun Protection: Clear or partly cloudy conditions
+
+## Key Functions
+
+### 1. Outfit Generation
+- `filterAvailableItems()`: Filters clothing based on style and season
+- `generateOutfitTemplates()`: Creates valid outfit combinations
+- `suggestOutfit()`: Main function for outfit recommendations
+
+### 2. Scoring System
+- `calculateTemperatureScore()`: Evaluates temperature appropriateness
+- `calculateWeatherProtectionScore()`: Checks weather protection
+- `calculateUserPreferenceScore()`: Considers user preferences
+- `calculateCohesionScore()`: Evaluates style matching
+- `calculateRecencyScore()`: Considers when items were last worn
+
+### 3. Feedback Processing
+- `processOutfitFeedback()`: Updates item properties based on feedback
+- `updateRecencyValues()`: Updates recency tracking
+
+## Integration Points
+
+### Weather Data
+```typescript
+interface OutfitWeatherData {
+  temperature: number;
+  feels_like: number;
+  wind_speed: number;
+  chance_of_rain: number;
+  icon: string;
+}
+```
+
+### User Preferences
+```typescript
+interface OutfitAlgorithmParams {
+  weatherData: OutfitWeatherData;
+  stylePreference: StylePreference;
+  clothingItems: ClothingItem[];
+  includeItems?: string[];
+  excludeItems?: string[];
+  template?: OutfitTemplate;
+}
+```
+
+## Adaptation Mechanisms
+
+### Temperature Calibration
+- Adjusts warmth factors based on user feedback
+- Learns user's temperature comfort zone
+- Updates item properties for future suggestions
+
+### Style Learning
+- Tracks item combinations that work well together
+- Updates cohesion scores based on user feedback
+- Improves style matching over time
+
+### Preference Evolution
+- Updates item preference scores
+- Considers recency of wear
+- Adapts to user's style preferences
+
+## Testing Strategy
+
+### Unit Tests
+- Test temperature scoring with different ranges
+- Verify weather protection calculations
+- Test user preference scoring
+- Validate style cohesion calculations
+
+### Integration Tests
+- Test complete outfit generation
+- Verify feedback processing
+- Test adaptation mechanisms
+- Validate weather integration
+
+## Implementation Details
+
+- **File Structure**: The core algorithm logic should reside in `src/utils/outfitAlgorithm.ts` for the MVP. While it is a large file, refactoring into multiple files should be considered post-MVP or if complexity significantly increases, especially if Machine Learning features are introduced.
+- **Readability**: Prioritize clear, well-documented code within `outfitAlgorithm.ts`. Use helper functions for distinct logical blocks (e.g., scoring, filtering, item selection).
+- **Modularity**: Design functions within the algorithm to be as modular as possible, even within a single file, to facilitate testing and potential future refactoring.
+- **Creative Shortening**: If opportunities arise to shorten or simplify the `outfitAlgorithm.ts` file without compromising its logic or readability during MVP development, such creative solutions are welcome.
+
+## Future Enhancements
+1. Machine learning for improved predictions
+2. Calendar integration for context-aware suggestions
+3. Color coordination scoring
+4. Activity-specific optimization
+5. **Machine Learning Integration**: Explore ML models for more personalized and context-aware outfit suggestions. This would likely necessitate a significant refactor of the current algorithm structure.
+6. Advanced user feedback mechanisms (e.g., "too hot/cold", "didn't like style").

@@ -1,0 +1,141 @@
+---
+description: 
+globs: BentoBox.tsx,FlipContainer.tsx,HomeScreen.tsx,outfitAlgorithm.ts
+alwaysApply: false
+---
+# BentoBox Component Implementation
+
+## Component Structure
+The BentoBox component is implemented in [src/components/BentoBox.tsx](mdc:src/components/BentoBox.tsx) and consists of:
+
+### Layout
+- Two rows on the left (one if a dress is in the outfit)
+- Three Rows on the right for Outerwear, Accessories, and shoes in that order
+- The Accessories and Outerwear rows should hold two items when two clothing objects are recommended
+- Currently the minimum viable product has this box as static while the final functionality will have elements expand when clicked
+
+## Grid Organization
+
+### Left Column
+- Top item (48% height)
+- Bottom item (48% height)
+- Margin gap between items
+- Dress option (100% height when used)
+
+### Right Column
+- Outerwear (stacked horizontally)
+- Accessories (stacked vertically)
+- Shoes (bottom right, aligned with bottom)
+
+## Element Implementation
+
+### BentoBoxElement
+- Light gray background
+- Square with rounded edges
+- No outlines
+- Vertical labels (rotated 90°)
+- Vector/PNG icons (black, no background)
+
+### Label Styling
+- Very light gray
+- Italic Montserrat font
+- Left side positioning
+- Transform origin: '0% 0%'
+
+## Animation and Interaction
+
+### Expansion Animation (not currently implemented)
+- Smooth width/height transitions
+- Animated.Value for both dimensions
+- Proper z-index management
+- Push other elements offscreen
+
+### Touch Handling
+- Single tap for expansion
+- When expanded, single tap for Smooth collapse animation
+- Proper event propagation
+
+## State Management
+
+### Element States
+```typescript
+interface BentoBoxElementState {
+  isExpanded: boolean;
+  position: {
+    x: number;
+    y: number;
+  };
+  dimensions: {
+    width: number;
+    height: number;
+  };
+}
+```
+
+### Layout States
+```typescript
+interface BentoBoxLayout {
+  columns: number;
+  rows: number;
+  gaps: {
+    horizontal: number;
+    vertical: number;
+  };
+}
+```
+
+## Styling Guidelines
+
+### Colors
+- Background: Light gray from theme
+- Text: Very light gray
+- Icons: Black
+- No outlines
+
+### Spacing
+- Consistent gaps between elements
+- Proper padding for expanded state
+- Margin for container
+- Dynamic spacing for accessories
+
+## Performance Optimization
+
+### Rendering
+- Use React.memo for elements
+- Implement proper key props
+- Optimize re-renders
+- Handle empty states
+
+### Animation
+- Use native driver where possible
+- Optimize animation performance
+- Handle cleanup properly
+- Implement proper easing
+
+## Testing Strategy
+
+### Unit Tests
+- Test element rendering
+- Verify layout calculations
+- Test animation states
+- Validate touch handling
+
+### Integration Tests
+- Test with different outfit data
+- Verify expansion behavior
+- Test with multiple accessories
+- Validate responsive layout
+
+## Accessibility
+
+### Screen Reader
+- Proper accessibility labels
+- Focus management
+- Keyboard navigation
+- ARIA attributes
+
+### Visual Accessibility
+- Proper color contrast
+- Scalable text
+- Touch target sizes
+- Visual feedback
