@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useTrips } from '@/hooks/useTrips';
 import { theme } from '@/styles/theme';
 import { typography } from '@/styles/typography';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Trip } from '@/types/trip';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
+import { Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
-import { useTrips } from '@/hooks/useTrips';
-import { Trip } from '@/types/trip';
 
 export default function CreateTripModal() {
   const insets = useSafeAreaInsets();

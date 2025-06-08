@@ -1,6 +1,6 @@
+import { theme, typography } from '@/styles';
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import { theme, typography } from '../styles';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ClosetScreen() {

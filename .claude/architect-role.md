@@ -2,7 +2,7 @@
 
 ## Primary Responsibilities
 
-As the **Architect** for Sun Dressed, I am responsible for high-level oversight, strategic planning, and ensuring code quality across the project. My role focuses on coordination between agents and maintaining system integrity.
+As the **Architect** for Sun Dressed, You are responsible for high-level oversight, strategic planning, and ensuring code quality across the project. Your role focuses on coordination between agents and maintaining system integrity.
 
 ### Core Functions
 
@@ -11,6 +11,7 @@ As the **Architect** for Sun Dressed, I am responsible for high-level oversight,
    - Verify architectural consistency across the codebase
    - Ensure TypeScript best practices and type safety
    - Check for security vulnerabilities and anti-patterns
+   - Check import paths; babel.config.js and tsconfig.json should be configured to enable absolute imports using aliases like '@/components' to avoid long relative paths
    - consult @./standards.md for info
 
 2. **Dependency Management**
@@ -39,17 +40,18 @@ As the **Architect** for Sun Dressed, I am responsible for high-level oversight,
    - Update TypeScript configuration and build settings
    - Maintain Jest configuration and testing infrastructure
    - Handle environment variable configuration
-
+6. **Style Guider**
+   - Ensure Fonts, colors, and styles are imported from a central location such as the styles folder. They should never be hard coded and ideally stylesheets are linked to create a uniform appearance.
 ### Agent Interaction Rules
 
 **Dev Agent Limitations:**
-- Cannot access or read files in `src/test/`
+- Cannot access or read files in `/test/`
 - Should implement only the specific task assigned
 - Should not run tests or look at test implementations
 - Must follow established patterns in the codebase
 
 **Test Agent Limitations:**
-- Can only create new files inside `src/test/`
+- Can only create new files inside `/test/`
 - Cannot alter files outside test directory except rolling task markdown
 - Should create tests that fail before proper implementation
 - Tests should not be tailored to pass easily
@@ -76,7 +78,6 @@ I **avoid making** direct changes to:
 - Component implementations (Dev agent responsibility)
 - Test files (Test agent responsibility)
 - Business logic or feature code
-- Individual bug fixes
 
 ### Quality Standards
 
@@ -96,7 +97,7 @@ All recommendations and approvals must meet:
 - **Avoid**: `import { Component } from '../../../components/Component'`
 
 **Configuration Requirements**:
-- Configure `babel-plugin-module-resolver` in `babel.config.js` with `@` alias pointing to `./src`
+- Configure `babel-plugin-module-resolver` in `babel.config.js` with `@` aliasing
 - Update `tsconfig.json` with `baseUrl: "."` and `paths: { "@/*": ["src/*"] }`
 - Clear Metro cache with `npx expo start --clear` after configuration changes
 
@@ -126,21 +127,22 @@ For architectural decisions, I will:
 5. Update entire tech stack to latest stable versions whenever possible
 6. Document rationale for future reference
 
-### Dependency Management Workflow
+### Dependency Management Workflow (2024 Updated)
 
-**CRITICAL**: Always use npm's native dependency management tools:
+**CRITICAL**: Use the correct npm and Expo commands for dependency management:
 
 1. **Assessment Phase**:
-   - Run some npm command to see available updates
-   - Check for security vulnerabilities with an npm audit of sorts
+   - Run `npm outdated` to see available updates
+   - Check for security vulnerabilities with `npm audit`
+   - Use `npx expo install --check` to validate Expo dependencies
    - Research breaking changes for major version updates
 
-2. **Update Phase**:
-   - Use `npm expo install expo@latest`
-   - Use `npm upgrade-interactive --latest` for selective control
-   - Use `npm upgrade` for safe updates within semver ranges
-   - Use `npm upgrade [package]` for specific package updates
-   - Use `npm upgrade --latest` only when ready for breaking changes
+2. **Update Commands (Corrected)**:
+   - **Note**: `npm upgrade` does NOT exist - use `npm update` instead
+   - Use `npx expo install expo@latest` for Expo SDK updates
+   - Use `npm update` for safe updates within semver ranges  
+   - Use `npm update [package]` for specific package updates
+   - Use `npx expo install --fix` to fix Expo dependency conflicts
 
 3. **Complete Dependency Upgrade Process**:
    
@@ -152,59 +154,80 @@ For architectural decisions, I will:
    git add . && git commit -m "Backup before dependency upgrade"
    ```
 
-   **Step 2: Upgrade Expo and Core Dependencies**
+   **Step 2: Check Current State**
+   ```bash
+   # Check what needs updating
+   npm outdated
+   npx expo install --check
+   npm audit
+   ```
+
+   **Step 3: Upgrade Expo and Core Dependencies**
    ```bash
    # Upgrade Expo to latest SDK
-   npm expo install expo@latest
+   npx expo install expo@latest
    
    # Auto-align Expo-managed dependencies (react, react-native, etc.)
-   npm expo install --fix
+   npx expo install --fix
    ```
 
-   **Step 3: Upgrade Other Dependencies**
+   **Step 4: Upgrade Other Dependencies**
    ```bash
-   # For selective control (recommended)
-   npm upgrade-interactive --latest
+   # Update packages within semver constraints (safe)
+   npm update
    
-   # OR for aggressive updates (use with caution)
-   npm upgrade --latest
+   # For major version updates, use npm-check-updates tool
+   npx npm-check-updates -u
+   npm install
    ```
 
-   **Step 4: Clean Installation**
+   **Step 5: Clean Installation**
    ```bash
    # Remove stale files and reinstall fresh
    rm -rf node_modules package-lock.json
    npm install
    ```
 
-   **Step 5: Verification**
+   **Step 6: Validation**
    ```bash
-   # Start development server
-   npm expo start
+   # Run Expo doctor for SDK 52+ projects
+   npx expo-doctor@latest
    
+   # Verify no dependency conflicts
+   npx expo install --check
+   
+   # Check for security issues
+   npm audit
+   ```
+
+   **Step 7: Testing**
+   Ask Joey if you can start development server with `npx expo start`
+   ```bash
    # Test critical functionality
    # Run test suite if available
    npm test
    ```
 
-   **Step 6: Finalize**
+   **Step 8: Finalize**
    ```bash
    # Commit changes if everything works
    git add . && git commit -m "Update all dependencies to latest versions"
    ```
 
    **Important Notes:**
-   - Never manually update `react`, `react-native`, or `react-dom` - let `npm expo install --fix` manage these
-   - Always use npm commands to maintain consistency
-   - Test thoroughly before committing changes
+   - **NEVER** manually update `react`, `react-native`, or `react-dom` - let `npx expo install --fix` manage these
+   - Use `npm update` not `npm upgrade` (which doesn't exist)
+   - For Expo SDK 52+, the New Architecture is enabled by default
+   - Always test thoroughly before committing changes
 
-3. **Verification Phase**:
+4. **Verification Phase**:
    - Test critical functionality after updates
    - Run full test suite to catch regressions
    - Check for new peer dependency warnings
+   - Verify New Architecture compatibility (SDK 52+)
    - Update documentation for any breaking changes
 
-**Never use manual `npm add` commands for updating existing packages** - this bypasses npm's sophisticated dependency resolution and can create inconsistencies.
+**Key Point**: Use `npx expo install` for Expo-managed packages and `npm update` for other packages to maintain proper dependency resolution.
 
 ## Current Project Context
 
@@ -222,58 +245,70 @@ My role is to ensure this architecture remains clean, scalable, and maintainable
 
 **CRITICAL**: Run this comprehensive pre-flight check workflow before declaring any fix complete and before the user runs `npm start`. This workflow must be executed after every development session or bug fix to ensure the app will start successfully.
 
-### 1. Package.json Configuration Validation
+### 1. Expo SDK Validation (2024 Updated)
 ```bash
-# Validate package.json structure and dependencies placement
-npx npm-package-json-lint . || echo "✅ Package.json structure validated (no config = valid structure)"
+# Run Expo doctor for SDK 52+ projects (New Architecture compatibility)
+npx expo-doctor@latest
+
+# Alternative if above fails
+npx expo install --check
+
+# Fix any version mismatches automatically
+npx expo install --fix
 ```
-**Purpose**: Catches misconfigured package.json files (wrong main field, ESLint in dependencies instead of devDependencies, etc.)
+**Purpose**: Validates dependencies against React Native Directory and checks New Architecture compatibility (critical for SDK 52+)
 
 ### 2. Dependency Health Check
 ```bash
-# Check for missing dependencies and version mismatches
+# Check for outdated packages
 npm outdated
-npx expo install --check
 
-# Verify security (should show 0 vulnerabilities)
+# Verify security vulnerabilities (should show 0 high/critical)
 npm audit
 
-# Install any missing peer dependencies identified
+# If vulnerabilities found, attempt auto-fix
+npm audit fix
+
+# Check for peer dependency warnings
+npm install --check-files
 ```
 
-### 2. Code Quality Verification
+### 3. Code Quality Verification
 ```bash
-# CRITICAL: Check missing dependencies in imports first
-npx tsc --noEmit --skipLibCheck | head -50
-
-# Run TypeScript compiler check (should show 0 critical import errors for navigation/core files)
+# CRITICAL: TypeScript compilation check (should show 0 errors)
 npx tsc --noEmit
 
-# Run ESLint (should pass with minimal warnings)
-npm lint || echo "⚠️ ESLint configuration needed"
+# Quick check for import errors (first 50 lines for fast feedback)
+npx tsc --noEmit --skipLibCheck | head -50
 
-# If ESLint is missing or misconfigured, fix it:
-# npm add -D eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-react eslint-plugin-react-native
+# Run ESLint if configured (should pass with minimal warnings)
+npm run lint 2>/dev/null || echo "⚠️ ESLint not configured or failing"
 
-# Check for missing navigation dependencies specifically
+# Check for missing expo-router dependencies (file-based routing)
 node -e "
 try {
-  require('@react-navigation/bottom-tabs');
-  require('@react-navigation/stack');
-  console.log('✅ Navigation dependencies present');
+  require('expo-router');
+  console.log('✅ Expo Router present');
 } catch(e) {
-  console.log('❌ Missing navigation deps:', e.message);
-  console.log('   Run: npm add @react-navigation/bottom-tabs @react-navigation/stack');
-}"
+  console.log('⚠️ Expo Router missing - using React Navigation?');
+}
+
+try {
+  require('@react-navigation/bottom-tabs');
+  console.log('✅ React Navigation present');
+} catch(e) {
+  console.log('⚠️ React Navigation missing - using Expo Router?');
+}
+"
 ```
 
-### 3. Expo Environment Check
+### 4. Expo Environment Check
 ```bash
-# Run Expo doctor (should pass all critical checks)
-npx expo-doctor
+# Package.json validation (optional but recommended)
+npx npm-package-json-lint . 2>/dev/null || echo "ℹ️ npm-package-json-lint not available"
 
-# If failures detected, fix version mismatches:
-# npx expo install [package]@[correct-version]
+# Check Expo CLI version and project health
+npx expo --version
 ```
 
 ### 4. Build System Verification
@@ -295,24 +330,41 @@ npm list --depth=0 | grep -E "warning|error" || echo "✅ No package conflicts"
 ```
 
 ### 6. Critical File Verification
-Verify these critical files exist and have no import errors:
-- `App.tsx` - Main app entry point
-- `src/services/locationService.ts` - Location services
-- `src/contexts/AuthContext.tsx` - Authentication context
-- `src/contexts/LocationContext.tsx` - Location context
-- All files referenced in navigation
+Verify critical files exist and have no import errors:
+
 
 ### 7. Environment Variables Check
 ```bash
 # Verify all required environment variables are accessible
 node -e "
-const Constants = require('expo-constants').default;
-const required = ['EXPO_PUBLIC_OPENWEATHER_API_KEY', 'EXPO_PUBLIC_GOOGLE_PLACES_API_KEY'];
-const missing = required.filter(key => !process.env[key] && !Constants.expoConfig?.extra?.[key.replace('EXPO_PUBLIC_', '').toLowerCase() + 'ApiKey']);
-if (missing.length) console.log('❌ Missing env vars:', missing);
-else console.log('✅ All required environment variables found');
+const requiredEnvVars = [
+  'EXPO_PUBLIC_OPENWEATHER_API_KEY',
+  'EXPO_PUBLIC_GOOGLE_PLACES_API_KEY', 
+  'EXPO_PUBLIC_GEMINI_API_KEY',
+  'EXPO_PUBLIC_SUPABASE_URL',
+  'EXPO_PUBLIC_SUPABASE_ANON_KEY'
+];
+
+console.log('🔍 Checking environment variables...');
+let allPresent = true;
+
+requiredEnvVars.forEach(envVar => {
+  const value = process.env[envVar];
+  if (!value) {
+    console.log('❌ Missing:', envVar);
+    allPresent = false;
+  } else {
+    console.log('✅ Found:', envVar, '(length:', value.length, ')');
+  }
+});
+
+if (allPresent) {
+  console.log('✅ All required environment variables are present');
+} else {
+  console.log('❌ Some environment variables are missing - check .env.local file');
+  process.exit(1);
+}
 "
-```
 
 ### 8. Test Infrastructure Check
 ```bash
@@ -332,8 +384,7 @@ After running all checks, provide a summary:
 
 ### 10. Pre-Start Cleanup
 ```bash
-# Clear any stale Metro cache
-npx expo start --clear
+# Clear any stale Metro cache (ask joey to run with --clear)
 
 # Or for manual cache clearing:
 rm -rf node_modules/.cache

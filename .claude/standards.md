@@ -1,39 +1,79 @@
 ### General TypeScript Best Practices
 
-Clean React Native code starts with a solid TypeScript foundation. Enforcing these rules improves type safety and code clarity[11].
+Clean React Native code starts with a solid TypeScript foundation. These practices are updated for 2024 to align with modern TypeScript and React Native patterns.
 
-*   **Enable Strict Mode**: In your `tsconfig.json`, set `"strict": true`. This enables a suite of type-checking rules that help catch common errors, such as `noImplicitAny` and `strictNullChecks`[3][4].
-*   **Avoid the `any` Type**: Using `any` disables TypeScript's type-checking for that variable. Instead, use specific types (`string`, `number`), create custom `interface` or `type` definitions for your objects, or use `unknown` for values where the type is truly unknown at compile time[1][3].
-*   **Embrace Immutability**: Use the `readonly` keyword for properties that should not be changed after initialization. This helps prevent accidental mutations of state and props[3][4]. For arrays, you can use the `ReadonlyArray` type[4].
-*   **Use Utility Types**: Leverage built-in utility types like `Partial`, `Pick`, `Omit`, and `Readonly` to avoid writing repetitive type definitions and keep your code DRY (Don't Repeat Yourself)[1][9].
+*   **Enable Strict Mode**: In your `tsconfig.json`, set `"strict": true`. This enables comprehensive type-checking rules that catch errors at compile-time rather than runtime.
+*   **Avoid the `any` Type**: Using `any` disables TypeScript's type-checking. Instead, use specific types (`string`, `number`), create custom `interface` or `type` definitions, or use `unknown` for truly unknown types.
+*   **Embrace Immutability**: Use the `readonly` keyword for properties that shouldn't change after initialization. For arrays, use `ReadonlyArray<T>` to prevent mutations.
+*   **Use Utility Types**: Leverage built-in utility types like `Partial`, `Pick`, `Omit`, and `Readonly` to avoid repetitive type definitions and maintain DRY principles.
 *   **Be Explicit with Types**:
-    *   Always explicitly define the return types for your functions. This makes the function's contract clear and allows TypeScript to catch bugs if the implementation changes[2][9].
-    *   Handle `null` and `undefined` safely. Use optional chaining (`?.`) and the nullish coalescing operator (`??`) to write cleaner and safer code when dealing with potentially nullish values[3][9].
-*   **Follow Naming and Style Conventions**:
-    *   **Naming**: Use `PascalCase` for type names, components, and enums. Use `camelCase` for functions, properties, and variables[2][6].
-    *   **Variables**: Use `const` by default and `let` only when a variable needs to be reassigned. Avoid using `var`[1][2].
-    *   **Equality**: Always use strict equality (`===` and `!==`) instead of loose equality (`==` and `!=`) to avoid unexpected type coercion[1].
+    *   Always explicitly define return types for functions to establish clear contracts and enable better error detection.
+    *   Handle `null` and `undefined` safely using optional chaining (`?.`) and nullish coalescing (`??`) operators.
+    *   Use type guards and discriminated unions for complex type checking.
+*   **Type Organization**: Create a centralized `types/` directory for shared type definitions. Keep component-specific types colocated with their components.
+*   **Follow Naming Conventions**:
+    *   **Types/Interfaces**: Use `PascalCase` (e.g., `UserProfile`, `ApiResponse`)
+    *   **Functions/Variables**: Use `camelCase` (e.g., `getUserData`, `isLoading`)
+    *   **Constants**: Use `SCREAMING_SNAKE_CASE` (e.g., `API_BASE_URL`)
+*   **Variable Declaration**: Use `const` by default, `let` only when reassignment is needed. Never use `var`.
+*   **Equality**: Always use strict equality (`===`, `!==`) to avoid unexpected type coercion.
 
-### React Native & Component-Specific Practices
+### Modern React Native Best Practices (2024)
 
-Building on TypeScript, these practices are specific to structuring and writing React Native applications[12].
+*   **Performance Optimization**:
+    *   Use `React.memo()` to prevent unnecessary re-renders of functional components
+    *   Implement `useMemo()` and `useCallback()` for expensive calculations and function references
+    *   Use `React.lazy()` and `Suspense` for code-splitting and lazy loading
+    *   Implement virtualization for long lists using `FlatList` or `VirtualizedList`
+*   **State Management Patterns**:
+    *   Prefer local state (`useState`) for component-specific data
+    *   Use Context API sparingly for truly global state
+    *   Consider Zustand or Redux Toolkit for complex state management
+    *   Avoid overusing global state to maintain scalability
+*   **Custom Hooks**: Create reusable logic through custom hooks prefixed with "use" to encapsulate stateful logic and side effects.
+*   **Error Boundaries**: Implement error boundaries to gracefully handle component errors and prevent app crashes.
+
+### React Native & Expo Component-Specific Practices (2024 Updated)
+
+Building on TypeScript, these practices align with modern React Native and Expo SDK 52/53 requirements.
 
 *   **Project Structure**:
-    *   **Organize by Feature**: Structure your project directory into modules based on features or domains (e.g., `components`, `screens`, `hooks`, `services`, `navigation`). This scales better than organizing by file type alone[5][13].
-    *   **Colocation**: Keep related files together. For example, a component file (`Button.tsx`) and its styles (`Button.styles.ts`) should reside in the same folder[5].
+    *   **Organize by Feature**: Structure your project into feature-based modules (`components`, `screens`, `hooks`, `services`, `types`). This scales better than organizing by file type alone.
+    *   **Colocation**: Keep related files together. Component files (`Button.tsx`), styles (`Button.styles.ts`), and tests (`Button.test.tsx`) should reside in the same folder.
+    *   **Absolute Imports**: Use path aliases configured in `babel.config.js` and `tsconfig.json` to avoid long relative imports (e.g., `@/components/Button` instead of `../../../components/Button`).
+
 *   **Component Design**:
-    *   **Small and Focused**: Break down large, complex components into smaller, single-purpose components. This improves reusability, testability, and readability[7].
-    *   **Meaningful Names**: Give components descriptive names that clearly convey their purpose (e.g., `ProductCard` instead of `Card`)[6][7].
-    *   **Destructure Props**: Always destructure props in the component's signature. This makes the code more readable by clearly showing which props the component expects and uses[5][7].
-*   **Styling**:
-    *   **Avoid Inline Styles**: While convenient for quick tests, inline styles are hard to maintain and reuse in larger applications. They also miss out on performance optimizations[5][8].
-    *   **Use `StyleSheet.create()`**: This API from React Native is the preferred method. It moves styles out of the render function, improves organization, and sends the style objects over the native bridge only once[5][8].
-*   **State Management**:
-    *   **Local vs. Global**: Prefer local state (`useState`) for data that is only used within a single component or its direct children. Use global state solutions for data that needs to be shared across many unrelated parts of your app[5].
-    *   **Global State Tools**: For simple global state, React's `Context API` is a good choice. For more complex, high-frequency updates, consider a dedicated library like Redux Toolkit[5][13].
+    *   **Single Responsibility**: Components should have one clear purpose and be under 150 lines when possible.
+    *   **Meaningful Names**: Use descriptive names that convey purpose (e.g., `UserProfileCard` instead of `Card`).
+    *   **Props Interface**: Always define explicit TypeScript interfaces for component props.
+    *   **Destructure Props**: Destructure props in the component signature for clarity.
+    *   **Ref Forwarding**: Use `forwardRef` when components need to expose imperative APIs.
+
+*   **Modern Styling Patterns**:
+    *   **StyleSheet.create()**: Use React Native's `StyleSheet.create()` for performance and validation.
+    *   **Centralized Theming**: Import colors, fonts, and spacing from a central theme system (e.g., `@/styles/theme`).
+    *   **Platform-Specific Styles**: Use `Platform.select()` for platform-specific styling needs.
+    *   **Avoid Inline Styles**: Inline styles should only be used for dynamic values that change frequently.
+    *   **Responsive Design**: Use Flexbox and percentage-based widths for responsive layouts.
+
+*   **Expo SDK 52/53 Specific**:
+    *   **New Architecture Ready**: Ensure components work with the New Architecture (enabled by default in SDK 53).
+    *   **Hermes Compatibility**: All code must be compatible with Hermes JavaScript engine (JSC no longer supported).
+    *   **expo-router v3**: Use file-based routing with Expo Router instead of React Navigation when possible.
+    *   **Modern APIs**: Prefer `expo-audio` over `expo-av` for audio functionality.
+
+*   **Performance & Security**:
+    *   **Lazy Loading**: Implement lazy loading for heavy components using `React.lazy()`.
+    *   **Memoization**: Use `React.memo()`, `useMemo()`, and `useCallback()` appropriately.
+    *   **List Optimization**: Use `FlatList` with proper `keyExtractor` and `getItemLayout` for large datasets.
+    *   **Image Optimization**: Use appropriate image formats and implement caching strategies.
+    *   **Security**: Never hardcode API keys or sensitive data in components.
+
 *   **Automated Tooling**:
-    *   **Linting and Formatting**: Integrate tools like ESLint and Prettier into your workflow. They automatically enforce consistent coding styles and catch common errors[2][4].
-    *   **IDE Integration**: Configure your editor (like VS Code) to show linting errors and format your code on save. This provides immediate feedback and ensures consistency across your team[2][22].
+    *   **ESLint + Prettier**: Enforce consistent code style with proper React Native and TypeScript rules.
+    *   **Type Checking**: Run `tsc --noEmit` in CI/CD to catch type errors.
+    *   **Testing**: Use Jest with React Native Testing Library for component testing.
+    *   **Pre-commit Hooks**: Use Husky and lint-staged for automated quality checks.
 
 [1] https://github.com/andredesousa/typescript-best-practices
 [2] https://www.itwinjs.org/learning/guidelines/typescript-coding-guidelines/

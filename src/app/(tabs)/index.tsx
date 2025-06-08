@@ -1,15 +1,15 @@
+import BentoBox from '@/components/BentoBox';
+import { theme, typography } from '@/styles';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  ScrollView
+  View
 } from 'react-native';
-import { typography, theme } from '../styles';
-import BentoBox from '../components/BentoBox';
 
 export default function HomeScreen() {
   const [location, setLocation] = useState('');

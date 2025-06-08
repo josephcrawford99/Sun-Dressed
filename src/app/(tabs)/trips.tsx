@@ -1,14 +1,13 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, FlatList } from 'react-native';
-import { Provider as PaperProvider } from 'react-native-paper';
-import { theme } from '@/styles/theme';
-import { typography } from '@/styles/typography';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router, useFocusEffect } from 'expo-router';
-import { useTrips } from '../../hooks/useTrips';
-import { Trip } from '@/types/trip';
 import { TripCard } from '@/components/TripCard';
+import { useTrips } from '@/hooks/useTrips';
+import { theme, typography } from '@/styles';
+import { Trip } from '@/types/trip';
+import { Ionicons } from '@expo/vector-icons';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback } from 'react';
+import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TripsScreen() {
   const insets = useSafeAreaInsets();
@@ -37,8 +36,8 @@ export default function TripsScreen() {
 
   return (
     <PaperProvider>
-      <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.header}>
         <Text style={styles.title}>Trips</Text>
         <TouchableOpacity onPress={handleAddTrip} style={styles.addButton}>
           <Ionicons name="add-circle-outline" size={32} color={theme.colors.black} />
@@ -68,6 +67,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingTop: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,

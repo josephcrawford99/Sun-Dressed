@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
+import { fonts, theme, typography } from '@/styles';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { typography, theme, fonts } from '../styles';
+import React from 'react';
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function AuthScreen() {
   const handleDevLogin = () => {
@@ -47,10 +47,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white
   },
   logoRow: {
-    marginTop: 48,
-    marginBottom: 32,
-    alignItems: 'flex-start',
-    paddingHorizontal: 20
+    paddingVertical: 25,
+    paddingLeft: 25,
+    maxWidth: '90%'
   },
   formContainer: {
     paddingHorizontal: 32,

@@ -1,5 +1,4 @@
-import { StyleSheet, TextStyle } from 'react-native';
-import { theme } from './theme';
+import { TextStyle } from 'react-native';
 
 export const fonts = {
   primary: 'LibreBaskerville_400Regular',
@@ -14,7 +13,7 @@ export const typography: { [key: string]: TextStyle } = {
   logo: {
     fontFamily: fonts.primaryItalic,
     fontStyle: 'italic',
-    fontWeight: '500',
+    fontWeight: '600',
     fontSize: 60,
     letterSpacing: -3.5,
     textAlign: 'left',

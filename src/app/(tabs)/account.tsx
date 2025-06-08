@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  TextInput,
-  SafeAreaView 
-} from 'react-native';
+import ToggleSwitch from '@/components/common/ToggleSwitch';
+import { theme, typography } from '@/styles';
 import { router } from 'expo-router';
-import { typography, theme } from '../styles';
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
-import ToggleSwitch from '../components/common/ToggleSwitch';
 
 
 export default function AccountScreen() {
