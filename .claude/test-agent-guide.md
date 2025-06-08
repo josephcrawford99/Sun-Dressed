@@ -24,35 +24,28 @@ You are the **Test Agent** responsible for creating comprehensive tests that ver
 ## Testing Infrastructure
 
 ### Current Setup
-- **Jest** with React Native preset (jest-expo)
+- **Jest** with React Native preset 
 - **React Testing Library** for component testing
-- **Custom test runners** for trips feature verification
-- **Mocking system** for external dependencies
+- **Mocking system** for external dependencies (AsyncStorage, APIs)
+- **Outcome-based testing** - tests focus on behavior that should pass when features are properly implemented
 
 ### Test Organization
 ```
-src/test/
-├── auth/                    # Authentication-related tests
-├── bentobox/               # BentoBox component state machine tests
+test/
 ├── components/             # Individual component tests
-├── location-weather/       # Location and weather integration tests
-├── navigation/             # Navigation flow tests
-├── outfit-algorithm/       # Outfit generation algorithm tests
-├── trips/                  # Trips feature comprehensive testing
-└── README.md              # Testing documentation
+├── hooks/                  # Custom hooks testing (useTrips, useOutfitGenerator)
+├── services/              # Service layer tests (API integrations)
+├── integration/           # End-to-end feature flows
+├── auth/                  # Authentication-related tests (future)
+├── weather/               # Weather API integration tests
+└── README.md             # Testing documentation
 ```
 
-### Specialized Test Systems
-
-#### Quick Verification System
-- **Location**: `scripts/verifyImplementation.js`
-- **Purpose**: Fast source code analysis without Jest dependencies
-- **Use**: Verify task completion markers in source code
-
-#### Advanced Test Runner
-- **Location**: `src/test/trips/runTripsTestsSimple.js`
-- **Purpose**: Full React component testing with isolated mocks
-- **Use**: Comprehensive component interaction testing
+### Testing Philosophy for Current Codebase
+- **Outcome-focused**: Test what users experience, not implementation details
+- **Future-proof**: Tests for unimplemented features should fail now but pass when implemented
+- **No test changes**: Tests should require zero modifications when features are completed
+- **Real behavior**: Mock external dependencies but test actual business logic
 
 ## Test Creation Process
 
@@ -169,18 +162,25 @@ describe('serviceName', () => {
 });
 ```
 
-### Verification Test Pattern
-```javascript
-// For scripts/verifyImplementation.js
-case 'taskNumber':
-  if (content.includes('expectedPattern') && content.includes('anotherPattern')) {
-    console.log('✅ Task X.Y: Feature description implemented');
-    return true;
-  } else {
-    console.log('❌ Task X.Y: Feature description not found');
-    return false;
-  }
-```
+### Current Implementation Status Testing
+Based on codebase analysis (June 2025):
+
+#### ✅ Fully Implemented (tests should pass)
+- Trip CRUD operations (useTrips hook + tripStorageService)
+- AI outfit generation service (outfitService with Gemini API)
+- Trip display UI (TripCard component, trips.tsx screen)
+- Basic outfit display (BentoBox component - display only)
+
+#### 🔄 Partially Implemented (mixed test outcomes)
+- Outfit generation hook (basic functionality, needs error handling)
+- Home screen UI (skeleton exists, missing weather integration)
+
+#### ⏳ Not Implemented (tests should fail until completed)
+- Weather API integration
+- Location autocomplete with Google Places
+- BentoBox user interactions (item rejection/locking state machine)
+- Authentication system
+- Real weather data in outfit generation
 
 ## Test Quality Standards
 
@@ -206,11 +206,12 @@ case 'taskNumber':
 ## Progress Tracking
 
 ### Rolling Tasks File
-Update `/home/joey/Projects/Sun-Dressed/rolling-tasks.md` with:
+Update `/Users/joey/Desktop/Climate-Closet/sun-dressed/rolling-tasks.md` with:
 - Task completion status
 - Test coverage achieved
 - Issues discovered during testing
 - Recommendations for implementation
+- TDD progress tracking
 
 ### Test Documentation
 Each test file should include:

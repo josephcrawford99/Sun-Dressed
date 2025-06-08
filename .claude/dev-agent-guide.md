@@ -299,6 +299,98 @@ Remember: **Providers provide, they don't consume!**
 - Report any deviations from original plan
 - Highlight any additional considerations for future tasks
 
+## Critical Debugging & Component Issues
+
+### Silent Component Crashes in React Native
+
+**Problem Pattern**: Component JSX creates successfully but component function never executes, causing state resets.
+
+**Detection Signs**:
+```typescript
+// Console logs show this pattern:
+LOG  renderTripCard called for item: [id] [location]
+LOG  TripCard JSX created successfully  
+LOG  TripsScreen rendered - trips.length: 0 trips: []  // ❌ State reset!
+// Missing: TripCard internal console logs
+```
+
+**Debugging Strategy**:
+1. **Create Minimal Test Component**: Strip all complex dependencies
+   ```typescript
+   export const MinimalTripCard = ({ trip }) => (
+     <Text>🔴 MINIMAL TEST: {trip.location}</Text>
+   );
+   ```
+
+2. **Incrementally Add Complexity**:
+   - Basic View + styling
+   - Date formatting functions  
+   - State management (useState)
+   - External library components (react-native-paper)
+
+3. **Common Crash Causes**:
+   - react-native-paper component incompatibilities
+   - Date formatting with string/Date type mismatches
+   - StyleSheet compilation errors
+   - Missing theme/typography imports
+   - Improper hook usage
+
+4. **Metro Bundler Cache Issues**: Visual changes not reflecting despite code updates
+   - Solution: Use obvious visual markers ("🔴 MINIMAL TEST") to confirm updates
+
+### TypeScript Date Handling Best Practices
+
+**Problem**: `react-native-ui-datepicker` uses `DateType` but codebase should use `Date` for strong typing.
+
+**Solution Pattern**:
+```typescript
+// ✅ Use Date throughout codebase
+interface Trip {
+  startDate: Date;  // Not DateType
+  endDate: Date;    // Not DateType
+}
+
+// ✅ Cast appropriately at DateTimePicker interface
+const [dateRange, setDateRange] = useState<{
+  startDate: Date | null;
+  endDate: Date | null;
+}>({ startDate: null, endDate: null });
+
+// ✅ Cast when receiving from DateTimePicker
+onChange={({ startDate, endDate }: { startDate: DateType; endDate: DateType }) => {
+  setDateRange({ 
+    startDate: startDate as Date,  // Cast DateType to Date
+    endDate: endDate as Date 
+  });
+}}
+
+// ✅ Cast when passing to DateTimePicker  
+<DateTimePicker
+  startDate={dateRange.startDate as DateType}  // Cast Date to DateType
+  endDate={dateRange.endDate as DateType}
+/>
+```
+
+**Key Principles**:
+- Use `Date` consistently in all interfaces and state
+- Cast `DateType` to `Date` when receiving from library components
+- Cast `Date` to `DateType` when passing to library components  
+- Avoid complex type utilities - simple casting is clearer
+
+### Component State Reset Patterns
+
+**When FlatList items cause crashes**:
+1. Component JSX renders successfully
+2. React lifecycle crash occurs before component function execution
+3. Parent component state resets to initial values
+4. FlatList shows empty state despite having data
+
+**Resolution**:
+- Isolate failing component with minimal implementation
+- Test with simple TestCard component first
+- Gradually restore functionality to identify crash point
+- Focus on external dependencies as primary suspects
+
 ## Important Reminders
 
 - **Stay Focused**: Implement only what's assigned, avoid feature creep
@@ -307,5 +399,7 @@ Remember: **Providers provide, they don't consume!**
 - **User Experience**: Consider how changes affect the end user
 - **Performance**: Avoid introducing performance regressions
 - **Security**: Never expose API keys or sensitive data
+- **Debug Systematically**: Use minimal implementations to isolate component crashes
+- **Strong Typing**: Prefer `Date` over `DateType` with explicit casting at library boundaries
 
 Your role is crucial for maintaining code quality while delivering user-facing value. Focus on clean, maintainable implementations that integrate seamlessly with the existing codebase.

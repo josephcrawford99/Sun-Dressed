@@ -1,137 +1,134 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import { Menu, IconButton } from 'react-native-paper';
+import { StyleSheet, Text, View } from 'react-native';
+import { IconButton, Menu } from 'react-native-paper';
 import { Trip } from '@/types/trip';
-import { theme } from '@/styles/theme';
-import { typography } from '@/styles/typography';
+import { theme, typography } from '@/styles';
 
 interface TripCardProps {
   trip: Trip;
   onDelete: (tripId: string) => Promise<void>;
+  onEdit: (trip: Trip) => void;
 }
 
-export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete }) => {
-  const [visible, setVisible] = useState(false);
+const formatDateRange = (startDate: Date | string, endDate: Date | string): string => {
+  const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
+  const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+  
+  const startStr = start.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  const endStr = end.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  
+  return `${startStr} - ${endStr}`;
+};
 
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
+export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) => {
+  console.log('TripCard FULL START render for trip:', trip.id, trip.location);
+  const [menuVisible, setMenuVisible] = useState(false);
 
-  const formatDateRange = (startDate: Date, endDate: Date) => {
-    const startYear = startDate.getFullYear();
-    const endYear = endDate.getFullYear();
-    const includeYear = startYear !== endYear;
-    
-    const start = startDate.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      ...(includeYear && { year: 'numeric' })
-    });
-    const end = endDate.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-    return `${start} - ${end}`;
-  };
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
 
-  const handleDelete = () => {
+  const handleEdit = () => {
+    console.log('TripCard handleEdit called for trip:', trip.id);
     closeMenu();
-    Alert.alert(
-      'Delete Trip',
-      'Are you sure you want to delete this trip?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await onDelete(trip.id);
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete trip');
-            }
-          },
-        },
-      ]
-    );
+    onEdit(trip);
   };
+
+  const handleDelete = async () => {
+    console.log('TripCard handleDelete called for trip:', trip.id);
+    closeMenu();
+    await onDelete(trip.id);
+  };
+
+  console.log('TripCard about to render JSX for trip:', trip.id);
 
   return (
-    <View style={styles.tripCard}>
-      <View style={styles.cardContent}>
-        <View style={styles.tripInfo}>
-          <Text style={styles.locationText}>{trip.location}</Text>
-          <Text style={styles.dateText}>{formatDateRange(trip.startDate, trip.endDate)}</Text>
-        </View>
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={
-            <IconButton
-              icon="dots-vertical"
-              size={20}
-              onPress={openMenu}
-              accessibilityLabel="Open trip options"
-              iconColor={theme.colors.gray}
-            />
-          }
-          contentStyle={styles.menuContent}
-        >
-          <Menu.Item 
-            onPress={handleDelete} 
-            title="Delete" 
-            titleStyle={styles.deleteMenuItem}
-            leadingIcon="trash-can-outline"
-          />
-        </Menu>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.location}>{trip.location}</Text>
+        <Text style={styles.dates}>
+          {formatDateRange(trip.startDate, trip.endDate)}
+        </Text>
       </View>
+      
+      <Menu
+        visible={menuVisible}
+        onDismiss={closeMenu}
+        contentStyle={styles.menuContent}
+        anchor={
+          <IconButton
+            icon="dots-vertical"
+            size={20}
+            onPress={openMenu}
+            style={styles.menuButton}
+            iconColor={theme.colors.gray}
+          />
+        }
+      >
+        <Menu.Item 
+          onPress={handleEdit} 
+          title="Edit"
+          leadingIcon="pencil"
+          titleStyle={styles.menuItemText}
+        />
+        <Menu.Item 
+          onPress={handleDelete} 
+          title="Delete"
+          leadingIcon="delete"
+          titleStyle={styles.menuItemText}
+        />
+      </Menu>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  tripCard: {
+  container: {
     backgroundColor: theme.colors.white,
     borderRadius: 12,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  cardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  tripInfo: {
+  content: {
     flex: 1,
   },
-  locationText: {
-    fontFamily: 'LibreBaskerville_400Regular',
+  location: {
+    ...typography.heading,
     fontSize: 18,
-    fontWeight: '400',
     color: theme.colors.black,
-    marginBottom: theme.spacing.xs,
+    marginBottom: 4,
   },
-  dateText: {
+  dates: {
     ...typography.body,
-    fontSize: 14,
     color: theme.colors.gray,
+    fontSize: 14,
+  },
+  menuButton: {
+    margin: 0,
   },
   menuContent: {
     backgroundColor: theme.colors.white,
     borderRadius: 8,
+    marginTop: 8,
   },
-  deleteMenuItem: {
-    color: '#FF0000',
-    fontSize: 14,
+  menuItemText: {
+    color: theme.colors.black,
+    fontSize: 16,
   },
 });

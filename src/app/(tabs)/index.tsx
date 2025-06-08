@@ -1,5 +1,5 @@
-import BentoBox from '@/components/BentoBox';
-import { theme, typography } from '@/styles';
+import BentoBox from '@components/BentoBox';
+import { theme, typography } from '@styles';
 import React, { useState } from 'react';
 import {
   SafeAreaView,

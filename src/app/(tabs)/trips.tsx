@@ -1,17 +1,20 @@
-import { TripCard } from '@/components/TripCard';
-import { useTrips } from '@/hooks/useTrips';
-import { theme, typography } from '@/styles';
-import { Trip } from '@/types/trip';
+import { TripCard } from '@components/TripCard';
 import { Ionicons } from '@expo/vector-icons';
+import { useTrips } from '@hooks/useTrips';
+import { theme, typography } from '@styles';
+import { Trip } from '@/types/trip';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback } from 'react';
-import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+console.log('TripCard import:', TripCard);
 
 export default function TripsScreen() {
   const insets = useSafeAreaInsets();
   const { trips, loading, refreshTrips, deleteTrip } = useTrips();
+  
+  console.log('TripsScreen rendered - trips.length:', trips.length, 'trips:', trips);
 
   // Refresh trips when screen comes into focus (e.g., after returning from create-trip modal)
   useFocusEffect(
@@ -24,9 +27,49 @@ export default function TripsScreen() {
     router.push('/create-trip');
   };
 
-  const renderTripCard = ({ item }: { item: Trip }) => (
-    <TripCard trip={item} onDelete={deleteTrip} />
-  );
+  const handleEditTrip = (trip: Trip) => {
+    console.log('TripsScreen handleEditTrip called for trip:', trip.id, trip.location);
+    router.push(`/edit-trip?tripId=${trip.id}`);
+  };
+
+  const TestCard = ({ item }: { item: Trip }) => {
+    console.log('TestCard rendering for:', item.id, item.location);
+    return (
+      <View style={{
+        backgroundColor: 'white',
+        padding: 16,
+        marginBottom: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ccc'
+      }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.location}</Text>
+        <Text style={{ fontSize: 14, color: '#666' }}>Test Card - ID: {item.id}</Text>
+        <TouchableOpacity 
+          style={{
+            backgroundColor: '#007AFF',
+            padding: 8,
+            borderRadius: 4,
+            marginTop: 8
+          }}
+          onPress={() => console.log('Test button pressed for:', item.id)}
+        >
+          <Text style={{ color: 'white', textAlign: 'center' }}>Test Button</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderTripCard = ({ item }: { item: Trip }) => {
+    console.log('renderTripCard called for item:', item.id, item.location);
+    return (
+      <TripCard 
+        trip={item} 
+        onDelete={deleteTrip} 
+        onEdit={handleEditTrip} 
+      />
+    );
+  };
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
@@ -80,8 +123,9 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   listContainer: {
-    padding: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.md,
+    paddingBottom: theme.spacing.lg,
   },
   emptyListContainer: {
     flex: 1,

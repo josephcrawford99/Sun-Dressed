@@ -4,8 +4,33 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["./src/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@styles": ["./src/styles"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@hooks": ["./src/hooks"],
+      "@/types/*": ["./src/types/*"],
+      "@/types": ["./src/types"],
+      "@services/*": ["./src/services/*"],
+      "@services": ["./src/services"],
+      "@assets/*": ["./src/assets/*"],
+      "@assets": ["./src/assets"],
+      "@utils/*": ["./src/utils/*"],
+      "@utils": ["./src/utils"],
+      "@components/*": ["./src/components/*"],
+      "@components": ["./src/components"],
+      "@app/*": ["./src/app/*"],
+      "@app": ["./src/app"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@contexts": ["./src/contexts"],
+      "@config/*": ["./src/config/*"],
+      "@config": ["./src/config"]
+    },
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ]
   },
   "include": [
     "**/*.ts",

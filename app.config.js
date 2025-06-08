@@ -5,6 +5,9 @@ export default {
     version: "1.0.0",
     orientation: "portrait",
     scheme: "sun-dressed",
+    experiments: {
+      typedRoutes: true,
+    },
     // icon: "./src/assets/icon.png",
     userInterfaceStyle: "light",
     plugins: [

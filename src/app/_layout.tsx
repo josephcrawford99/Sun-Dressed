@@ -1,3 +1,4 @@
+import { useColorScheme } from '@hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -18,7 +19,7 @@ import {
   Montserrat_700Bold,
 } from '@expo-google-fonts/montserrat';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -56,6 +57,13 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen 
             name="create-trip" 
+            options={{ 
+              presentation: 'modal',
+              headerShown: false
+            }} 
+          />
+          <Stack.Screen 
+            name="edit-trip" 
             options={{ 
               presentation: 'modal',
               headerShown: false

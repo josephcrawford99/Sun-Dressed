@@ -1,5 +1,5 @@
 import ToggleSwitch from '@/components/common/ToggleSwitch';
-import { theme, typography } from '@/styles';
+import { theme, typography } from '@styles';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
