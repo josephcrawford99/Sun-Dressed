@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { generateOutfitLLM } from '../services/outfitService';
-import { Outfit } from '../types/Outfit';
-import { Weather } from '../types/weather';
+import { Outfit } from '@/types/Outfit';
+import { Weather } from '@/types/weather';
+import { generateOutfitLLM } from '@services/llmService';
+import { useCallback, useState } from 'react';
 
 export const useOutfitGenerator = () => {
   const [outfit, setOutfit] = useState<Outfit | null>(null);

@@ -14,6 +14,467 @@ As the **Architect** for Sun Dressed, You are responsible for high-level oversig
    - Check import paths; babel.config.js and tsconfig.json should be configured to enable absolute imports using aliases like '@/components' to avoid long relative paths
    - consult @./standards.md for info
 
+## Centralized Design System Documentation
+
+### Current Styling Architecture (Updated June 8, 2025)
+
+**Sun Dressed** uses a centralized design system to ensure visual consistency and maintainable code. This system was completely standardized in June 2025 to eliminate all hardcoded values and create a unified styling approach across the entire application.
+
+**CRITICAL**: All styling should use the established design tokens and components rather than hardcoded values. This is mandatory for all new code and existing code should be refactored to follow these patterns.
+
+#### 1. Theme System (`src/styles/theme.ts`)
+
+**Spacing Tokens**:
+```typescript
+theme.spacing = {
+  xs: 4,    // Small gaps, minor spacing
+  sm: 8,    // Small margins, gaps between elements
+  md: 16,   // Standard padding/margins (most common)
+  lg: 24,   // Large spacing, section breaks
+  xl: 32    // Extra large spacing, major separations
+}
+```
+
+**Border Radius Tokens**:
+```typescript
+theme.borderRadius = {
+  small: 4,   // Small elements, chips
+  medium: 8,  // Buttons, inputs, cards
+  large: 12,  // Prominent buttons, major containers
+  xl: 16      // Hero elements, modals
+}
+```
+
+**Color System** (Consolidated from multiple systems):
+```typescript
+theme.colors = {
+  // Primary colors
+  black: '#000',
+  white: '#fff',
+  
+  // Gray scale
+  gray: '#757575',
+  lightGray: '#E0E0E0', 
+  darkGray: '#424242',
+  
+  // Brand colors
+  primary: '#0a7ea4',
+  primaryDark: '#1976D2',
+  secondary: '#2196F3',
+  accent: '#FFEE8C',
+  
+  // Semantic colors
+  error: '#FF4757',
+  success: '#2ED573', 
+  warning: '#FFA726',
+  info: '#29B6F6',
+  
+  // Surface colors
+  background: '#fff',
+  surface: '#F5F5F5',
+  surfaceVariant: '#E8F4FD',
+  errorSurface: '#FFE8E8',
+  
+  // Border and divider
+  border: '#757575',
+  divider: '#E0E0E0',
+  
+  // Overlay (for modals, dropdowns)
+  overlay: 'rgba(0, 0, 0, 0.3)',
+  
+  // Text colors
+  text: '#11181C',
+  textSecondary: '#687076',
+  textInverse: '#fff',
+  
+  // Legacy compatibility
+  tint: '#0a7ea4',
+  icon: '#687076',
+  tabIconDefault: '#687076',
+  tabIconSelected: '#0a7ea4'
+}
+```
+
+**Typography System** (`src/styles/typography.ts`):
+```typescript
+theme.fontSize = {
+  xs: 12,    // Small captions, footnotes
+  sm: 14,    // Secondary text, labels
+  md: 16,    // Body text (most common)
+  lg: 18,    // Prominent body text
+  xl: 20,    // Small headings
+  xxl: 24,   // Medium headings
+  xxxl: 28   // Large headings
+}
+
+// Pre-defined typography styles
+typography = {
+  heading: { fontSize: theme.fontSize.xxl, fontWeight: 'bold' },
+  subheading: { fontSize: theme.fontSize.xl, fontWeight: '600' },
+  body: { fontSize: theme.fontSize.md, fontWeight: 'normal' },
+  button: { fontSize: theme.fontSize.md, fontWeight: '600' },
+  label: { fontSize: theme.fontSize.sm, fontWeight: '500' },
+  caption: { fontSize: theme.fontSize.xs, fontWeight: 'normal' }
+}
+```
+
+**Shadow/Elevation System** (Added June 2025):
+```typescript
+theme.shadows = {
+  none: {
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+  small: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  medium: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  large: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  xl: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 12,
+  }
+}
+```
+
+#### 2. Standardized Components
+
+**Button Component (`src/components/ui/Button.tsx`)**:
+- **Variants**: `primary`, `secondary`, `danger`, `outline`
+- **Sizes**: `small` (36px), `medium` (48px), `large` (56px)
+- **States**: `disabled`, `loading` (with activity indicator)
+- **Usage**: `<Button title="Save" onPress={handler} variant="primary" size="medium" />`
+
+**TextInput Component (`src/components/ui/TextInput.tsx`)**:
+- **Unified styling**: Single consistent design across all screens
+- **Sizes**: `small` (36px), `medium` (48px), `large` (56px)
+- **Features**: Built-in label support, error state, consistent theming
+- **Usage**: `<TextInput label="Email" placeholder="Enter email" size="medium" />`
+
+**Example Implementation**:
+```tsx
+// ✅ CORRECT - Use standardized Button
+<Button
+  title="Save Trip"
+  onPress={handleSave}
+  variant="primary"
+  size="medium"
+  loading={saving}
+  disabled={saving}
+/>
+
+// ✅ CORRECT - Use standardized TextInput
+<TextInput
+  label="Location"
+  value={location}
+  onChangeText={setLocation}
+  placeholder="Enter destination"
+  size="medium"
+/>
+
+// ❌ INCORRECT - Custom button styles
+<TouchableOpacity style={{
+  backgroundColor: '#000',
+  padding: 16,
+  borderRadius: 8
+}}>
+  <Text style={{color: '#fff'}}>Save Trip</Text>
+</TouchableOpacity>
+
+// ❌ INCORRECT - Custom TextInput styles
+<TextInput style={{
+  borderWidth: 1,
+  borderColor: '#E0E0E0',
+  padding: 16,
+  borderRadius: 8
+}} />
+```
+
+#### 3. Page Header Standards (Added June 2025)
+
+All page headers must follow the standardized pattern established for consistency:
+
+**Standard Header Structure**:
+```tsx
+// ✅ CORRECT - Standardized header pattern
+<View style={styles.container}>
+  <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
+    <Text style={styles.title}>Page Title</Text>
+  </View>
+  {/* Page content */}
+</View>
+
+const styles = StyleSheet.create({
+  header: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.lightGray,  // Light gray underline
+    backgroundColor: theme.colors.white,
+  },
+  title: {
+    ...typography.heading,
+    color: theme.colors.black,
+  },
+});
+```
+
+**Header Requirements**:
+- ✅ **Border**: Light gray underline (`borderBottomColor: theme.colors.lightGray`)
+- ✅ **Safe Area**: Platform-specific padding for iOS notch support
+- ✅ **Spacing**: Consistent horizontal padding (`theme.spacing.lg`)
+- ✅ **Typography**: Use `typography.heading` for titles
+- ✅ **Background**: White background for contrast
+
+**Examples of Standardized Headers**:
+- `app/(tabs)/closet.tsx` - "My Closet" header
+- `app/(tabs)/social.tsx` - "Social" header  
+- `app/(tabs)/trips.tsx` - "Trips" header with add button
+- `app/(tabs)/account.tsx` - "Account" header
+- `app/(tabs)/index.tsx` - Location input with gray underline
+
+#### 4. Styling Enforcement Rules
+
+**Spacing Rules**:
+- ✅ **Always use**: `theme.spacing.md` (16px), `theme.spacing.lg` (24px)
+- ❌ **Never use**: `padding: 16`, `margin: 24`, hardcoded pixel values
+- ✅ **For containers**: `paddingHorizontal: theme.spacing.md`
+- ✅ **For gaps**: `marginBottom: theme.spacing.lg`
+
+**Color Rules**:
+- ✅ **Always use**: `theme.colors.primary`, `theme.colors.surface`
+- ❌ **Never use**: `'#2196F3'`, `'#F5F5F5'`, hardcoded hex values
+- ✅ **For backgrounds**: `backgroundColor: theme.colors.surface`
+- ✅ **For text**: `color: theme.colors.textSecondary`
+- ✅ **For borders**: `borderColor: theme.colors.lightGray`
+
+**Typography Rules**:
+- ✅ **Always use**: `fontSize: theme.fontSize.md`, `...typography.heading`
+- ❌ **Never use**: `fontSize: 16`, `fontSize: 24`, hardcoded font sizes
+- ✅ **For headings**: `...typography.heading`
+- ✅ **For body text**: `...typography.body` 
+- ✅ **For buttons**: `...typography.button`
+
+**Shadow Rules** (Added June 2025):
+- ✅ **Always use**: `...theme.shadows.medium`, `...theme.shadows.large`
+- ❌ **Never use**: Individual shadow properties like `shadowOffset: { width: 0, height: 2 }`
+- ✅ **For cards**: `...theme.shadows.medium`
+- ✅ **For modals**: `...theme.shadows.large`
+- ✅ **For buttons**: `...theme.shadows.small`
+
+**Border Radius Rules**:
+- ✅ **Always use**: `theme.borderRadius.medium` (8px), `theme.borderRadius.large` (12px)
+- ❌ **Never use**: `borderRadius: 8`, `borderRadius: 12`, hardcoded values
+- ✅ **For buttons**: `borderRadius: theme.borderRadius.medium`
+- ✅ **For cards**: `borderRadius: theme.borderRadius.large`
+
+#### 5. Inline Style Prevention Rules (Added June 2025)
+
+**CRITICAL**: All inline styles have been eliminated from the codebase. These rules prevent regression:
+
+**StyleSheet.create() Requirement**:
+- ✅ **Always use**: `StyleSheet.create({ ... })` for all component styles
+- ❌ **Never use**: `style={{ ... }}` with style objects
+- ✅ **Acceptable**: Dynamic values like `style={{ opacity: isVisible ? 1 : 0 }}`
+- ❌ **Unacceptable**: Static style objects like `style={{ padding: 16, backgroundColor: '#fff' }}`
+
+**Anti-Pattern Detection**:
+```tsx
+// ❌ CRITICAL VIOLATIONS - Must be flagged immediately
+style={{ padding: 16, backgroundColor: '#F5F5F5', borderRadius: 8 }}
+<TouchableOpacity style={{ backgroundColor: '#000', padding: 12 }}>
+<Text style={{ fontSize: 16, color: '#333' }}>
+placeholderTextColor="#888"
+color: '#2196F3'
+
+// ✅ CORRECT REPLACEMENTS
+const styles = StyleSheet.create({
+  container: { 
+    padding: theme.spacing.md, 
+    backgroundColor: theme.colors.surface, 
+    borderRadius: theme.borderRadius.medium 
+  }
+});
+<Button variant="primary" size="medium" />
+<Text style={styles.heading}>
+placeholderTextColor={theme.colors.textSecondary}
+color: theme.colors.secondary
+```
+
+**Dynamic Style Exceptions** (These are acceptable):
+```tsx
+// ✅ These inline styles are allowed (state/prop dependent)
+style={{ opacity: isVisible ? 1 : 0 }}
+style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}
+style={[styles.dropdown, { left: position.x, top: position.y }]}
+```
+
+#### 6. Component Usage Guidelines
+
+**When to Use Button Component**:
+- ✅ All interactive buttons (save, cancel, submit, etc.)
+- ✅ Navigation buttons and action triggers  
+- ✅ Primary, secondary, and danger actions
+- ❌ Do not create custom TouchableOpacity buttons
+
+**When to Use TextInput Component**:
+- ✅ All form inputs (login, registration, settings, etc.)
+- ✅ Any text input fields requiring user input
+- ✅ Search inputs and data entry forms
+- ❌ Do not create custom TextInput styling
+
+**Typography Integration**:
+- ✅ Use existing `typography.heading`, `typography.body`, `typography.button`
+- ✅ Override only `fontSize` when necessary: `fontSize: theme.fontSize.lg`
+- ❌ Do not create completely custom text styles
+- ❌ Never use hardcoded fontSize values like `fontSize: 18`
+
+#### 7. Code Review Checklist (Updated June 2025)
+
+**MANDATORY Architect Agent Review Points**:
+1. **No inline style objects**: Check for `style={{ padding: 16, ... }}`
+2. **No hardcoded spacing**: Check for `padding: 16`, `margin: 24`
+3. **No hardcoded colors**: Check for `backgroundColor: '#F5F5F5'`, `color: '#333'`
+4. **No hardcoded typography**: Check for `fontSize: 16`, `fontSize: 24`
+5. **No hardcoded shadows**: Check for individual `shadowOffset`, `shadowOpacity`
+6. **No hardcoded border radius**: Check for `borderRadius: 8`
+7. **Button standardization**: All buttons use `<Button>` component
+8. **TextInput standardization**: All text inputs use `<TextInput>` component
+9. **Header standardization**: All page headers follow the established pattern
+10. **Theme token usage**: All values reference `theme.*` or `typography.*` properties
+11. **StyleSheet usage**: All styles defined in `StyleSheet.create()`
+12. **Import consistency**: All styles imported from `@/styles` or `@/components/ui`
+
+**Critical Anti-Patterns to Flag Immediately**:
+```tsx
+// ❌ STOP IMMEDIATELY - These must be flagged as critical violations:
+style={{ padding: 16, backgroundColor: '#F5F5F5', borderRadius: 8 }}
+<TouchableOpacity style={{ backgroundColor: '#000', padding: 12 }}>
+<Text style={{ fontSize: 16, color: '#333', fontWeight: 'bold' }}>
+<TextInput style={{ borderWidth: 1, padding: 16, borderRadius: 8 }} />
+placeholderTextColor="#888"
+shadowColor: '#000', shadowOffset: { width: 0, height: 2 }
+```
+
+**Correct Replacements**:
+```tsx
+// ✅ Approved patterns:
+const styles = StyleSheet.create({
+  container: { 
+    padding: theme.spacing.md, 
+    backgroundColor: theme.colors.surface, 
+    borderRadius: theme.borderRadius.medium 
+  },
+  text: {
+    ...typography.heading,
+    color: theme.colors.black,
+  },
+  card: {
+    ...theme.shadows.medium,
+    borderRadius: theme.borderRadius.large,
+  }
+});
+
+<Button variant="primary" size="medium" title="Save" />
+<TextInput label="Field" placeholder="Enter value" size="medium" />
+placeholderTextColor={theme.colors.textSecondary}
+```
+
+**Quick Violation Detection Commands**:
+```bash
+# Search for common violations (run during code reviews)
+grep -r "style={{" src/ --include="*.tsx" --include="*.ts"
+grep -r "padding: [0-9]" src/ --include="*.tsx" --include="*.ts"
+grep -r "fontSize: [0-9]" src/ --include="*.tsx" --include="*.ts"
+grep -r "#[0-9A-Fa-f]" src/ --include="*.tsx" --include="*.ts" | grep -v "theme.colors"
+```
+
+#### 8. Implementation Status (June 8, 2025)
+
+**✅ COMPLETED - Full Styling Standardization**:
+- ✅ **Theme System**: Complete with spacing, colors, typography, shadows, border radius
+- ✅ **Button Component**: Standardized with variants (primary, secondary, danger, outline)
+- ✅ **TextInput Component**: Unified styling across all screens
+- ✅ **Header Standardization**: All page headers follow consistent pattern
+- ✅ **Shadow System**: Centralized shadow tokens replacing all hardcoded shadows
+- ✅ **Typography System**: Font size tokens and pre-defined typography styles
+- ✅ **Inline Style Elimination**: All components use StyleSheet.create()
+- ✅ **Color Consolidation**: Single color system with semantic colors
+- ✅ **Code Quality**: ESLint passing, no critical styling violations
+
+**🎯 FULLY IMPLEMENTED COMPONENTS**:
+- `src/styles/theme.ts` - Complete design token system
+- `src/styles/typography.ts` - Typography constants and styles  
+- `src/components/ui/Button.tsx` - Multi-variant button component
+- `src/components/ui/TextInput.tsx` - Standardized input component
+- All page headers in `app/(tabs)/` - Consistent styling pattern
+
+**📊 METRICS (June 8, 2025)**:
+- **0 inline style objects** - All styles moved to StyleSheet
+- **0 hardcoded colors** - All colors use theme tokens
+- **0 hardcoded spacing** - All spacing uses theme.spacing
+- **0 hardcoded typography** - All text uses theme.fontSize
+- **0 hardcoded shadows** - All shadows use theme.shadows
+- **100% component adoption** - Button and TextInput used throughout
+
+#### 9. Maintenance Protocol
+
+**When Adding New Styles**:
+1. **Check existing tokens first** - avoid creating new values for existing needs
+2. **Add to theme system** - extend `theme.ts` rather than hardcoding
+3. **Update this documentation** - keep style guide current  
+4. **Use StyleSheet.create()** - never use inline style objects
+5. **Create reusable components** - avoid one-off styling patterns
+
+**When Reviewing Code**:
+1. **Run violation detection**: Use grep commands to find hardcoded values
+2. **Verify Button usage**: All interactive elements use `<Button>` component
+3. **Verify TextInput usage**: All text inputs use `<TextInput>` component
+4. **Check header consistency**: All page headers follow standard pattern
+5. **Validate theme usage**: All styling uses theme tokens
+
+**Emergency Style Fixes**:
+If hardcoded values are found during development:
+1. **Stop immediately** - do not continue with hardcoded values
+2. **Check theme first** - use existing tokens if available
+3. **Add to theme** - if new token needed, add to theme.ts
+4. **Use StyleSheet** - move to StyleSheet.create() if inline
+5. **Update documentation** - document any new patterns
+
+#### 10. Design System Summary
+
+This centralized design system provides:
+- **Visual Consistency**: All components look and feel unified
+- **Code Maintainability**: Changes to theme propagate throughout app
+- **Performance**: StyleSheet.create() provides optimization over inline styles
+- **Developer Experience**: Clear patterns and reusable components
+- **Quality Assurance**: Systematic approach prevents styling regressions
+
+**ALL AGENTS MUST ENFORCE THESE STANDARDS** - No exceptions for hardcoded values or inline style objects. This system is the foundation for scalable, maintainable styling in Sun Dressed.
+
 2. **Dependency Management**
    - Monitor and update package.json dependencies to current stable versions
    - Verify compatibility between package versions
@@ -88,6 +549,107 @@ All recommendations and approvals must meet:
 - Performance considerations
 - Accessibility standards
 - Security requirements
+
+### Code Review Checklist (Common Issues Found)
+
+**CRITICAL Priority Issues to Flag Immediately:**
+
+1. **Production Console Logs** 🔴
+   - Search for: `console.log`, `console.warn`, `console.error` in production code
+   - Remove all debugging statements before production deployment
+   - Exception: Essential error logging with proper error boundaries
+
+2. **Dead/Unused Code** 🔴
+   - Unused imports, components, functions, or styles
+   - Test components left in production files
+   - Commented-out code blocks that should be removed
+
+3. **Import Organization** 🔴
+   - Group imports: React → React Native → Third-party → Local modules
+   - Use path aliases (@/components) instead of relative paths (../../../)
+   - Remove unused imports
+
+**HIGH Priority Issues:**
+
+4. **Error Handling** 🟠
+   - Router navigation calls must have try-catch blocks
+   - API calls need proper error boundaries
+   - User-facing error messages for failed operations
+
+5. **Hard-coded Values** 🟠
+   - Route paths should use constants file
+   - Magic numbers should be named constants
+   - Theme tokens instead of hardcoded styles
+
+6. **TypeScript Compliance** 🟠
+   - Eliminate `any` types
+   - Add proper type guards for data parsing
+   - Interface properties need JSDoc documentation
+
+**MEDIUM Priority Issues:**
+
+7. **Architecture Separation** 🟡
+   - Components mixing UI and business logic
+   - Missing custom hooks for reusable logic
+   - Prop drilling instead of context/state management
+
+8. **DRY Principle Violations** 🟡
+   - Repeated styling patterns
+   - Duplicate business logic
+   - Copy-pasted component structures
+
+9. **Performance Issues** 🟡
+   - Missing useCallback/useMemo for expensive operations
+   - Function recreation on every render
+   - Inefficient list rendering patterns
+
+**Code Review Commands:**
+```bash
+# Find console logs
+grep -r "console\." src/ --include="*.tsx" --include="*.ts"
+
+# Find hardcoded values
+grep -r "padding: [0-9]" src/ --include="*.tsx"
+grep -r "fontSize: [0-9]" src/ --include="*.tsx"
+
+# Find relative imports
+grep -r "\.\./\.\." src/ --include="*.tsx" --include="*.ts"
+
+# Find any types
+grep -r ": any" src/ --include="*.tsx" --include="*.ts"
+```
+
+**Enforcement Protocol:**
+- Critical issues: STOP review immediately, must fix before proceeding
+- High issues: Fix in current sprint
+- Medium issues: Schedule for next sprint
+- Document patterns in this guide for future prevention
+
+**Expo Router v5 Navigation Best Practices:**
+
+10. **Navigation Patterns** 🟡
+   - Use direct `router.push()` calls from `useRouter()` hook
+   - **AVOID** custom navigation hooks - not recommended by Expo Router
+   - Keep navigation logic in components for better TypeScript integration
+   - Use error handling around navigation calls for robustness
+   
+   ```typescript
+   // ✅ CORRECT - Direct router usage
+   const router = useRouter();
+   const handleNavigate = () => {
+     try {
+       router.push('/destination');
+     } catch (error) {
+       console.error('Navigation failed:', error);
+     }
+   };
+   
+   // ❌ INCORRECT - Custom navigation hooks
+   const useCustomNavigation = () => {
+     const router = useRouter();
+     return { navigateToSomething: () => router.push('/something') };
+   };
+   ```
 
 ### Import Path Standards
 

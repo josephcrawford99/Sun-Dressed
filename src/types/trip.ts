@@ -13,4 +13,5 @@ export interface Trip {
   endDate: Date;
   createdAt: Date;
   updatedAt: Date;
+  packingList?: string[];
 }

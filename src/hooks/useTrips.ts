@@ -92,6 +92,44 @@ export const useTrips = () => {
   };
 
   /**
+   * Get a specific trip by ID
+   */
+  const getTrip = (tripId: string): Trip | null => {
+    const trip = trips.find(t => t.id === tripId);
+    return trip || null;
+  };
+
+  /**
+   * Update a trip's packing list
+   */
+  const updateTripPackingList = async (tripId: string, packingList: string[]) => {
+    try {
+      setError(null);
+      const trip = trips.find(t => t.id === tripId);
+      if (!trip) {
+        throw new Error('Trip not found');
+      }
+      
+      const updatedTrip: Trip = {
+        ...trip,
+        packingList,
+        updatedAt: new Date(),
+      };
+      
+      await TripStorageService.updateTrip(updatedTrip);
+      setTrips(prevTrips =>
+        prevTrips.map(t =>
+          t.id === tripId ? updatedTrip : t
+        )
+      );
+    } catch (err) {
+      setError('Failed to update packing list');
+      console.error('Error updating packing list:', err);
+      throw err;
+    }
+  };
+
+  /**
    * Clear all trips
    */
   const clearAllTrips = async () => {
@@ -113,6 +151,8 @@ export const useTrips = () => {
     addTrip,
     updateTrip,
     deleteTrip,
+    getTrip,
+    updateTripPackingList,
     clearAllTrips,
     refreshTrips: loadTrips,
   };

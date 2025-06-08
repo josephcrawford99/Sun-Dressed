@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   box: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.medium,
     marginHorizontal: theme.spacing.xs,
     padding: theme.spacing.sm,
@@ -75,27 +75,27 @@ const styles = StyleSheet.create({
     minHeight: 60,
   },
   loadingBox: {
-    backgroundColor: '#E8F4FD',
+    backgroundColor: theme.colors.surfaceVariant,
   },
   errorBox: {
-    backgroundColor: '#FFE8E8',
+    backgroundColor: theme.colors.errorSurface,
   },
   itemText: {
-    fontSize: 14,
+    fontSize: theme.fontSize.sm,
     fontWeight: '600',
     color: theme.colors.black,
     textAlign: 'center',
     marginBottom: 4,
   },
   labelText: {
-    fontSize: 10,
+    fontSize: theme.fontSize.xxs,
     color: theme.colors.gray,
     textAlign: 'center',
     fontWeight: '500',
   },
   errorText: {
-    fontSize: 12,
-    color: '#D32F2F',
+    fontSize: theme.fontSize.xs,
+    color: theme.colors.error,
     textAlign: 'center',
     marginBottom: 4,
   },

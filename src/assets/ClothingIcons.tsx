@@ -1,5 +1,6 @@
 import React from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { theme } from '@styles';
 
 type IconProps = {
   color?: string;
@@ -41,7 +42,7 @@ export const ClothingIcons = {
 
 // Default props
 const defaultProps: IconProps = {
-  color: '#000',
+  color: theme.colors.black,
   size: 24,
 };
 

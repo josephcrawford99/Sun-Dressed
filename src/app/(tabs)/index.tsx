@@ -1,4 +1,5 @@
 import BentoBox from '@components/BentoBox';
+import LocationAutocomplete from '@components/LocationAutocomplete';
 import { theme, typography } from '@styles';
 import React, { useState } from 'react';
 import {
@@ -6,13 +7,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  View
+  View,
+  ActivityIndicator
 } from 'react-native';
 
 export default function HomeScreen() {
-  const [location, setLocation] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -24,17 +25,28 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.locationRow}>
-        <TextInput
-          style={styles.locationInput}
-          value={location}
-          onChangeText={setLocation}
+        <LocationAutocomplete
+          initialValue="Blue Jean, MO"
+          onLocationSelect={(data, details) => {
+            console.log('📍 Location selected:', { data, details });
+            if (details?.formatted_address) {
+              setSelectedLocation(details.formatted_address);
+            } else if (data?.description) {
+              setSelectedLocation(data.description);
+            }
+          }}
           placeholder="Enter location"
-          placeholderTextColor={theme.colors.gray}
         />
         <TouchableOpacity style={styles.weatherButton}>
           <Text style={styles.weatherButtonText}>--°</Text>
         </TouchableOpacity>
       </View>
+      
+      {selectedLocation && (
+        <View style={styles.debugContainer}>
+          <Text style={styles.debugText}>Selected: {selectedLocation}</Text>
+        </View>
+      )}
 
       <ScrollView
         style={styles.mainContainer}
@@ -53,9 +65,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
   },
   greetingRow: {
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 16,
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   name: {
     ...typography.heading,
@@ -65,24 +77,17 @@ const styles = StyleSheet.create({
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  locationInput: {
-    flex: 1,
-    height: 48,
-    borderWidth: 1,
-    borderColor: theme.colors.gray,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    backgroundColor: theme.colors.white,
-    ...typography.body,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.lg,
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.lightGray,
   },
   weatherButton: {
-    marginLeft: 12,
+    marginLeft: theme.spacing.sm,
     backgroundColor: theme.colors.black,
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    borderRadius: theme.borderRadius.medium,
+    paddingHorizontal: theme.spacing.sm,
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
@@ -93,17 +98,27 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
-    marginHorizontal: 16,
+    marginHorizontal: theme.spacing.md,
     backgroundColor: theme.colors.white,
-    borderRadius: 12,
+    borderRadius: theme.borderRadius.large,
   },
   scrollContent: {
-    padding: 20,
+    padding: theme.spacing.lg,
     minHeight: 400,
   },
   contentPlaceholder: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  debugContainer: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
+  },
+  debugText: {
+    ...typography.body,
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.black,
+    textAlign: 'center',
   },
 });

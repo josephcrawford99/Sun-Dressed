@@ -73,33 +73,27 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: theme.colors.overlay,
   },
   dropdown: {
     position: 'absolute',
     backgroundColor: theme.colors.white,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    borderRadius: theme.borderRadius.medium,
+    ...theme.shadows.large,
     minWidth: 120,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: theme.colors.lightGray,
   },
   dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    gap: theme.spacing.xs,
   },
   dropdownText: {
-    fontSize: 14,
+    fontSize: theme.fontSize.sm,
     fontWeight: '500',
+    color: theme.colors.black,
   },
 });

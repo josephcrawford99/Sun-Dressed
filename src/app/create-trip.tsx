@@ -2,10 +2,12 @@ import { Trip } from '@/types/trip';
 import { useTrips } from '@hooks/useTrips';
 import { theme } from '@styles/theme';
 import { typography } from '@styles/typography';
+import { Button } from '@/components/ui/Button';
+import { TextInput } from '@/components/ui/TextInput';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker';
 
@@ -97,16 +99,13 @@ export default function CreateTripModal() {
         <Text style={styles.title}>Create Trip</Text>
         
         <View style={styles.formContainer}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Location</Text>
-            <TextInput
-              style={styles.textInput}
-              value={location}
-              onChangeText={setLocation}
-              placeholder="Enter destination"
-              placeholderTextColor={theme.colors.gray}
-            />
-          </View>
+          <TextInput
+            label="Location"
+            value={location}
+            onChangeText={setLocation}
+            placeholder="Enter destination"
+            size="medium"
+          />
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Trip Dates</Text>
@@ -136,15 +135,14 @@ export default function CreateTripModal() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+          <Button
+            title={saving ? 'Saving...' : 'Save Trip'}
             onPress={handleSaveTrip}
             disabled={saving}
-          >
-            <Text style={styles.saveButtonText}>
-              {saving ? 'Saving...' : 'Save Trip'}
-            </Text>
-          </TouchableOpacity>
+            loading={saving}
+            variant="primary"
+            size="medium"
+          />
         </View>
       </View>
       <StatusBar style="auto" />
@@ -163,7 +161,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.heading,
-    fontSize: 28,
+    fontSize: theme.fontSize.xxxl,
     color: theme.colors.black,
     textAlign: 'center',
     marginBottom: theme.spacing.xl,
@@ -177,53 +175,29 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.body,
-    fontSize: 16,
+    fontSize: theme.fontSize.md,
     fontWeight: '600',
     color: theme.colors.black,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: theme.colors.gray,
-    borderRadius: 8,
-    padding: theme.spacing.md,
-    fontSize: 16,
-    backgroundColor: theme.colors.white,
   },
   buttonContainer: {
     paddingBottom: theme.spacing.lg,
   },
-  saveButton: {
-    backgroundColor: theme.colors.black,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  saveButtonDisabled: {
-    backgroundColor: theme.colors.gray,
-  },
-  saveButtonText: {
-    ...typography.body,
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.white,
-  },
   datePickerContainer: {
     backgroundColor: theme.colors.white,
-    borderRadius: 8,
+    borderRadius: theme.borderRadius.medium,
     padding: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.gray,
   },
   dateDisplay: {
     padding: theme.spacing.sm,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 4,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.small,
     marginTop: theme.spacing.xs,
   },
   dateDisplayText: {
     ...typography.body,
-    fontSize: 14,
+    fontSize: theme.fontSize.sm,
     color: theme.colors.black,
     textAlign: 'center',
   },

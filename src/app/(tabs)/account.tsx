@@ -1,20 +1,22 @@
 import ToggleSwitch from '@/components/common/ToggleSwitch';
+import { Button } from '@/components/ui/Button';
+import { TextInput } from '@/components/ui/TextInput';
 import { theme, typography } from '@styles';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  TouchableOpacity,
   View
 } from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 export default function AccountScreen() {
+  const insets = useSafeAreaInsets();
   const [tempUnit, setTempUnit] = useState<'Celcius' | 'Fahrenheit'>('Fahrenheit');
   const [speedUnit, setSpeedUnit] = useState<'mph' | 'kph'>('mph');
   const [selectedStyleId, setSelectedStyleId] = useState('3');
@@ -42,31 +44,27 @@ export default function AccountScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
+        <Text style={styles.title}>Account</Text>
+      </View>
+      
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Account</Text>
-
         <View style={styles.formContainer}>
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>name</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="name"
-              placeholderTextColor={theme.colors.gray}
-            />
-          </View>
+          <TextInput
+            label="Name"
+            placeholder="Enter your name"
+            size="medium"
+          />
 
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>email</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="email"
-              placeholderTextColor={theme.colors.gray}
-            />
-          </View>
+          <TextInput
+            label="Email"
+            placeholder="Enter your email"
+            size="medium"
+          />
 
                     <View style={styles.unitContainer}>
             <ToggleSwitch
@@ -91,7 +89,7 @@ export default function AccountScreen() {
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>style preference</Text>
+            <Text style={styles.fieldLabel}>Style Preference</Text>
             <RadioGroup 
               radioButtons={styleRadioButtons} 
               onPress={setSelectedStyleId}
@@ -101,11 +99,14 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Log Out</Text>
-        </TouchableOpacity>
+        <Button
+          title="Log Out"
+          onPress={handleLogout}
+          variant="danger"
+          size="medium"
+        />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -114,45 +115,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.white,
   },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
+  header: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.lightGray,
+    backgroundColor: theme.colors.white,
   },
   title: {
     ...typography.heading,
-    marginBottom: 24,
+    color: theme.colors.black,
+  },
+  scrollContent: {
+    padding: theme.spacing.md,
+    paddingBottom: theme.spacing.xl,
   },
   formContainer: {
-    marginBottom: 32,
+    marginBottom: theme.spacing.xl,
   },
   fieldContainer: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   fieldLabel: {
     ...typography.label,
-    marginBottom: 8,
-  },
-  textInput: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: theme.colors.gray,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    backgroundColor: theme.colors.white,
-    ...typography.body,
+    marginBottom: theme.spacing.sm,
   },
   unitContainer: {
-    gap: 16,
-    marginBottom: 24,
-  },
-  logoutButton: {
-    backgroundColor: theme.colors.black,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    ...typography.button,
-    color: theme.colors.white,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
 });

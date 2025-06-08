@@ -391,6 +391,152 @@ onChange={({ startDate, endDate }: { startDate: DateType; endDate: DateType }) =
 - Gradually restore functionality to identify crash point
 - Focus on external dependencies as primary suspects
 
+## Expo Router Patterns & Navigation Best Practices
+
+### File-Based Routing Structure
+Expo Router v5 uses file-based routing where files in `src/app/` automatically become routes:
+
+```
+src/app/
+├── (tabs)/          # Tab group - files here become tabs
+│   ├── index.tsx    # Home tab route: /
+│   ├── trips.tsx    # Trips tab route: /trips  
+│   └── account.tsx  # Account tab route: /account
+├── create-trip.tsx  # Modal route: /create-trip
+├── packing-list.tsx # Modal route: /packing-list
+└── _layout.tsx      # Root layout
+```
+
+### Modal Implementation Pattern
+**✅ Correct Modal Setup:**
+```typescript
+// src/app/modal-name.tsx - Automatic modal in Expo Router
+export default function ModalScreen() {
+  const { paramName } = useLocalSearchParams();
+  
+  return (
+    <View style={styles.container}>
+      {/* Modal content */}
+    </View>
+  );
+}
+```
+
+### Navigation & Routing Responsibilities
+
+**❌ WRONG: Components handling their own routing**
+```typescript
+// BAD - TripCard should not handle navigation directly
+import { router } from 'expo-router';
+
+export const TripCard = ({ trip }) => {
+  const handleViewPacking = () => {
+    router.push('/packing-list'); // ❌ Component doing routing
+  };
+};
+```
+
+**✅ CORRECT: Parent screens handle all routing**
+```typescript
+// GOOD - TripCard emits events, parent handles routing
+export const TripCard = ({ trip, onViewPackingList }) => {
+  const handleViewPacking = () => {
+    onViewPackingList(trip); // ✅ Emit event to parent
+  };
+};
+
+// Parent screen handles all navigation
+export default function TripsScreen() {
+  const handleViewPackingList = (trip: Trip) => {
+    router.push(`/packing-list?tripId=${trip.id}`); // ✅ Parent does routing
+  };
+  
+  return (
+    <TripCard 
+      trip={trip}
+      onViewPackingList={handleViewPackingList}
+    />
+  );
+}
+```
+
+### URL Parameters & Data Passing
+
+**✅ Pass data via URL parameters:**
+```typescript
+// Navigate with parameters
+router.push(`/packing-list?tripId=${trip.id}&location=${trip.location}`);
+
+// Receive parameters in modal
+export default function PackingListModal() {
+  const { tripId, location } = useLocalSearchParams();
+  // Use tripId to load trip data
+}
+```
+
+### Back Navigation Pattern
+
+**✅ Simple back navigation in modals:**
+```typescript
+// Add back button to modal headers
+<View style={styles.header}>
+  <TouchableOpacity onPress={() => router.back()}>
+    <Ionicons name="arrow-back" size={24} />
+  </TouchableOpacity>
+  <Text style={styles.title}>Modal Title</Text>
+  <View style={styles.spacer} />
+</View>
+```
+
+### Component Responsibility Separation
+
+**Components should:**
+- ✅ Render UI based on props
+- ✅ Emit events via callback props
+- ✅ Handle local state management
+- ✅ Manage internal interactions
+
+**Components should NOT:**
+- ❌ Import or use `router` directly
+- ❌ Know about route structure
+- ❌ Handle navigation logic
+- ❌ Manage global application state
+
+**Screens should:**
+- ✅ Handle all navigation decisions
+- ✅ Manage data fetching for the screen
+- ✅ Coordinate between multiple components
+- ✅ Handle URL parameters and route state
+
+### Navigation Flow Best Practices
+
+**✅ Clean separation pattern:**
+```typescript
+// 1. Component emits events
+<TripCard onViewPackingList={handleViewPackingList} />
+
+// 2. Screen handles routing
+const handleViewPackingList = (trip: Trip) => {
+  router.push(`/packing-list?tripId=${trip.id}`);
+};
+
+// 3. Modal receives parameters
+const { tripId } = useLocalSearchParams();
+```
+
+This pattern ensures:
+- Components are reusable and testable
+- Routing logic is centralized in screens
+- Clear data flow from UI events to navigation
+- Easy to modify routes without changing components
+
+### Common Anti-Patterns to Avoid
+
+❌ **Component-Level Routing**: Never import `router` in reusable components
+❌ **Deep Prop Drilling**: Don't pass router functions through multiple component layers  
+❌ **Mixed Responsibilities**: Keep navigation logic separate from UI logic
+❌ **Hard-coded Routes**: Use parameters instead of hard-coding destination routes
+
 ## Important Reminders
 
 - **Stay Focused**: Implement only what's assigned, avoid feature creep
@@ -401,5 +547,58 @@ onChange={({ startDate, endDate }: { startDate: DateType; endDate: DateType }) =
 - **Security**: Never expose API keys or sensitive data
 - **Debug Systematically**: Use minimal implementations to isolate component crashes
 - **Strong Typing**: Prefer `Date` over `DateType` with explicit casting at library boundaries
+- **Navigation Separation**: Components emit events, screens handle routing
+- **Expo Router**: Use file-based routing with URL parameters for data passing
 
 Your role is crucial for maintaining code quality while delivering user-facing value. Focus on clean, maintainable implementations that integrate seamlessly with the existing codebase.
+
+## Current Session Status (June 8, 2025)
+
+### LocationAutocomplete Component Development
+
+**COMPLETED WORK:**
+- ✅ Disconnected `useLocationWeather` hook from home screen as requested
+- ✅ Created standalone `LocationAutocomplete` component using `react-native-google-places-autocomplete`
+- ✅ Implemented Google Places API integration with proper configuration
+- ✅ Fixed API authorization issues by removing custom `requestUrl` configuration
+- ✅ Added proper debouncing (500ms) to reduce excessive keystroke events
+- ✅ Improved dropdown UI styling with absolute positioning and z-index for overlay effect
+- ✅ Added `keyboardShouldPersistTaps="handled"` for better mobile touch handling
+
+**CURRENT ISSUE:**
+**Selection not filling input field properly** - When users click dropdown options, the input field doesn't get filled with the selected location and the field loses focus with only partial text.
+
+**LINTER WARNINGS PRESENT:**
+The linter shows 7 warnings total, but no errors. Most warnings are for unused imports in various files. No specific LocationAutocomplete linter errors mentioned.
+
+**CURRENT IMPLEMENTATION STATUS:**
+- Component renders and shows dropdown suggestions ✅
+- Google Places API authentication works ✅ 
+- Dropdown appears as overlay without pushing content down ✅
+- Debouncing reduces excessive API calls ✅
+- **Selection completion mechanism not working** ❌
+
+### Next Steps Required
+
+**IMMEDIATE PRIORITY:**
+1. **Fix dropdown selection filling the input field** - Research and implement proper selection handling
+   - Current approach with `setAddressText()` via ref not working
+   - May need different approach or library configuration
+   - Consider reviewing react-native-google-places-autocomplete documentation for selection patterns
+
+**MEDIUM PRIORITY:**
+2. **Clean up linter warnings** - Address unused imports in LocationAutocomplete.tsx and other files
+3. **Reconnect weather functionality** - Once LocationAutocomplete is fully working, reconnect to useLocationWeather hook
+4. **Add proper API key restrictions** - User mentioned needing to restrict Google Places API key for production
+
+**TECHNICAL CONTEXT:**
+- Component is isolated and working independently from weather logic as requested
+- Uses TypeScript with proper interfaces
+- Follows existing styling patterns with theme constants
+- Located at: `/Users/joey/Desktop/Climate-Closet/sun-dressed/src/components/LocationAutocomplete.tsx`
+- Currently used in: `/Users/joey/Desktop/Climate-Closet/sun-dressed/src/app/(tabs)/index.tsx`
+
+**ARCHITECTURE NOTES:**
+The component uses proper separation of concerns with callback props (`onLocationSelect`, `onTextChange`) allowing parent components to handle selection logic while keeping the component focused on Google Places integration.
+
+**END OF SESSION - Development handoff point ready for next session to continue with selection fix.**

@@ -16,7 +16,7 @@ export default function ClosetScreen() {
         <View style={styles.placeholderBox}>
           <Text style={styles.comingSoonTitle}>Feature Coming Soon!</Text>
           <Text style={styles.comingSoonText}>
-            We're busy tailoring this space for you. Soon, you'll be able to add your own clothes, create custom outfits, and get even smarter recommendations.
+            We&apos;re busy tailoring this space for you. Soon, you&apos;ll be able to add your own clothes, create custom outfits, and get even smarter recommendations.
           </Text>
           <Text style={styles.stayTunedText}>
             Stay tuned!
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: theme.colors.lightGray,
     backgroundColor: theme.colors.white,
   },
   title: {
@@ -55,14 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.large,
     alignItems: 'center',
-    shadowColor: theme.colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: theme.borderRadius.medium,
-    elevation: 5,
+    ...theme.shadows.medium,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },

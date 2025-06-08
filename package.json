@@ -48,6 +48,7 @@
     "react-native": "0.79.3",
     "react-native-autocomplete-input": "^5.5.6",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-get-random-values": "^1.11.0",
     "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-paper": "^5.14.5",
     "react-native-popup-menu": "^0.18.0",
@@ -60,7 +61,8 @@
     "react-native-ui-datepicker": "^3.1.2",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "react-test-renderer": "^19.0.0"
+    "react-test-renderer": "^19.0.0",
+    "use-debounce": "^10.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

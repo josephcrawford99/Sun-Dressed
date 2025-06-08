@@ -8,6 +8,7 @@ interface TripCardProps {
   trip: Trip;
   onDelete: (tripId: string) => Promise<void>;
   onEdit: (trip: Trip) => void;
+  onViewPackingList: (trip: Trip) => void;
 }
 
 const formatDateRange = (startDate: Date | string, endDate: Date | string): string => {
@@ -26,7 +27,7 @@ const formatDateRange = (startDate: Date | string, endDate: Date | string): stri
   return `${startStr} - ${endStr}`;
 };
 
-export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) => {
+export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit, onViewPackingList }) => {
   console.log('TripCard FULL START render for trip:', trip.id, trip.location);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -77,6 +78,16 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) =>
           titleStyle={styles.menuItemText}
         />
         <Menu.Item 
+          onPress={() => {
+            console.log('View Packing List pressed for trip:', trip.id);
+            closeMenu();
+            onViewPackingList(trip);
+          }} 
+          title="View Packing List"
+          leadingIcon="bag-suitcase"
+          titleStyle={styles.menuItemText}
+        />
+        <Menu.Item 
           onPress={handleDelete} 
           title="Delete"
           leadingIcon="delete"
@@ -90,34 +101,27 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) =>
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.white,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: theme.borderRadius.large,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...theme.shadows.medium,
   },
   content: {
     flex: 1,
   },
   location: {
     ...typography.heading,
-    fontSize: 18,
+    fontSize: theme.fontSize.lg,
     color: theme.colors.black,
     marginBottom: 4,
   },
   dates: {
     ...typography.body,
     color: theme.colors.gray,
-    fontSize: 14,
+    fontSize: theme.fontSize.sm,
   },
   menuButton: {
     margin: 0,
@@ -129,6 +133,6 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     color: theme.colors.black,
-    fontSize: 16,
+    fontSize: theme.fontSize.md,
   },
 });

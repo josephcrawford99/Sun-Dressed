@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { fonts, theme, typography } from '@styles';
+import { Button } from '@/components/ui/Button';
+import { TextInput } from '@/components/ui/TextInput';
 import { router } from 'expo-router';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 export default function AuthScreen() {
   const handleDevLogin = () => {
@@ -16,25 +18,30 @@ export default function AuthScreen() {
       </View>
       <View style={styles.formContainer}>
         <TextInput 
-          style={styles.input}
           placeholder="Email"
-          placeholderTextColor="#888"
+          size="medium"
         />
         <TextInput 
-          style={styles.input}
           placeholder="Password"
           secureTextEntry
-          placeholderTextColor="#888"
+          size="medium"
         />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
+        <Button
+          title="Log In"
+          onPress={() => {}}
+          variant="primary"
+          size="medium"
+        />
         
         {__DEV__ && (
-          <TouchableOpacity style={styles.devButton} onPress={handleDevLogin}>
-            <Ionicons name="code-slash" size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.devButtonText}>Developer Login</Text>
-          </TouchableOpacity>
+          <View style={styles.devButtonContainer}>
+            <Button
+              title="Developer Login"
+              onPress={handleDevLogin}
+              variant="secondary"
+              size="medium"
+            />
+          </View>
         )}
       </View>
     </SafeAreaView>
@@ -52,46 +59,10 @@ const styles = StyleSheet.create({
     maxWidth: '90%'
   },
   formContainer: {
-    paddingHorizontal: 32,
+    paddingHorizontal: theme.spacing.xl,
     flex: 1
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 16,
-    fontFamily: fonts.secondary,
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: theme.colors.black,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    height: 48,
-  },
-  buttonText: {
-    ...typography.button,
-    color: '#fff',
-  },
-  devButton: {
-    backgroundColor: '#2196F3',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 24,
-    borderWidth: 2,
-    borderColor: '#1976D2',
-    height: 48,
-    flexDirection: 'row',
-  },
-  devButtonText: {
-    ...typography.button,
-    color: '#fff',
+  devButtonContainer: {
+    marginTop: theme.spacing.lg,
   },
 });

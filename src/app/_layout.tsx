@@ -1,3 +1,4 @@
+import 'react-native-get-random-values'; // Must be first import for Google Places
 import { useColorScheme } from '@hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
