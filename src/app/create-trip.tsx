@@ -1,9 +1,9 @@
+import { Button } from '@/components/ui/Button';
+import { TextInput } from '@/components/ui/TextInput';
 import { Trip } from '@/types/trip';
 import { useTrips } from '@hooks/useTrips';
 import { theme } from '@styles/theme';
 import { typography } from '@styles/typography';
-import { Button } from '@/components/ui/Button';
-import { TextInput } from '@/components/ui/TextInput';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
