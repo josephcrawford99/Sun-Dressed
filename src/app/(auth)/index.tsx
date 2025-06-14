@@ -3,11 +3,22 @@ import { TextInput } from '@/components/ui/TextInput';
 import { theme, typography } from '@styles';
 import { router } from 'expo-router';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AuthScreen() {
   const handleDevLogin = () => {
     router.replace('/(tabs)/home');
+  };
+
+  const handleAppleLogin = () => {
+    // TODO: Implement Apple OAuth
+    console.log('Apple OAuth login');
+  };
+
+  const handleGoogleLogin = () => {
+    // TODO: Implement Google OAuth
+    console.log('Google OAuth login');
   };
 
   return (
@@ -31,6 +42,24 @@ export default function AuthScreen() {
           variant="primary"
           size="medium"
         />
+
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>or</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <View style={styles.oauthContainer}>
+          <TouchableOpacity style={styles.appleButton} onPress={handleAppleLogin}>
+            <Ionicons name="logo-apple" size={20} color={theme.colors.white} />
+            <Text style={styles.appleButtonText}>Continue with Apple</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+            <Ionicons name="logo-google" size={20} color={theme.colors.black} />
+            <Text style={styles.googleButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
+        </View>
         
         {__DEV__ && (
           <View style={styles.devButtonContainer}>
@@ -63,5 +92,56 @@ const styles = StyleSheet.create({
   },
   devButtonContainer: {
     marginTop: theme.spacing.lg,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: theme.spacing.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: theme.colors.lightGray,
+  },
+  dividerText: {
+    ...typography.body,
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.gray,
+    paddingHorizontal: theme.spacing.md,
+  },
+  oauthContainer: {
+    gap: theme.spacing.sm,
+  },
+  appleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.black,
+    borderRadius: theme.borderRadius.medium,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    gap: theme.spacing.sm,
+  },
+  appleButtonText: {
+    ...typography.button,
+    fontWeight: '600',
+    color: theme.colors.white,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.medium,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.gray,
+    gap: theme.spacing.sm,
+  },
+  googleButtonText: {
+    ...typography.button,
+    fontWeight: '600',
+    color: theme.colors.black,
   },
 });

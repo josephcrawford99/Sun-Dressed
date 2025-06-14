@@ -1,9 +1,10 @@
 import ToggleSwitch from '@/components/common/ToggleSwitch';
 import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
+import { useSettings } from '@/contexts/SettingsContext';
 import { theme, typography } from '@styles';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Platform,
   ScrollView,
@@ -11,33 +12,38 @@ import {
   Text,
   View
 } from 'react-native';
-import RadioGroup from 'react-native-radio-buttons-group';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
-  const [tempUnit, setTempUnit] = useState<'Celcius' | 'Fahrenheit'>('Fahrenheit');
-  const [speedUnit, setSpeedUnit] = useState<'mph' | 'kph'>('mph');
-  const [selectedStyleId, setSelectedStyleId] = useState('3');
+  const { settings, updateSetting } = useSettings();
+  const [name, setName] = useState(settings.name);
+  const [email, setEmail] = useState(settings.email);
 
-  const styleRadioButtons = [
-    {
-      id: '1',
-      label: 'Masculine',
-      value: 'masculine'
-    },
-    {
-      id: '2', 
-      label: 'Feminine',
-      value: 'feminine'
-    },
-    {
-      id: '3',
-      label: 'Neutral', 
-      value: 'neutral'
+  // Update local state when settings change
+  useEffect(() => {
+    setName(settings.name);
+    setEmail(settings.email);
+  }, [settings]);
+
+  const handleNameChange = async (value: string) => {
+    setName(value);
+    try {
+      await updateSetting('name', value);
+    } catch (error) {
+      console.error('Failed to update name:', error);
     }
-  ];
+  };
+
+  const handleEmailChange = async (value: string) => {
+    setEmail(value);
+    try {
+      await updateSetting('email', value);
+    } catch (error) {
+      console.error('Failed to update email:', error);
+    }
+  };
 
   const handleLogout = () => {
     router.replace('/(auth)');
@@ -58,50 +64,49 @@ export default function AccountScreen() {
             label="Name"
             placeholder="Enter your name"
             size="medium"
+            value={name}
+            onChangeText={handleNameChange}
           />
 
           <TextInput
             label="Email"
             placeholder="Enter your email"
             size="medium"
+            value={email}
+            onChangeText={handleEmailChange}
           />
 
-                    <View style={styles.unitContainer}>
+          <View style={styles.unitContainer}>
             <ToggleSwitch
               label="Temperature Unit"
-              value={tempUnit}
+              value={settings.temperatureUnit}
               options={[
-                { value: 'Celcius', label: '°C' },
+                { value: 'Celsius', label: '°C' },
                 { value: 'Fahrenheit', label: '°F' }
               ]}
-              onValueChange={(value) => setTempUnit(value as 'Celcius' | 'Fahrenheit')}
+              onValueChange={(value) => updateSetting('temperatureUnit', value as 'Celsius' | 'Fahrenheit')}
             />
 
             <ToggleSwitch
               label="Wind Speed Unit"
-              value={speedUnit}
+              value={settings.speedUnit}
               options={[
                 { value: 'kph', label: 'km/h' },
                 { value: 'mph', label: 'mph' }
               ]}
-              onValueChange={(value) => setSpeedUnit(value as 'mph' | 'kph')}
+              onValueChange={(value) => updateSetting('speedUnit', value as 'mph' | 'kph')}
             />
           </View>
 
           <ToggleSwitch
             label="Style Preference"
-            value={styleRadioButtons.find(button => button.id === selectedStyleId)?.value || 'neutral'}
+            value={settings.stylePreference}
             options={[
               { value: 'masculine', label: 'Masculine' },
               { value: 'feminine', label: 'Feminine' },
               { value: 'neutral', label: 'Neutral' }
             ]}
-            onValueChange={(value) => {
-              const selectedButton = styleRadioButtons.find(button => button.value === value);
-              if (selectedButton) {
-                setSelectedStyleId(selectedButton.id);
-              }
-            }}
+            onValueChange={(value) => updateSetting('stylePreference', value as 'masculine' | 'feminine' | 'neutral')}
           />
         </View>
 

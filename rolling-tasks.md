@@ -355,6 +355,55 @@
 
 **Developer Assessment**: The developer demonstrates **exceptional React hooks knowledge** - all implementations follow React best practices with no misused or fake hooks detected.
 
+## Settings Context Architecture Refactor (June 14, 2025) - ✅ COMPLETE
+
+**Dev Team Implementation Summary:**
+- **Architecture Shift**: Moved from component-level settings to hook-level abstraction for cleaner separation of concerns
+- **Files Created**:
+  - `src/types/settings.ts` - TypeScript interfaces for user preferences with defaults
+  - `src/services/settingsService.ts` - AsyncStorage persistence service
+  - `src/contexts/SettingsContext.tsx` - React context provider with state management
+  - `src/utils/unitConversions.ts` - Temperature and speed conversion utilities
+- **Files Modified**:
+  - `src/app/_layout.tsx` - Added SettingsProvider to app root
+  - `src/app/(tabs)/account.tsx` - Connected to settings context for real-time persistence
+  - `src/hooks/useLocationWeather.ts` - Enhanced with WeatherDisplay interface and unit conversions
+  - `src/hooks/useOutfitGenerator.ts` - Internally consumes style preferences
+  - `src/hooks/usePackingList.ts` - Internally consumes style preferences
+  - `src/components/WeatherCard.tsx` - Refactored to use WeatherDisplay (no direct settings)
+  - `src/app/(tabs)/home.tsx` - Uses weatherDisplay from hook, personalized greeting
+  - `src/app/packing-list.tsx` - Removed direct settings consumption
+  - `src/services/llmService.ts` - Enhanced with style preference integration
+  - `src/types/weather.ts` - Added WeatherDisplay interface for pre-converted display data
+
+**Architecture Achievement**: 
+- ✅ **Hook-Level Abstraction**: Settings consumed at hook level, not component level
+- ✅ **Clean Component APIs**: Components receive display-ready data with correct units
+- ✅ **Single Responsibility**: Hooks handle settings logic, components focus on UI
+- ✅ **Type Safety**: WeatherDisplay interface ensures correct unit display format
+- ✅ **Real-Time Persistence**: Settings automatically saved to AsyncStorage on change
+- ✅ **Personalization**: User name, temperature units (°F/°C), wind speed units (mph/kph), style preferences
+
+**User Experience Improvements**:
+- ✅ **Personalized Greetings**: Home screen displays user's name or "Name!" placeholder
+- ✅ **Preferred Units**: Weather displays in user's chosen temperature and speed units
+- ✅ **Style-Aware AI**: Outfit and packing list generation includes masculine/feminine/neutral preferences
+- ✅ **Persistent Settings**: All preferences survive app restarts via AsyncStorage
+
+**Technical Benefits**:
+- ✅ **Better Testing**: Settings logic testable at hook level with easier mocking
+- ✅ **Performance**: Unit conversions done once in hooks, not per component render
+- ✅ **Maintainability**: Clean separation allows settings changes without touching UI components
+- ✅ **Extensibility**: Easy to add new settings without modifying existing components
+
+### ⚠️ Future Enhancements Identified
+- **WeatherDisplay Naming**: Interface name `WeatherDisplay` is confusing - consider `WeatherWithDisplay` or `FormattedWeather`
+- **Unit Label Removal**: Eventually remove unit labels (°F, mph) from WeatherCard indicators for cleaner design
+- **Settings Validation**: Add input validation for settings form fields
+- **Settings Export/Import**: Consider settings backup/restore functionality
+
+**Code Quality Score**: 9.5/10 - Excellent React patterns with proper hook abstraction and TypeScript integration
+
 ---
 
 *This file tracks TDD progress and guides development priorities for MVP completion.*

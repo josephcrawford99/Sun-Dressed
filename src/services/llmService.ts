@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { Outfit } from '../types/Outfit';
 import { Weather } from '../types/weather';
+import { StylePreference } from '../types/settings';
 import { geminiRateLimiter } from './rateLimiter';
 
-export const generateOutfitLLM = async (weather?: Weather, activity?: string): Promise<Outfit> => {
+export const generateOutfitLLM = async (weather?: Weather, activity?: string, stylePreference?: StylePreference): Promise<Outfit> => {
   console.log('🔄 Starting outfit generation...');
-  console.log('📊 Input params:', { weather, activity });
+  console.log('📊 Input params:', { weather, activity, stylePreference });
   
   await geminiRateLimiter.checkRateLimit();
   console.log('✅ Rate limit check passed');
@@ -14,7 +15,11 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string): P
     ? `${weather.condition} weather with high of ${weather.dailyHighTemp}°F, low of ${weather.dailyLowTemp}°F, feels like ${weather.feelsLikeTemp}°F, ${weather.highestChanceOfRain}% chance of rain, wind at ${weather.windiness}mph, ${weather.sunniness}% sunny`
     : 'any weather';
   
-  const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}. Return only a JSON object with: top, bottom, outerwear (array), accessories (array), shoes.`;
+  const styleInstruction = stylePreference && stylePreference !== 'neutral'
+    ? ` Focus on ${stylePreference} style clothing options.`
+    : '';
+  
+  const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}.${styleInstruction} Return only a JSON object with: top, bottom, outerwear (array), accessories (array), shoes.`;
   
   console.log('📝 Generated prompt:', prompt);
   
@@ -73,10 +78,11 @@ export const generatePackingListLLM = async (
   location: string, 
   startDate: Date, 
   endDate: Date, 
-  weatherData?: Weather[]
+  weatherData?: Weather[],
+  stylePreference?: StylePreference
 ): Promise<string[]> => {
   console.log('🧳 Starting packing list generation...');
-  console.log('📊 Input params:', { location, startDate, endDate, weatherData });
+  console.log('📊 Input params:', { location, startDate, endDate, weatherData, stylePreference });
   
   await geminiRateLimiter.checkRateLimit();
   console.log('✅ Rate limit check passed');
@@ -86,7 +92,11 @@ export const generatePackingListLLM = async (
     ? `Weather forecast: ${weatherData.map(w => `${w.condition}, high ${w.dailyHighTemp}°F, low ${w.dailyLowTemp}°F`).join('; ')}`
     : 'no specific weather data available';
   
-  const prompt = `Generate a packing list for a ${tripDays}-day trip to ${location} from ${startDate.toDateString()} to ${endDate.toDateString()}. ${weatherDescription}. Return only a JSON array of clothing items needed, like ["item1", "item2", "item3"].`;
+  const styleInstruction = stylePreference && stylePreference !== 'neutral'
+    ? ` Focus on ${stylePreference} style clothing options.`
+    : '';
+  
+  const prompt = `Generate a packing list for a ${tripDays}-day trip to ${location} from ${startDate.toDateString()} to ${endDate.toDateString()}. ${weatherDescription}.${styleInstruction} Return only a JSON array of clothing items needed, like ["item1", "item2", "item3"].`;
   
   console.log('📝 Generated prompt:', prompt);
   

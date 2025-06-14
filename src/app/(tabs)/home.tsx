@@ -1,13 +1,14 @@
+import { useSettings } from '@/contexts/SettingsContext';
 import BentoBox from '@components/BentoBox';
 import FlipComponent from '@components/FlipComponent';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import WeatherCard from '@components/WeatherCard';
 import { Ionicons } from '@expo/vector-icons';
-import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
 import { useLocationWeather } from '@hooks/useLocationWeather';
+import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -26,8 +27,9 @@ const getTimeBasedGreeting = (): string => {
 };
 
 export default function HomeScreen() {
+  const { settings } = useSettings();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
-  const { weather, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
+  const { weather, weatherDisplay, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
   const [isFlipped, setIsFlipped] = useState(false);
 
 
@@ -43,8 +45,8 @@ export default function HomeScreen() {
     setIsFlipped(!isFlipped);
   };
 
-  // Compute current temperature from weather data
-  const currentTemp = weather?.feelsLikeTemp;
+  // Get current temperature from weatherDisplay (already in user's preferred unit)
+  const currentTemp = weatherDisplay?.displayTemp.current || '--°';
 
   // Memoize LocationAutocomplete props to prevent unnecessary re-renders
   const locationAutocompleteProps = useMemo(() => ({
@@ -61,7 +63,7 @@ export default function HomeScreen() {
       <View style={styles.greetingRow}>
         <View>
           <Text style={typography.label}>{getTimeBasedGreeting()},</Text>
-          <Text style={styles.name}>Name!</Text>
+          <Text style={styles.name}>{settings.name || 'Name!'}</Text>
         </View>
       </View>
 
@@ -75,13 +77,13 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.weatherButtonContent}>
               <Ionicons
-                name={getIoniconForWeather(weather?.icon)}
+                name={getIoniconForWeather(weatherDisplay?.icon)}
                 size={20}
                 color={theme.colors.white}
                 style={styles.weatherIcon}
               />
               <Text style={styles.weatherButtonText}>
-                {currentTemp ? `${currentTemp}°` : '--°'}
+                {currentTemp}
               </Text>
             </View>
           )}
@@ -106,7 +108,7 @@ export default function HomeScreen() {
           }
           backComponent={
             <WeatherCard 
-              weather={weather}
+              weatherDisplay={weatherDisplay}
               loading={isLoading}
               error={error}
             />
@@ -127,10 +129,13 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.md,
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.md,
+    paddingLeft: theme.spacing.xs,
   },
   name: {
     ...typography.headingItalic,
     marginTop: -4,
+    paddingLeft: theme.spacing.xs,
+    fontSize: 32,
   },
   locationRow: {
     flexDirection: 'row',

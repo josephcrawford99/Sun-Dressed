@@ -12,6 +12,20 @@ export interface Weather {
   icon?: string; // OpenWeatherMap icon code (e.g., "10d", "01n")
 }
 
+export interface WeatherDisplay extends Weather {
+  displayTemp: {
+    feelsLike: string;
+    high: string;
+    low: string;
+    current: string;
+  };
+  displayWind: {
+    speed: string;
+    unit: string;
+  };
+  temperatureUnit: string;
+}
+
 export const mockWeather: Weather = {
   dailyHighTemp: 55,
   dailyLowTemp: 42,

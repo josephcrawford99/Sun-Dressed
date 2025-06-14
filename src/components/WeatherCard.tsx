@@ -3,15 +3,16 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { getIoniconForWeather } from '../services/weatherIconService';
 import { theme } from '../styles';
-import { Weather } from '../types/weather';
+import { WeatherDisplay } from '../types/weather';
 
 interface WeatherCardProps {
-  weather?: Weather;
+  weatherDisplay?: WeatherDisplay;
   loading?: boolean;
   error?: string | null;
 }
 
-const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading, error }) => {
+const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, error }) => {
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -22,7 +23,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading, error }) =>
     );
   }
 
-  if (error || !weather) {
+  if (error || !weatherDisplay) {
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
@@ -54,14 +55,14 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading, error }) =>
       {/* Header with location and main condition */}
       <View style={styles.header}>
         <Ionicons
-          name={getIoniconForWeather(weather.icon)}
+          name={getIoniconForWeather(weatherDisplay.icon)}
           size={32}
           color={theme.colors.black}
           style={styles.mainIcon}
         />
         <View style={styles.headerText}>
-          <Text style={styles.location}>{weather.location}</Text>
-          <Text style={styles.condition}>{weather.condition.replace('-', ' ')}</Text>
+          <Text style={styles.location}>{weatherDisplay.location}</Text>
+          <Text style={styles.condition}>{weatherDisplay.condition.replace('-', ' ')}</Text>
         </View>
       </View>
 
@@ -70,15 +71,21 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading, error }) =>
         <Text style={styles.sectionTitle}>Temperature</Text>
         <View style={styles.tempRow}>
           <View style={styles.tempItem}>
-            <Text style={styles.tempValue}>{weather.feelsLikeTemp}°</Text>
+            <Text style={styles.tempValue}>
+              {weatherDisplay.displayTemp.feelsLike}
+            </Text>
             <Text style={styles.tempLabel}>Feels Like</Text>
           </View>
           <View style={styles.tempItem}>
-            <Text style={styles.tempValue}>{weather.dailyHighTemp}°</Text>
+            <Text style={styles.tempValue}>
+              {weatherDisplay.displayTemp.high}
+            </Text>
             <Text style={styles.tempLabel}>High</Text>
           </View>
           <View style={styles.tempItem}>
-            <Text style={styles.tempValue}>{weather.dailyLowTemp}°</Text>
+            <Text style={styles.tempValue}>
+              {weatherDisplay.displayTemp.low}
+            </Text>
             <Text style={styles.tempLabel}>Low</Text>
           </View>
         </View>
@@ -90,31 +97,33 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading, error }) =>
         <View style={styles.detailsGrid}>
           <View style={styles.detailItem}>
             <Ionicons name="water" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weather.humidity}%</Text>
+            <Text style={styles.detailValue}>{weatherDisplay.humidity}%</Text>
             <Text style={styles.detailLabel}>Humidity</Text>
           </View>
           
           <View style={styles.detailItem}>
             <Ionicons name="sunny" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{getUVDescription(weather.uvIndex)}</Text>
-            <Text style={styles.detailLabel}>UV Index ({weather.uvIndex})</Text>
+            <Text style={styles.detailValue}>{getUVDescription(weatherDisplay.uvIndex)}</Text>
+            <Text style={styles.detailLabel}>UV Index ({weatherDisplay.uvIndex})</Text>
           </View>
           
           <View style={styles.detailItem}>
             <Ionicons name="leaf" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weather.windiness} mph</Text>
-            <Text style={styles.detailLabel}>{getWindDescription(weather.windiness)}</Text>
+            <Text style={styles.detailValue}>
+              {weatherDisplay.displayWind.speed} {weatherDisplay.displayWind.unit}
+            </Text>
+            <Text style={styles.detailLabel}>{getWindDescription(weatherDisplay.windiness)}</Text>
           </View>
           
           <View style={styles.detailItem}>
             <Ionicons name="rainy" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weather.highestChanceOfRain}%</Text>
+            <Text style={styles.detailValue}>{weatherDisplay.highestChanceOfRain}%</Text>
             <Text style={styles.detailLabel}>Rain Chance</Text>
           </View>
           
           <View style={styles.detailItem}>
             <Ionicons name="partly-sunny" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weather.sunniness}%</Text>
+            <Text style={styles.detailValue}>{weatherDisplay.sunniness}%</Text>
             <Text style={styles.detailLabel}>Sunshine</Text>
           </View>
         </View>

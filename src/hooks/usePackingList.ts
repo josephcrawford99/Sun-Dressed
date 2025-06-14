@@ -1,9 +1,11 @@
 import { Weather } from '@/types/weather';
+import { useSettings } from '@/contexts/SettingsContext';
 import { generatePackingListLLM } from '@services/llmService';
 import { useCallback, useState } from 'react';
 import { useWeatherForecast } from './useWeatherForecast';
 
 export const usePackingList = (updateTripPackingList?: (tripId: string, packingList: string[]) => Promise<void>) => {
+  const { settings } = useSettings();
   const [packingList, setPackingList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +31,8 @@ export const usePackingList = (updateTripPackingList?: (tripId: string, packingL
         weatherArray = [];
       }
       
-      const newPackingList = await generatePackingListLLM(location, startDate, endDate, weatherArray);
+      // Hook automatically includes user's style preference
+      const newPackingList = await generatePackingListLLM(location, startDate, endDate, weatherArray, settings.stylePreference);
       setPackingList(newPackingList);
       
       // Save to trip storage if tripId and update function are provided
@@ -42,7 +45,7 @@ export const usePackingList = (updateTripPackingList?: (tripId: string, packingL
     } finally {
       setLoading(false);
     }
-  }, [updateTripPackingList, fetchWeatherForecast]);
+  }, [updateTripPackingList, fetchWeatherForecast, settings.stylePreference]);
 
   const setStoredPackingList = useCallback((storedList: string[]) => {
     setPackingList(storedList);

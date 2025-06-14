@@ -8,13 +8,13 @@ interface OpenWeatherOneCallResponse {
     humidity: number;
     uvi: number;
     wind_speed: number;
-    weather: Array<{
+    weather: {
       main: string;
       description: string;
       icon: string;
-    }>;
+    }[];
   };
-  daily: Array<{
+  daily: {
     temp: {
       min: number;
       max: number;
@@ -28,12 +28,12 @@ interface OpenWeatherOneCallResponse {
     humidity: number;
     uvi: number;
     wind_speed: number;
-    weather: Array<{
+    weather: {
       main: string;
       description: string;
       icon: string;
-    }>;
-  }>;
+    }[];
+  }[];
 }
 
 class WeatherService {
