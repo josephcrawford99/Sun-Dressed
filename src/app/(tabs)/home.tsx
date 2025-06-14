@@ -1,9 +1,11 @@
 import { useSettings } from '@/contexts/SettingsContext';
 import BentoBox from '@components/BentoBox';
+import CalendarBar, { DateOffset } from '@components/CalendarBar';
 import FlipComponent from '@components/FlipComponent';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import WeatherCard from '@components/WeatherCard';
 import { Ionicons } from '@expo/vector-icons';
+import { useLastLocation } from '@hooks/useLastLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
 import { getIoniconForWeather } from '@services/weatherIconService';
@@ -28,18 +30,34 @@ const getTimeBasedGreeting = (): string => {
 
 export default function HomeScreen() {
   const { settings } = useSettings();
+  const { lastLocation, saveLastLocation } = useLastLocation();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
   const { weather, weatherDisplay, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
   const [isFlipped, setIsFlipped] = useState(false);
+  const [selectedDateOffset, setSelectedDateOffset] = useState<DateOffset>(0); // Default to today
+
+  // Fetch weather for the saved location on mount
+  useEffect(() => {
+    if (lastLocation) {
+      fetchWeatherByLocationString(lastLocation);
+    }
+  }, [lastLocation, fetchWeatherByLocationString]);
 
 
-  // Generate initial outfit and regenerate when weather updates
+  // Generate initial outfit and regenerate when weather updates or date changes
   useEffect(() => {
     if (weather) {
-      console.log('👕 Weather updated, generating new outfit:', weather);
-      generateOutfit(weather, 'daily activities');
+      console.log('👕 Weather updated, generating new outfit:', weather, 'for date offset:', selectedDateOffset);
+      // Modify activity based on selected date
+      let activity = 'daily activities';
+      if (selectedDateOffset === -1) {
+        activity = 'daily activities (yesterday)';
+      } else if (selectedDateOffset === 1) {
+        activity = 'daily activities (tomorrow)';
+      }
+      generateOutfit(weather, activity);
     }
-  }, [weather, generateOutfit]);
+  }, [weather, generateOutfit, selectedDateOffset]);
 
   const handleWeatherButtonPress = () => {
     setIsFlipped(!isFlipped);
@@ -50,13 +68,13 @@ export default function HomeScreen() {
 
   // Memoize LocationAutocomplete props to prevent unnecessary re-renders
   const locationAutocompleteProps = useMemo(() => ({
-    initialValue: "New York, NY, USA",
-    onLocationSelect: (locationString: string, coordinates?: { lat: number; lon: number }) => {
-      console.log('📍 Location selected:', locationString);
+    initialValue: lastLocation,
+    onLocationSelect: async (locationString: string, coordinates?: { lat: number; lon: number }) => {
+      await saveLastLocation(locationString);
       fetchWeatherByLocationString(locationString, coordinates);
     },
     placeholder: "Enter location"
-  }), [fetchWeatherByLocationString]);
+  }), [lastLocation, saveLastLocation, fetchWeatherByLocationString]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,6 +108,11 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
+      <CalendarBar
+        selectedDateOffset={selectedDateOffset}
+        onDateSelect={setSelectedDateOffset}
+      />
+
       <ScrollView
         style={styles.mainContainer}
         contentContainerStyle={styles.scrollContent}
@@ -100,7 +123,11 @@ export default function HomeScreen() {
           frontComponent={
             <BentoBox 
               weather={weather}
-              activity="daily activities"
+              activity={
+                selectedDateOffset === -1 ? 'yesterday\'s outfit' :
+                selectedDateOffset === 1 ? 'tomorrow\'s outfit' :
+                'today\'s outfit'
+              }
               outfit={outfit}
               loading={outfitLoading}
               error={outfitError}

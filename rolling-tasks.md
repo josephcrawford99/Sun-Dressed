@@ -404,6 +404,37 @@
 
 **Code Quality Score**: 9.5/10 - Excellent React patterns with proper hook abstraction and TypeScript integration
 
+## Last Location Persistence (June 14, 2025) - ✅ COMPLETE
+
+**Dev Team Implementation Summary:**
+- **Files Created**:
+  - `src/services/locationStorageService.ts` - AsyncStorage service for location string persistence
+  - `src/hooks/useLastLocation.ts` - Hook for managing last selected location state
+- **Files Modified**:
+  - `src/app/(tabs)/home.tsx` - Integrated location persistence with weather fetching
+  - `src/components/LocationAutocomplete.tsx` - Removed auto-trigger to prevent race conditions
+- **Architecture Achievement**: Simplified location persistence with automatic default handling
+- **User Experience**: Location selections now persist across app restarts and login/logout cycles
+- **Technical Implementation**:
+  - ✅ **Service-Level Default Handling**: LocationStorageService automatically saves "New York, NY, USA" if no location exists
+  - ✅ **Simplified Hook Logic**: useLastLocation hook with clean load/save pattern, no complex state management
+  - ✅ **Race Condition Elimination**: Removed auto-trigger from LocationAutocomplete, parent handles initial weather fetching
+  - ✅ **Logout Persistence**: Location survives authentication state changes via AsyncStorage
+  - ✅ **Clean Error Handling**: Graceful fallback to default location on any storage errors
+
+**Problem Solved**: Previously, users would see "New York, NY, USA" every time they logged out and back in. Now their last selected location persists across all app lifecycle events.
+
+**Code Quality**: Clean separation of concerns with service layer handling default logic, hook managing state, and component focusing on UI. No complex timing dependencies or race conditions.
+
+### ✅ Completed & Tested (Location Persistence)
+- **Location Persistence System**: Complete last location storage and restoration
+  - ✅ AsyncStorage-based location string persistence
+  - ✅ Automatic default location handling on first use
+  - ✅ Simplified hook pattern with clean load/save methods
+  - ✅ Race condition elimination in LocationAutocomplete
+  - ✅ Logout/login persistence functionality
+  - ✅ Error resilience with graceful fallbacks
+
 ---
 
 *This file tracks TDD progress and guides development priorities for MVP completion.*

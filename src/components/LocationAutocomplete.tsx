@@ -36,13 +36,8 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
     }
   }, [initialValue]);
 
-  // Auto-trigger onLocationSelect with initial value on mount
-  useEffect(() => {
-    if (initialValue) {
-      console.log('🚀 Auto-triggering location select with initial value:', initialValue);
-      onLocationSelect(initialValue); // No coordinates for initial load - will use geocoding service
-    }
-  }, []); // Empty dependency array to run only on mount
+  // Note: Auto-trigger removed to prevent race conditions with location persistence
+  // The parent component should handle initial weather fetching based on saved location
 
   return (
     <GooglePlacesAutocomplete
@@ -73,12 +68,12 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       query={{
         key: apiKey,
         language: 'en',
-        types: '(cities)',
+        types: 'locality|sublocality',
         // Location biasing - prioritize results near device location or US center
         location: deviceLocation ? 
           `${deviceLocation.latitude},${deviceLocation.longitude}` : 
           '39.8283,-98.5795', // US center fallback
-        radius: 2000000, // 2000km radius for biasing
+        radius: 50000, // 50km radius for better local biasing
       }}
       fetchDetails={true}
       enablePoweredByContainer={false}
