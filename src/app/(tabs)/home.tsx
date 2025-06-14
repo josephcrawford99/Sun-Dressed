@@ -1,8 +1,9 @@
 import BentoBox from '@components/BentoBox';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import { useWeather } from '@hooks/useWeather';
+import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
 import { theme, typography } from '@styles';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -14,8 +15,14 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const { weather, isLoading, currentTemp, fetchWeatherByCoordinates } = useWeather();
+  const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
+
+  // Generate initial outfit and regenerate when weather updates
+  useEffect(() => {
+    console.log('👕 Weather updated, generating new outfit:', weather);
+    generateOutfit(weather, 'daily activities');
+  }, [weather, generateOutfit]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,7 +41,6 @@ export default function HomeScreen() {
             
             // Extract location name for display
             const locationName = details?.formatted_address || data?.description || '';
-            setSelectedLocation(locationName);
             
             // Extract coordinates and fetch weather
             const coordinates = details?.geometry?.location;
@@ -68,7 +74,13 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <BentoBox />
+        <BentoBox 
+          weather={weather}
+          activity="daily activities"
+          outfit={outfit}
+          loading={outfitLoading}
+          error={outfitError}
+        />
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,15 +1,24 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { theme } from '../styles';
-import { useOutfitGenerator } from '../hooks/useOutfitGenerator';
-import { mockWeather } from '../types/weather';
+import { Weather } from '../types/weather';
+import { Outfit } from '../types/Outfit';
 
-const BentoBox: React.FC = () => {
-  const { outfit, loading, error, generateOutfit } = useOutfitGenerator();
+interface BentoBoxProps {
+  weather?: Weather;
+  activity?: string;
+  outfit?: Outfit | null;
+  loading?: boolean;
+  error?: string | null;
+}
 
-  useEffect(() => {
-    generateOutfit(mockWeather, 'daily activities');
-  }, [generateOutfit]);
+const BentoBox: React.FC<BentoBoxProps> = ({ 
+  weather, 
+  activity = 'daily activities',
+  outfit,
+  loading = false,
+  error = null
+}) => {
 
   const renderOutfitItem = (item: string | undefined, label: string) => {
     if (loading) {
