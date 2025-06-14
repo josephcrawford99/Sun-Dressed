@@ -1,26 +1,35 @@
-import { Weather, mockWeather } from '@/types/weather';
+import { Weather } from '@/types/weather';
 import { generatePackingListLLM } from '@services/llmService';
 import { useCallback, useState } from 'react';
+import { useWeatherForecast } from './useWeatherForecast';
 
 export const usePackingList = (updateTripPackingList?: (tripId: string, packingList: string[]) => Promise<void>) => {
   const [packingList, setPackingList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { fetchWeatherForecast } = useWeatherForecast();
 
   const generatePackingList = useCallback(async (location: string, startDate: Date, endDate: Date, tripId?: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      // Calculate trip days for mock weather array
-      const tripDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      console.log('🧳 Generating packing list for:', { location, startDate, endDate });
       
-      // Create mock weather array for each day of the trip
-      const mockWeatherArray: Weather[] = Array(tripDays).fill(mockWeather);
+      let weatherArray: Weather[] = [];
       
-      console.log('🧳 Generating packing list for:', { location, startDate, endDate, tripDays });
+      try {
+        // Fetch real weather forecast data
+        console.log('🌤️ Fetching weather forecast for packing list...');
+        weatherArray = await fetchWeatherForecast(location, startDate, endDate);
+        console.log('✅ Weather forecast obtained for packing list:', weatherArray.length, 'days');
+      } catch (weatherError) {
+        console.warn('⚠️ Failed to fetch weather forecast, proceeding without weather data:', weatherError);
+        // Continue without weather data - the LLM can still generate a basic packing list
+        weatherArray = [];
+      }
       
-      const newPackingList = await generatePackingListLLM(location, startDate, endDate, mockWeatherArray);
+      const newPackingList = await generatePackingListLLM(location, startDate, endDate, weatherArray);
       setPackingList(newPackingList);
       
       // Save to trip storage if tripId and update function are provided
@@ -33,7 +42,7 @@ export const usePackingList = (updateTripPackingList?: (tripId: string, packingL
     } finally {
       setLoading(false);
     }
-  }, [updateTripPackingList]);
+  }, [updateTripPackingList, fetchWeatherForecast]);
 
   const setStoredPackingList = useCallback((storedList: string[]) => {
     setPackingList(storedList);
