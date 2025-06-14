@@ -13,7 +13,7 @@ export const theme = {
     primary: '#0a7ea4',
     primaryDark: '#1976D2',
     secondary: '#2196F3',
-    accent: '#FFEE8C',
+    accent: '#FFD636FF',
     
     // Semantic colors
     error: '#FF4757',

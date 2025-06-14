@@ -89,31 +89,31 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, loading, error }) =>
         <Text style={styles.sectionTitle}>Details</Text>
         <View style={styles.detailsGrid}>
           <View style={styles.detailItem}>
-            <Ionicons name="water" size={20} color={theme.colors.primary} />
+            <Ionicons name="water" size={20} color={theme.colors.accent} />
             <Text style={styles.detailValue}>{weather.humidity}%</Text>
             <Text style={styles.detailLabel}>Humidity</Text>
           </View>
           
           <View style={styles.detailItem}>
-            <Ionicons name="sunny" size={20} color={theme.colors.primary} />
+            <Ionicons name="sunny" size={20} color={theme.colors.accent} />
             <Text style={styles.detailValue}>{getUVDescription(weather.uvIndex)}</Text>
             <Text style={styles.detailLabel}>UV Index ({weather.uvIndex})</Text>
           </View>
           
           <View style={styles.detailItem}>
-            <Ionicons name="leaf" size={20} color={theme.colors.primary} />
+            <Ionicons name="leaf" size={20} color={theme.colors.accent} />
             <Text style={styles.detailValue}>{weather.windiness} mph</Text>
             <Text style={styles.detailLabel}>{getWindDescription(weather.windiness)}</Text>
           </View>
           
           <View style={styles.detailItem}>
-            <Ionicons name="rainy" size={20} color={theme.colors.primary} />
+            <Ionicons name="rainy" size={20} color={theme.colors.accent} />
             <Text style={styles.detailValue}>{weather.highestChanceOfRain}%</Text>
             <Text style={styles.detailLabel}>Rain Chance</Text>
           </View>
           
           <View style={styles.detailItem}>
-            <Ionicons name="partly-sunny" size={20} color={theme.colors.primary} />
+            <Ionicons name="partly-sunny" size={20} color={theme.colors.accent} />
             <Text style={styles.detailValue}>{weather.sunniness}%</Text>
             <Text style={styles.detailLabel}>Sunshine</Text>
           </View>
