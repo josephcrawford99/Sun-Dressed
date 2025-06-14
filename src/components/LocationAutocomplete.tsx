@@ -5,7 +5,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 
 interface LocationAutocompleteProps {
   initialValue?: string;
-  onLocationSelect: (data: any, details: any) => void;
+  onLocationSelect: (locationString: string) => void;
   onTextChange?: (text: string) => void;
   placeholder?: string;
 }
@@ -39,7 +39,9 @@ export default function LocationAutocomplete({
       placeholder={placeholder}
       onPress={(data, details) => {
         console.log('🎯 GooglePlacesAutocomplete onPress:', { data, details });
-        onLocationSelect(data, details);
+        const locationString = details?.formatted_address || data?.description || '';
+        console.log('📍 Emitting location string:', locationString);
+        onLocationSelect(locationString);
       }}
       textInputProps={{
         onChangeText: (text) => {

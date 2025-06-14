@@ -30,7 +30,7 @@ export const typography: { [key: string]: TextStyle } = {
   headingItalic: {
     fontFamily: fonts.primaryItalic,
     fontStyle: 'italic',
-    fontWeight: '400',
+    fontWeight: '600',
     letterSpacing: -1.25,
     fontSize: 28,
     color: '#000',

@@ -1,12 +1,12 @@
 import BentoBox from '@components/BentoBox';
-import WeatherCard from '@components/WeatherCard';
 import FlipComponent from '@components/FlipComponent';
 import LocationAutocomplete from '@components/LocationAutocomplete';
-import { useWeather } from '@hooks/useWeather';
+import WeatherCard from '@components/WeatherCard';
+import { Ionicons } from '@expo/vector-icons';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
+import { useWeather } from '@hooks/useWeather';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
-import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,8 +18,15 @@ import {
   View
 } from 'react-native';
 
+const getTimeBasedGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'good morning';
+  if (hour < 18) return 'good afternoon';
+  return 'good evening';
+};
+
 export default function HomeScreen() {
-  const { weather, isLoading, currentTemp, fetchWeatherByCoordinates } = useWeather();
+  const { weather, isLoading, currentTemp, fetchWeatherByLocationString } = useWeather();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -37,33 +44,17 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.greetingRow}>
         <View>
-          <Text style={typography.label}>greeting,</Text>
+          <Text style={typography.label}>{getTimeBasedGreeting()},</Text>
           <Text style={styles.name}>Name!</Text>
         </View>
       </View>
 
       <View style={styles.locationRow}>
         <LocationAutocomplete
-          initialValue="Blue Jean, MO"
-          onLocationSelect={(data, details) => {
-            console.log('📍 Location selected:', { data, details });
-            
-            // Extract location name for display
-            const locationName = details?.formatted_address || data?.description || '';
-            
-            // Extract coordinates and fetch weather
-            const coordinates = details?.geometry?.location;
-            if (coordinates && locationName) {
-              console.log('🌤️ Fetching weather for coordinates:', { 
-                lat: coordinates.lat, 
-                lng: coordinates.lng, 
-                location: locationName 
-              });
-              
-              fetchWeatherByCoordinates(coordinates.lat, coordinates.lng, locationName);
-            } else {
-              console.warn('❌ No coordinates found in location selection');
-            }
+          initialValue="New York, NY, USA"
+          onLocationSelect={(locationString) => {
+            console.log('📍 Location selected:', locationString);
+            fetchWeatherByLocationString(locationString);
           }}
           placeholder="Enter location"
         />
@@ -127,8 +118,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   name: {
-    ...typography.heading,
-    fontStyle: 'italic',
+    ...typography.headingItalic,
     marginTop: -4,
   },
   locationRow: {

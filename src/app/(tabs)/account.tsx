@@ -88,15 +88,21 @@ export default function AccountScreen() {
             />
           </View>
 
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Style Preference</Text>
-            <RadioGroup 
-              radioButtons={styleRadioButtons} 
-              onPress={setSelectedStyleId}
-              selectedId={selectedStyleId}
-              layout="row"
-            />
-          </View>
+          <ToggleSwitch
+            label="Style Preference"
+            value={styleRadioButtons.find(button => button.id === selectedStyleId)?.value || 'neutral'}
+            options={[
+              { value: 'masculine', label: 'Masculine' },
+              { value: 'feminine', label: 'Feminine' },
+              { value: 'neutral', label: 'Neutral' }
+            ]}
+            onValueChange={(value) => {
+              const selectedButton = styleRadioButtons.find(button => button.value === value);
+              if (selectedButton) {
+                setSelectedStyleId(selectedButton.id);
+              }
+            }}
+          />
         </View>
 
         <Button

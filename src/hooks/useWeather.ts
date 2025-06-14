@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getWeatherByCoordinates, getDefaultWeather } from '@/services/weatherService';
+import { geocodeLocationString } from '@/services/locationService';
+import { getDefaultWeather, getWeatherByCoordinates } from '@/services/weatherService';
 import { Weather } from '@/types/weather';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useState } from 'react';
 
 const STORAGE_KEY = 'last_location';
-const DEFAULT_LOCATION = 'Blue Jean, MO';
+const DEFAULT_LOCATION = 'New York, NY, USA';
 
 export const useWeather = () => {
   const [location, setLocation] = useState(DEFAULT_LOCATION);
@@ -21,7 +22,7 @@ export const useWeather = () => {
     setLocation(locationName);
 
     try {
-      const weatherData = await getWeatherByCoordinates(lat, lon);
+      const weatherData = await getWeatherByCoordinates(lat, lon, locationName);
       
       console.log('🌤️ Weather data received:', weatherData);
       
@@ -41,6 +42,56 @@ export const useWeather = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch weather';
       console.error('🌤️ Weather fetch error:', errorMessage);
+      setError(errorMessage);
+      setWeather(prev => ({ ...getDefaultWeather(), location: prev.location }));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Fetch weather using location string (geocodes then fetches weather)
+  const fetchWeatherByLocationString = useCallback(async (locationString: string) => {
+    console.log('🌤️ fetchWeatherByLocationString called:', { locationString });
+    
+    setIsLoading(true);
+    setError(null);
+    setLocation(locationString);
+
+    try {
+      // First geocode the location string to get coordinates
+      const geocodeResult = await geocodeLocationString(locationString);
+      
+      if (!geocodeResult.isValid || !geocodeResult.coordinates) {
+        throw new Error(geocodeResult.error || 'Failed to find location coordinates');
+      }
+      
+      console.log('🗺️ Geocoding successful:', geocodeResult);
+      
+      // Then fetch weather using the coordinates
+      const weatherData = await getWeatherByCoordinates(
+        geocodeResult.coordinates.lat, 
+        geocodeResult.coordinates.lon, 
+        geocodeResult.formattedName || locationString
+      );
+      
+      console.log('🌤️ Weather data received:', weatherData);
+      
+      // Check if we actually got real weather data
+      if (weatherData.location === 'Mock Location' || weatherData.location === 'Error - Using Mock Data') {
+        throw new Error('No weather data available for this location');
+      }
+
+      setWeather({
+        ...weatherData,
+        location: geocodeResult.formattedName || locationString,
+      });
+
+      // Save valid location for persistence
+      AsyncStorage.setItem(STORAGE_KEY, geocodeResult.formattedName || locationString);
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch weather';
+      console.error('🌤️ Weather fetch error:', errorMessage, locationString);
       setError(errorMessage);
       setWeather(prev => ({ ...getDefaultWeather(), location: prev.location }));
     } finally {
@@ -69,6 +120,7 @@ export const useWeather = () => {
     isLocationValid: !error && weather.location !== 'Mock Location',
     currentTemp: weather.feelsLikeTemp,
     fetchWeatherByCoordinates,
+    fetchWeatherByLocationString,
     loadSavedLocation,
   };
 };

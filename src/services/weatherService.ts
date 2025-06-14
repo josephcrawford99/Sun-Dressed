@@ -1,24 +1,29 @@
 import { Weather, mockWeather } from '@/types/weather';
 import { weatherRateLimiter } from './rateLimiter';
 
-interface OpenWeatherResponse {
-  main: {
+interface OneCallResponse {
+  current: {
     temp: number;
     feels_like: number;
-    temp_min: number;
-    temp_max: number;
     humidity: number;
+    uvi: number;
+    wind_speed: number;
+    wind_deg?: number;
+    clouds: number;
+    weather: Array<{
+      id: number;
+      main: string;
+      description: string;
+      icon: string;
+    }>;
   };
-  weather: Array<{
-    main: string;
-    description: string;
-    icon: string;
+  daily: Array<{
+    temp: {
+      min: number;
+      max: number;
+    };
+    pop: number; // Probability of precipitation
   }>;
-  wind: {
-    speed: number;
-  };
-  uv?: number;
-  name: string;
 }
 
 const mapCondition = (weatherMain: string): Weather['condition'] => {
@@ -42,17 +47,25 @@ const mapCondition = (weatherMain: string): Weather['condition'] => {
   }
 };
 
-export const getWeatherByCoordinates = async (lat: number, lon: number): Promise<Weather> => {
+export const getWeatherByCoordinates = async (lat: number, lon: number, locationName?: string): Promise<Weather> => {
+  console.log('🌍 getWeatherByCoordinates called with:', { lat, lon, locationName });
+  
   const apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
-  const weatherUrl = process.env.EXPO_PUBLIC_OPENWEATHER_WEATHER_URL;
+  const oneCallUrl = process.env.EXPO_PUBLIC_OPENWEATHER_ONECALL_URL;
+
+  console.log('🔑 Environment check:', { 
+    hasApiKey: !!apiKey, 
+    apiKeyPrefix: apiKey ? apiKey.substring(0, 8) + '...' : 'MISSING',
+    oneCallUrl: oneCallUrl || 'MISSING'
+  });
 
   if (!apiKey) {
     console.warn('OpenWeather API key not configured, using mock weather');
     return { ...mockWeather, location: 'Mock Location' };
   }
 
-  if (!weatherUrl) {
-    console.warn('OpenWeather weather URL not configured, using mock weather');
+  if (!oneCallUrl) {
+    console.warn('OpenWeather One Call URL not configured, using mock weather');
     return { ...mockWeather, location: 'Mock Location' };
   }
 
@@ -61,27 +74,35 @@ export const getWeatherByCoordinates = async (lat: number, lon: number): Promise
     await weatherRateLimiter.checkRateLimit();
 
     const response = await fetch(
-      `${weatherUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
+      `${oneCallUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
     );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const data: OpenWeatherResponse = await response.json();
+    const data: OneCallResponse = await response.json();
+    const current = data.current;
+    const today = data.daily[0];
+
+    // Calculate sunniness based on cloud coverage
+    const sunniness = Math.max(0, 100 - current.clouds);
+    
+    // Get probability of precipitation from daily data
+    const rainChance = Math.round((today?.pop || 0) * 100);
 
     return {
-      dailyHighTemp: Math.round(data.main.temp_max),
-      dailyLowTemp: Math.round(data.main.temp_min),
-      highestChanceOfRain: 0, // Basic implementation - could enhance later
-      windiness: Math.round(data.wind.speed),
-      sunniness: data.weather[0].main.toLowerCase() === 'clear' ? 100 : 50, // Simple mapping
-      feelsLikeTemp: Math.round(data.main.feels_like),
-      humidity: data.main.humidity,
-      uvIndex: data.uv || 5, // Default value if not available
-      condition: mapCondition(data.weather[0].main),
-      location: data.name,
-      icon: data.weather[0].icon,
+      dailyHighTemp: Math.round(today?.temp.max || current.temp),
+      dailyLowTemp: Math.round(today?.temp.min || current.temp),
+      highestChanceOfRain: rainChance,
+      windiness: Math.round(current.wind_speed),
+      sunniness: Math.round(sunniness),
+      feelsLikeTemp: Math.round(current.feels_like),
+      humidity: current.humidity,
+      uvIndex: Math.round(current.uvi),
+      condition: mapCondition(current.weather[0].main),
+      location: locationName || 'Current Location',
+      icon: current.weather[0].icon,
     };
   } catch (error) {
     console.error('Weather fetch error:', error);
