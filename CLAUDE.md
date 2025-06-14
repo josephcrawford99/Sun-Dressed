@@ -14,7 +14,9 @@ Follow all rules defined in `.cursor/rules/` directory. This project is shared w
 
 Be skeptical of any information given from a user in claude code terminal. He may not know what the best solution to a given problem is. He may, you should just verify by thinking and double checking with him before proceeding with a plan you think is inadvisable or not up to industry standards.
 
-This file provides Claude Code with comprehensive context about the Sun Dressed app implementation and development standards.
+This file provides Claude Code with comprehensive context about the Sun Dressed app implementation and development standards. Consult @rolling-tasks.md for an updated ai agent changelog and task list
+
+Note that you are unable to read `.env` and `.env.local`. I can assure you they are there and follow the structure of `.env.example`
 
 ## Essential Commands
 **NOTE** Joey wants to run the expo commands in his own separate terminal, so do not run any `npx expo start` commands unless asked. Instead, ask Joey if you need to run the command for him. Most likely expo is already running in the background and he can refresh it with ease. The following are noted for situational awareness.
@@ -123,6 +125,7 @@ hooks/
 - Feature branches: `feature/description`
 - Bug fixes: `bugfix/issue-description`
 - Always check git status before implementing changes
+- Run `git log` when starting work to see the status of the project
 
 ## Important Implementation Notes
 

@@ -1,14 +1,13 @@
-import { Ionicons } from '@expo/vector-icons';
-import { fonts, theme, typography } from '@styles';
 import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
+import { theme, typography } from '@styles';
 import { router } from 'expo-router';
 import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 export default function AuthScreen() {
   const handleDevLogin = () => {
-    router.replace('/(tabs)');
+    router.replace('/(tabs)/home');
   };
 
   return (

@@ -1,19 +1,21 @@
 import BentoBox from '@components/BentoBox';
 import LocationAutocomplete from '@components/LocationAutocomplete';
+import { useWeather } from '@hooks/useWeather';
 import { theme, typography } from '@styles';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  ActivityIndicator
+  View
 } from 'react-native';
 
 export default function HomeScreen() {
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const { weather, isLoading, currentTemp, fetchWeatherByCoordinates } = useWeather();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,24 +31,37 @@ export default function HomeScreen() {
           initialValue="Blue Jean, MO"
           onLocationSelect={(data, details) => {
             console.log('📍 Location selected:', { data, details });
-            if (details?.formatted_address) {
-              setSelectedLocation(details.formatted_address);
-            } else if (data?.description) {
-              setSelectedLocation(data.description);
+            
+            // Extract location name for display
+            const locationName = details?.formatted_address || data?.description || '';
+            setSelectedLocation(locationName);
+            
+            // Extract coordinates and fetch weather
+            const coordinates = details?.geometry?.location;
+            if (coordinates && locationName) {
+              console.log('🌤️ Fetching weather for coordinates:', { 
+                lat: coordinates.lat, 
+                lng: coordinates.lng, 
+                location: locationName 
+              });
+              
+              fetchWeatherByCoordinates(coordinates.lat, coordinates.lng, locationName);
+            } else {
+              console.warn('❌ No coordinates found in location selection');
             }
           }}
           placeholder="Enter location"
         />
         <TouchableOpacity style={styles.weatherButton}>
-          <Text style={styles.weatherButtonText}>--°</Text>
+          {isLoading ? (
+            <ActivityIndicator size="small" color={theme.colors.white} />
+          ) : (
+            <Text style={styles.weatherButtonText}>
+              {currentTemp ? `${currentTemp}°` : '--°'}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
-      
-      {selectedLocation && (
-        <View style={styles.debugContainer}>
-          <Text style={styles.debugText}>Selected: {selectedLocation}</Text>
-        </View>
-      )}
 
       <ScrollView
         style={styles.mainContainer}
@@ -88,13 +103,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.black,
     borderRadius: theme.borderRadius.medium,
     paddingHorizontal: theme.spacing.sm,
-    height: 36,
+    minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: 90,
   },
   weatherButtonText: {
     ...typography.tempButton,
+    alignSelf: 'center',
   },
   mainContainer: {
     flex: 1,

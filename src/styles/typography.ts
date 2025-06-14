@@ -75,7 +75,7 @@ export const typography: { [key: string]: TextStyle } = {
   tempButton: {
     fontFamily: fonts.primary,
     fontWeight: '400',
-    fontSize: 18,
+    fontSize: 24,
     color: '#FFF',
     letterSpacing: 0.5,
   },

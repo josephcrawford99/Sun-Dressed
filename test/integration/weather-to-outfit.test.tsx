@@ -6,7 +6,7 @@
 import React from 'react';
 import { fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import HomeScreen from '@/app/(tabs)/index';
+import HomeScreen from '@/app/(tabs)/home';
 import { mockWeatherData, mockWeatherDataVariations } from '../__fixtures__/weatherData';
 import { mockGeneratedOutfit, mockOutfitScenarios } from '../__fixtures__/outfitData';
 import { renderWithProviders } from '../utils/testHelpers';
