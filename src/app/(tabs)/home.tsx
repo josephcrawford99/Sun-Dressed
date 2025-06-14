@@ -1,11 +1,13 @@
 import BentoBox from '@components/BentoBox';
+import WeatherCard from '@components/WeatherCard';
+import FlipComponent from '@components/FlipComponent';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import { useWeather } from '@hooks/useWeather';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -19,12 +21,17 @@ import {
 export default function HomeScreen() {
   const { weather, isLoading, currentTemp, fetchWeatherByCoordinates } = useWeather();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
+  const [isFlipped, setIsFlipped] = useState(false);
 
   // Generate initial outfit and regenerate when weather updates
   useEffect(() => {
     console.log('👕 Weather updated, generating new outfit:', weather);
     generateOutfit(weather, 'daily activities');
   }, [weather, generateOutfit]);
+
+  const handleWeatherButtonPress = () => {
+    setIsFlipped(!isFlipped);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,7 +67,7 @@ export default function HomeScreen() {
           }}
           placeholder="Enter location"
         />
-        <TouchableOpacity style={styles.weatherButton}>
+        <TouchableOpacity style={styles.weatherButton} onPress={handleWeatherButtonPress}>
           {isLoading ? (
             <ActivityIndicator size="small" color={theme.colors.white} />
           ) : (
@@ -84,12 +91,25 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <BentoBox 
-          weather={weather}
-          activity="daily activities"
-          outfit={outfit}
-          loading={outfitLoading}
-          error={outfitError}
+        <FlipComponent
+          isFlipped={isFlipped}
+          frontComponent={
+            <BentoBox 
+              weather={weather}
+              activity="daily activities"
+              outfit={outfit}
+              loading={outfitLoading}
+              error={outfitError}
+            />
+          }
+          backComponent={
+            <WeatherCard 
+              weather={weather}
+              loading={isLoading}
+              error={outfitError}
+            />
+          }
+          style={styles.flipContainer}
         />
       </ScrollView>
     </SafeAreaView>
@@ -150,6 +170,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: theme.spacing.lg,
+    minHeight: 400,
+  },
+  flipContainer: {
     minHeight: 400,
   },
   contentPlaceholder: {

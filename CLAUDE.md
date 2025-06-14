@@ -7,6 +7,8 @@ If you have been assigned a role, do not continue without reading the relevant a
 - [Dev Agent Guide](.claude/dev-agent-guide.md)
 - [Test Agent Guide](.claude/test-agent-guide.md)
 - [Architect Guide](.claude/architect-role.md)
+- [Intern Guide](.claude/intern-role.md)
+
 
 **ONLY** follow the rules in the agent guide you have been assigned. Do not read or modify the other guides unless you are explicitly told to do so.
 
