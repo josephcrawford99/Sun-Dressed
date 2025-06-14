@@ -33,7 +33,6 @@ npx expo start -c         # Start with cache cleared
 # Testing & Quality
 npm test                  # Run Jest tests
 npm run lint              # Run ESLint
-node scripts/verifyImplementation.js all  # Quick implementation verification
 
 # Platform-specific
 npx expo start --ios      # iOS simulator
@@ -119,7 +118,6 @@ hooks/
 
 ### Testing
 - Ask Joey to test functionality after implementing atomic features
-- Use quick verification: `node scripts/verifyImplementation.js all`
 - Test on both iOS and Android platforms
 - Pause and request testing when features are visible in the app
 
@@ -140,7 +138,6 @@ hooks/
 1. Do not run 
 2. Check current git status and branch
 3. Focus on completing existing MVP features rather than adding new ones
-4. Use verification scripts to test implementations
 5. Follow the existing code patterns and architecture
 
 ## ROLLING PROJECT NOTES (June 2025)

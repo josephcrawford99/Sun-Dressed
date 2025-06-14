@@ -1,9 +1,9 @@
+import LocationAutocomplete from '@/components/LocationAutocomplete';
+import { Button } from '@/components/ui/Button';
 import { useTrips } from '@/hooks/useTrips';
 import { Trip } from '@/types/trip';
 import { theme } from '@styles/theme';
 import { typography } from '@styles/typography';
-import { Button } from '@/components/ui/Button';
-import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';

@@ -1,7 +1,9 @@
 import { useDeviceLocation } from '@hooks/useDeviceLocation';
+import { geocodeService } from '@services/geocodeService';
 import { theme, typography } from '@styles';
-import React, { useEffect, useRef } from 'react';
-import { StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 interface LocationAutocompleteProps {
@@ -19,11 +21,13 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
 }: LocationAutocompleteProps) {
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
   const ref = useRef<any>(null);
-  const { location: deviceLocation } = useDeviceLocation();
+  const { location: deviceLocation, requestLocation, hasPermission } = useDeviceLocation();
+  const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
   
   console.log('🏗️ LocationAutocomplete render:', { 
     initialValue, 
     deviceLocation,
+    hasPermission,
     apiKey: apiKey ? `EXISTS (${apiKey.substring(0, 8)}...)` : 'MISSING' 
   });
 
@@ -36,10 +40,66 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
     }
   }, [initialValue]);
 
+  // Handle device location button press
+  const handleDeviceLocationPress = useCallback(async () => {
+    if (isReverseGeocoding) return; // Prevent multiple requests
+    
+    try {
+      setIsReverseGeocoding(true);
+      
+      // Get fresh device location
+      await requestLocation();
+      
+      if (!deviceLocation) {
+        console.warn('⚠️ Device location not available');
+        return;
+      }
+      
+      console.log('📍 Using device location:', deviceLocation);
+      
+      // Reverse geocode the coordinates using OpenWeather API
+      const formattedAddress = await geocodeService.reverseGeocode(
+        deviceLocation.latitude, 
+        deviceLocation.longitude
+      );
+      
+      console.log('🗺️ Reverse geocode result:', formattedAddress);
+      
+      // Set the text in the autocomplete field
+      if (ref.current) {
+        ref.current.setAddressText(formattedAddress);
+      }
+      
+      // Trigger the onLocationSelect callback with both string and coordinates
+      onLocationSelect(formattedAddress, {
+        lat: deviceLocation.latitude,
+        lon: deviceLocation.longitude
+      });
+      
+    } catch (error) {
+      console.error('❌ Device location error:', error);
+      
+      // Fallback: use device coordinates with generic name if reverse geocoding fails
+      if (deviceLocation) {
+        const fallbackLocation = "Current Location";
+        if (ref.current) {
+          ref.current.setAddressText(fallbackLocation);
+        }
+        onLocationSelect(fallbackLocation, {
+          lat: deviceLocation.latitude,
+          lon: deviceLocation.longitude
+        });
+      }
+    } finally {
+      setIsReverseGeocoding(false);
+    }
+  }, [deviceLocation, requestLocation, onLocationSelect, isReverseGeocoding]);
+
   // Note: Auto-trigger removed to prevent race conditions with location persistence
   // The parent component should handle initial weather fetching based on saved location
 
   return (
+    <View style={styles.inputContainer}>
     <GooglePlacesAutocomplete
       ref={ref}
       placeholder={placeholder}
@@ -99,12 +159,37 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
         console.log('🔍 GooglePlacesAutocomplete no results found');
       }}
     />
+      <TouchableOpacity 
+        style={[
+          styles.locationButton,
+          (hasPermission === false || isReverseGeocoding) && styles.locationButtonDisabled
+        ]}
+        onPress={handleDeviceLocationPress}
+        disabled={hasPermission === false || isReverseGeocoding}
+      >
+        {isReverseGeocoding ? (
+          <ActivityIndicator size="small" color={theme.colors.gray} />
+        ) : (
+          <Ionicons 
+            name="location" 
+            size={20} 
+            color={hasPermission === false ? theme.colors.lightGray : theme.colors.gray} 
+          />
+        )}
+      </TouchableOpacity>
+    </View>
   );
 });
 
 export default LocationAutocomplete;
 
 const styles = StyleSheet.create({
+  inputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    zIndex: 1000,
+  },
   container: {
     flex: 1,
     zIndex: 1000,
@@ -147,5 +232,20 @@ const styles = StyleSheet.create({
   description: {
     ...typography.body,
     color: theme.colors.black,
+  },
+  locationButton: {
+    marginLeft: theme.spacing.xs,
+    height: 48,
+    width: 48,
+    borderWidth: 1,
+    borderColor: theme.colors.gray,
+    borderRadius: theme.borderRadius.medium,
+    backgroundColor: theme.colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  locationButtonDisabled: {
+    borderColor: theme.colors.lightGray,
+    backgroundColor: theme.colors.lightGray,
   },
 });
