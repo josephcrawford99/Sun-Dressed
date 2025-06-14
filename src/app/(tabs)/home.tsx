@@ -2,7 +2,9 @@ import BentoBox from '@components/BentoBox';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import { useWeather } from '@hooks/useWeather';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
+import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
@@ -62,9 +64,17 @@ export default function HomeScreen() {
           {isLoading ? (
             <ActivityIndicator size="small" color={theme.colors.white} />
           ) : (
-            <Text style={styles.weatherButtonText}>
-              {currentTemp ? `${currentTemp}°` : '--°'}
-            </Text>
+            <View style={styles.weatherButtonContent}>
+              <Ionicons
+                name={getIoniconForWeather(weather?.icon)}
+                size={20}
+                color={theme.colors.white}
+                style={styles.weatherIcon}
+              />
+              <Text style={styles.weatherButtonText}>
+                {currentTemp ? `${currentTemp}°` : '--°'}
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
       </View>
@@ -119,6 +129,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: 90,
+  },
+  weatherButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  weatherIcon: {
+    marginRight: theme.spacing.xs,
   },
   weatherButtonText: {
     ...typography.tempButton,

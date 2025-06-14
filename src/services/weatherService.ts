@@ -12,6 +12,7 @@ interface OpenWeatherResponse {
   weather: Array<{
     main: string;
     description: string;
+    icon: string;
   }>;
   wind: {
     speed: number;
@@ -80,6 +81,7 @@ export const getWeatherByCoordinates = async (lat: number, lon: number): Promise
       uvIndex: data.uv || 5, // Default value if not available
       condition: mapCondition(data.weather[0].main),
       location: data.name,
+      icon: data.weather[0].icon,
     };
   } catch (error) {
     console.error('Weather fetch error:', error);

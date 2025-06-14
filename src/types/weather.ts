@@ -9,6 +9,7 @@ export interface Weather {
   uvIndex: number; // 0-11 scale
   condition: 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'stormy' | 'snowy' | 'foggy';
   location?: string; // Optional location info
+  icon?: string; // OpenWeatherMap icon code (e.g., "10d", "01n")
 }
 
 export const mockWeather: Weather = {
@@ -21,5 +22,6 @@ export const mockWeather: Weather = {
   humidity: 85,
   uvIndex: 2,
   condition: 'rainy',
-  location: 'Current Location'
+  location: 'Current Location',
+  icon: '10d' // Mock rain icon
 };
