@@ -10,6 +10,8 @@ interface BentoBoxProps {
   outfit?: Outfit | null;
   loading?: boolean;
   error?: string | null;
+  showNoOutfit?: boolean;
+  noOutfitDate?: string;
 }
 
 const BentoBox: React.FC<BentoBoxProps> = ({ 
@@ -17,8 +19,23 @@ const BentoBox: React.FC<BentoBoxProps> = ({
   activity = 'daily activities',
   outfit,
   loading = false,
-  error = null
+  error = null,
+  showNoOutfit = false,
+  noOutfitDate
 }) => {
+
+  // Handle no-outfit state
+  if (showNoOutfit) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.noOutfitContainer}>
+          <Text style={styles.noOutfitText}>
+            no outfit for date: {noOutfitDate || 'this date'}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   const renderOutfitItem = (item: string | undefined, label: string) => {
     if (loading) {
@@ -107,6 +124,23 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     textAlign: 'center',
     marginBottom: 4,
+  },
+  noOutfitContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.lightGray,
+    borderRadius: theme.borderRadius.medium,
+    marginHorizontal: theme.spacing.xs,
+    padding: theme.spacing.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  noOutfitText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.gray,
+    textAlign: 'center',
+    fontWeight: '500',
+    fontStyle: 'italic',
   },
 });
 

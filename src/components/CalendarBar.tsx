@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme, typography } from '@styles';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export type DateOffset = -1 | 0 | 1; // Yesterday, Today, Tomorrow
 
@@ -68,7 +68,7 @@ const CalendarBar: React.FC<CalendarBarProps> = ({ selectedDateOffset, onDateSel
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.lightGray,
   },
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   dateOption: {
     flex: 1,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
     paddingHorizontal: theme.spacing.sm,
     alignItems: 'center',
     backgroundColor: theme.colors.white,

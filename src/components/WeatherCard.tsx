@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { getIoniconForWeather } from '../services/weatherIconService';
-import { theme } from '../styles';
+import { theme, typography } from '../styles';
 import { WeatherDisplay } from '../types/weather';
 
 interface WeatherCardProps {
@@ -34,29 +34,13 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, erro
     );
   }
 
-  const getUVDescription = (uvIndex: number): string => {
-    if (uvIndex <= 2) return 'Low';
-    if (uvIndex <= 5) return 'Moderate';
-    if (uvIndex <= 7) return 'High';
-    if (uvIndex <= 10) return 'Very High';
-    return 'Extreme';
-  };
-
-  const getWindDescription = (speed: number): string => {
-    if (speed < 4) return 'Light';
-    if (speed < 11) return 'Gentle';
-    if (speed < 19) return 'Moderate';
-    if (speed < 29) return 'Fresh';
-    return 'Strong';
-  };
-
   return (
     <View style={styles.container}>
-      {/* Header with location and main condition */}
+      {/* Compact header */}
       <View style={styles.header}>
         <Ionicons
           name={getIoniconForWeather(weatherDisplay.icon)}
-          size={32}
+          size={28}
           color={theme.colors.black}
           style={styles.mainIcon}
         />
@@ -66,66 +50,54 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, erro
         </View>
       </View>
 
-      {/* Temperature section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Temperature</Text>
-        <View style={styles.tempRow}>
-          <View style={styles.tempItem}>
-            <Text style={styles.tempValue}>
-              {weatherDisplay.displayTemp.feelsLike}
-            </Text>
-            <Text style={styles.tempLabel}>Feels Like</Text>
-          </View>
-          <View style={styles.tempItem}>
-            <Text style={styles.tempValue}>
-              {weatherDisplay.displayTemp.high}
-            </Text>
-            <Text style={styles.tempLabel}>High</Text>
-          </View>
-          <View style={styles.tempItem}>
-            <Text style={styles.tempValue}>
-              {weatherDisplay.displayTemp.low}
-            </Text>
-            <Text style={styles.tempLabel}>Low</Text>
-          </View>
+      {/* Compact temperature row */}
+      <View style={styles.tempRow}>
+        <View style={styles.tempItem}>
+          <Text style={styles.tempValue}>{weatherDisplay.displayTemp.feelsLike}</Text>
+          <Text style={styles.tempLabel}>Feels Like</Text>
+        </View>
+        <View style={styles.tempDivider} />
+        <View style={styles.tempItem}>
+          <Text style={styles.tempValue}>{weatherDisplay.displayTemp.high}</Text>
+          <Text style={styles.tempLabel}>High</Text>
+        </View>
+        <View style={styles.tempDivider} />
+        <View style={styles.tempItem}>
+          <Text style={styles.tempValue}>{weatherDisplay.displayTemp.low}</Text>
+          <Text style={styles.tempLabel}>Low</Text>
         </View>
       </View>
 
-      {/* Weather details grid */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Details</Text>
-        <View style={styles.detailsGrid}>
-          <View style={styles.detailItem}>
-            <Ionicons name="water" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weatherDisplay.humidity}%</Text>
-            <Text style={styles.detailLabel}>Humidity</Text>
-          </View>
-          
-          <View style={styles.detailItem}>
-            <Ionicons name="sunny" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{getUVDescription(weatherDisplay.uvIndex)}</Text>
-            <Text style={styles.detailLabel}>UV Index ({weatherDisplay.uvIndex})</Text>
-          </View>
-          
-          <View style={styles.detailItem}>
-            <Ionicons name="leaf" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>
-              {weatherDisplay.displayWind.speed} {weatherDisplay.displayWind.unit}
-            </Text>
-            <Text style={styles.detailLabel}>{getWindDescription(weatherDisplay.windiness)}</Text>
-          </View>
-          
-          <View style={styles.detailItem}>
-            <Ionicons name="rainy" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weatherDisplay.highestChanceOfRain}%</Text>
-            <Text style={styles.detailLabel}>Rain Chance</Text>
-          </View>
-          
-          <View style={styles.detailItem}>
-            <Ionicons name="partly-sunny" size={20} color={theme.colors.accent} />
-            <Text style={styles.detailValue}>{weatherDisplay.sunniness}%</Text>
-            <Text style={styles.detailLabel}>Sunshine</Text>
-          </View>
+      {/* Compact details grid */}
+      <View style={styles.detailsGrid}>
+        <View style={styles.detailItem}>
+          <Ionicons name="water" size={18} color={theme.colors.accent} />
+          <Text style={styles.detailValue}>{weatherDisplay.humidity}%</Text>
+          <Text style={styles.detailLabel}>Humidity</Text>
+        </View>
+        
+        <View style={styles.detailItem}>
+          <Ionicons name="sunny" size={18} color={theme.colors.accent} />
+          <Text style={styles.detailValue}>{weatherDisplay.uvIndex}</Text>
+          <Text style={styles.detailLabel}>UV Index</Text>
+        </View>
+        
+        <View style={styles.detailItem}>
+          <Ionicons name="leaf" size={18} color={theme.colors.accent} />
+          <Text style={styles.detailValue}>{weatherDisplay.displayWind.speed}</Text>
+          <Text style={styles.detailLabel}>Wind {weatherDisplay.displayWind.unit}</Text>
+        </View>
+        
+        <View style={styles.detailItem}>
+          <Ionicons name="rainy" size={18} color={theme.colors.accent} />
+          <Text style={styles.detailValue}>{weatherDisplay.highestChanceOfRain}%</Text>
+          <Text style={styles.detailLabel}>Rain</Text>
+        </View>
+        
+        <View style={styles.detailItem}>
+          <Ionicons name="partly-sunny" size={18} color={theme.colors.accent} />
+          <Text style={styles.detailValue}>{weatherDisplay.sunniness}%</Text>
+          <Text style={styles.detailLabel}>Sun</Text>
         </View>
       </View>
     </View>
@@ -136,8 +108,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.lightGray,
     borderRadius: theme.borderRadius.large,
-    padding: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+    padding: theme.spacing.lg,
     marginHorizontal: theme.spacing.xs,
   },
   loadingContainer: {
@@ -146,9 +117,8 @@ const styles = StyleSheet.create({
     minHeight: 200,
   },
   loadingText: {
-    fontSize: theme.fontSize.md,
+    ...typography.body,
     color: theme.colors.gray,
-    fontWeight: '500',
   },
   errorContainer: {
     justifyContent: 'center',
@@ -156,98 +126,95 @@ const styles = StyleSheet.create({
     minHeight: 200,
   },
   errorText: {
-    fontSize: theme.fontSize.md,
+    ...typography.subheading,
     color: theme.colors.error,
-    fontWeight: '600',
     textAlign: 'center',
   },
   errorDetails: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.gray,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: theme.spacing.xs,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.gray,
   },
   mainIcon: {
-    marginRight: theme.spacing.md,
+    marginRight: theme.spacing.sm,
   },
   headerText: {
     flex: 1,
+    justifyContent: 'center',
   },
   location: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: '700',
-    color: theme.colors.black,
+    ...typography.subheading,
     marginBottom: 2,
   },
   condition: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.gray,
+    ...typography.label,
     textTransform: 'capitalize',
-    fontWeight: '500',
-  },
-  section: {
-    marginBottom: theme.spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: '600',
-    color: theme.colors.black,
-    marginBottom: theme.spacing.md,
+    lineHeight: 16,
   },
   tempRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.medium,
-    padding: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   tempItem: {
     alignItems: 'center',
+    flex: 1,
+  },
+  tempDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: theme.colors.gray,
+    marginHorizontal: theme.spacing.sm,
   },
   tempValue: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: '700',
-    color: theme.colors.black,
-    marginBottom: 4,
+    ...typography.heading,
+    fontSize: 20,
+    marginBottom: 2,
   },
   tempLabel: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.gray,
-    fontWeight: '500',
+    ...typography.caption,
+    fontSize: 10,
+    textAlign: 'center',
   },
   detailsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.xs,
   },
   detailItem: {
     backgroundColor: theme.colors.white,
-    borderRadius: theme.borderRadius.medium,
-    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.small,
+    padding: theme.spacing.sm,
     alignItems: 'center',
-    minWidth: '45%',
+    justifyContent: 'center',
+    minWidth: '18%',
     flex: 1,
+    minHeight: 60,
   },
   detailValue: {
-    fontSize: theme.fontSize.md,
+    ...typography.body,
+    fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.black,
-    marginTop: theme.spacing.xs,
-    marginBottom: 2,
+    marginTop: 2,
+    marginBottom: 1,
   },
   detailLabel: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.gray,
+    ...typography.caption,
+    fontSize: 9,
     textAlign: 'center',
-    fontWeight: '500',
   },
 });
 

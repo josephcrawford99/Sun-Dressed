@@ -492,6 +492,48 @@
   - ✅ Error handling with "Current Location" fallback
   - ✅ Integration with existing location persistence system
 
+## Outfit Storage & Calendar Integration (June 14, 2025) - ✅ COMPLETE
+
+**Dev Team Implementation Summary:**
+- **Feature Achievement**: Complete yesterday's outfit storage and retrieval system
+- **Files Created**:
+  - `src/services/outfitStorageService.ts` - AsyncStorage service for outfit persistence as string arrays
+  - `src/hooks/useStoredOutfit.ts` - Hook for retrieving stored outfits by date offset
+- **Files Modified**:
+  - `src/hooks/useOutfitGenerator.ts` - Added auto-storage for "today" outfits only
+  - `src/components/BentoBox.tsx` - Added no-outfit state with gray container display
+  - `src/app/(tabs)/home.tsx` - Calendar coordination logic for stored vs generated outfits
+
+**Architecture Achievement**:
+- ✅ **Auto-Storage**: Outfits automatically saved when generated for "today" only
+- ✅ **Calendar Integration**: Yesterday button loads stored outfits, today/tomorrow generate live
+- ✅ **Clean Separation**: Components receive clean data, hooks handle all storage logic
+- ✅ **Simple Storage Format**: Outfits stored as flat string arrays with date keys
+- ✅ **No-Outfit UX**: Displays "no outfit for date: {formatted date}" in gray container
+
+**User Experience**:
+- ✅ **Today (offset 0)**: Generate outfit + auto-save (unchanged behavior)
+- ✅ **Yesterday (offset -1)**: Display stored outfit or "no outfit for date: Jun 13, 2025"
+- ✅ **Tomorrow (offset 1)**: Generate outfit only (no storage)
+
+**Technical Implementation**:
+- ✅ **Date-Keyed Storage**: Uses ISO date strings (YYYY-MM-DD) as AsyncStorage keys
+- ✅ **Outfit Conversion**: Converts Outfit interface → string[] for simple storage
+- ✅ **Error Resilience**: Storage failures don't break outfit generation (graceful degradation)
+- ✅ **TypeScript Safety**: Full type safety with Outfit interface reconstruction
+- ✅ **Loading States**: Proper loading/error handling for stored outfit retrieval
+
+**Code Quality**: Clean service layer abstraction following existing tripStorageService patterns. Hooks manage business logic, components focus on display. Simple storage format avoids complex data structures.
+
+### ✅ Completed & Tested (Outfit Storage Integration)
+- **Outfit Storage System**: Complete outfit persistence and calendar integration
+  - ✅ AsyncStorage-based outfit storage with date-keyed access
+  - ✅ Auto-storage integration in useOutfitGenerator for today's outfits
+  - ✅ Calendar-driven outfit retrieval for yesterday's stored outfits
+  - ✅ No-outfit state display with formatted date messages
+  - ✅ Clean separation of storage logic from UI components
+  - ✅ Simple string array storage format for easy persistence
+
 ---
 
 *This file tracks TDD progress and guides development priorities for MVP completion.*

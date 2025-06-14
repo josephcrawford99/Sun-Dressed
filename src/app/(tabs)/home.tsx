@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLastLocation } from '@hooks/useLastLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
+import { useStoredOutfit } from '@hooks/useStoredOutfit';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -33,6 +34,13 @@ export default function HomeScreen() {
   const { lastLocation, saveLastLocation } = useLastLocation();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
   const { weather, weatherDisplay, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
+  const { 
+    outfit: storedOutfit, 
+    loading: storedLoading, 
+    error: storedError, 
+    loadStoredOutfit, 
+    getDateString 
+  } = useStoredOutfit();
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedDateOffset, setSelectedDateOffset] = useState<DateOffset>(0); // Default to today
 
@@ -44,20 +52,24 @@ export default function HomeScreen() {
   }, [lastLocation, fetchWeatherByLocationString]);
 
 
-  // Generate initial outfit and regenerate when weather updates or date changes
+  // Handle outfit loading based on selected date
   useEffect(() => {
     if (weather) {
-      console.log('👕 Weather updated, generating new outfit:', weather, 'for date offset:', selectedDateOffset);
-      // Modify activity based on selected date
-      let activity = 'daily activities';
+      console.log('👕 Date/weather updated, handling outfit for offset:', selectedDateOffset);
+      
       if (selectedDateOffset === -1) {
-        activity = 'daily activities (yesterday)';
-      } else if (selectedDateOffset === 1) {
-        activity = 'daily activities (tomorrow)';
+        // Yesterday: Load stored outfit
+        loadStoredOutfit(-1);
+      } else {
+        // Today (0) or Tomorrow (1): Generate live outfit
+        let activity = 'daily activities';
+        if (selectedDateOffset === 1) {
+          activity = 'daily activities (tomorrow)';
+        }
+        generateOutfit(weather, activity);
       }
-      generateOutfit(weather, activity);
     }
-  }, [weather, generateOutfit, selectedDateOffset]);
+  }, [weather, generateOutfit, selectedDateOffset, loadStoredOutfit]);
 
   const handleWeatherButtonPress = () => {
     setIsFlipped(!isFlipped);
@@ -121,17 +133,29 @@ export default function HomeScreen() {
         <FlipComponent
           isFlipped={isFlipped}
           frontComponent={
-            <BentoBox 
-              weather={weather}
-              activity={
-                selectedDateOffset === -1 ? 'yesterday\'s outfit' :
-                selectedDateOffset === 1 ? 'tomorrow\'s outfit' :
-                'today\'s outfit'
-              }
-              outfit={outfit}
-              loading={outfitLoading}
-              error={outfitError}
-            />
+            selectedDateOffset === -1 ? (
+              // Yesterday: Show stored outfit or no-outfit message
+              <BentoBox 
+                weather={weather}
+                activity="yesterday's outfit"
+                outfit={storedOutfit}
+                loading={storedLoading}
+                error={storedError}
+                showNoOutfit={!storedLoading && !storedOutfit}
+                noOutfitDate={getDateString(-1)}
+              />
+            ) : (
+              // Today or Tomorrow: Show generated outfit
+              <BentoBox 
+                weather={weather}
+                activity={
+                  selectedDateOffset === 1 ? 'tomorrow\'s outfit' : 'today\'s outfit'
+                }
+                outfit={outfit}
+                loading={outfitLoading}
+                error={outfitError}
+              />
+            )
           }
           backComponent={
             <WeatherCard 
