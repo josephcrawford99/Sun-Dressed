@@ -4,10 +4,10 @@ import LocationAutocomplete from '@components/LocationAutocomplete';
 import WeatherCard from '@components/WeatherCard';
 import { Ionicons } from '@expo/vector-icons';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
-import { useWeather } from '@hooks/useWeather';
+import { useLocationWeather } from '@hooks/useLocationWeather';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -26,19 +26,35 @@ const getTimeBasedGreeting = (): string => {
 };
 
 export default function HomeScreen() {
-  const { weather, isLoading, currentTemp, fetchWeatherByLocationString } = useWeather();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
+  const { weather, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
   const [isFlipped, setIsFlipped] = useState(false);
+
 
   // Generate initial outfit and regenerate when weather updates
   useEffect(() => {
-    console.log('👕 Weather updated, generating new outfit:', weather);
-    generateOutfit(weather, 'daily activities');
+    if (weather) {
+      console.log('👕 Weather updated, generating new outfit:', weather);
+      generateOutfit(weather, 'daily activities');
+    }
   }, [weather, generateOutfit]);
 
   const handleWeatherButtonPress = () => {
     setIsFlipped(!isFlipped);
   };
+
+  // Compute current temperature from weather data
+  const currentTemp = weather?.feelsLikeTemp;
+
+  // Memoize LocationAutocomplete props to prevent unnecessary re-renders
+  const locationAutocompleteProps = useMemo(() => ({
+    initialValue: "New York, NY, USA",
+    onLocationSelect: (locationString: string, coordinates?: { lat: number; lon: number }) => {
+      console.log('📍 Location selected:', locationString);
+      fetchWeatherByLocationString(locationString, coordinates);
+    },
+    placeholder: "Enter location"
+  }), [fetchWeatherByLocationString]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -51,12 +67,7 @@ export default function HomeScreen() {
 
       <View style={styles.locationRow}>
         <LocationAutocomplete
-          initialValue="New York, NY, USA"
-          onLocationSelect={(locationString) => {
-            console.log('📍 Location selected:', locationString);
-            fetchWeatherByLocationString(locationString);
-          }}
-          placeholder="Enter location"
+          {...locationAutocompleteProps}
         />
         <TouchableOpacity style={styles.weatherButton} onPress={handleWeatherButtonPress}>
           {isLoading ? (
@@ -97,7 +108,7 @@ export default function HomeScreen() {
             <WeatherCard 
               weather={weather}
               loading={isLoading}
-              error={outfitError}
+              error={error}
             />
           }
           style={styles.flipContainer}

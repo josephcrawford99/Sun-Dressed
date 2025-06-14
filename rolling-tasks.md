@@ -176,5 +176,31 @@
 - **Code Quality**: Clean mapping service maintains flexibility to change icon libraries easily
 - **Visual Enhancement**: Better looking icons that match app design language using Ionicons
 
+## Location Biasing Enhancement (June 14, 2025) - ✅ COMPLETE
+**Dev Team Implementation Summary:**
+- **Files Created**:
+  - `src/hooks/useDeviceLocation.ts` - Device location permissions and coordinate management
+- **Files Modified**:
+  - `src/components/LocationAutocomplete.tsx` - Added device location biasing with US fallback
+- **Architecture Improvement**: Clean separation of location permissions logic into dedicated hook
+- **User Experience**: Google Places now prioritizes results near user's current location, with graceful fallback to US-centered results
+- **Technical Achievement**: 
+  - Automatic location permission handling with expo-location
+  - Intelligent location biasing (device location → US center fallback)
+  - Removed hard US country restriction, enabling international search results
+  - 2000km radius biasing for optimal result prioritization
+- **Code Quality**: React.memo optimization maintained, proper error handling for location services
+- **Global Enhancement**: Users can now search internationally while maintaining local result prioritization
+
+### ✅ Completed & Tested (Updated)
+- **Location Services**: Complete Google Places integration with device location biasing
+  - ✅ Google Places autocomplete component implemented
+  - ✅ Location input functionality (LocationAutocomplete)
+  - ✅ Coordinate extraction from Google Places API
+  - ✅ Direct weather API integration with coordinates
+  - ✅ **NEW**: Device location-based result biasing with US fallback
+  - ✅ **NEW**: International location search capability
+  - ✅ **NEW**: Automatic location permission handling
+
 ---
 *This file tracks TDD progress and guides development priorities for MVP completion.*

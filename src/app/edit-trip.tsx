@@ -3,11 +3,11 @@ import { Trip } from '@/types/trip';
 import { theme } from '@styles/theme';
 import { typography } from '@styles/typography';
 import { Button } from '@/components/ui/Button';
-import { TextInput } from '@/components/ui/TextInput';
+import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker';
 
@@ -124,27 +124,32 @@ export default function EditTripModal() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <View style={[styles.content, { paddingTop: Platform.OS === 'ios' ? insets.top + 20 : 40 }]}>
           <Text style={styles.title}>Loading...</Text>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+
       <View style={[styles.content, { paddingTop: Platform.OS === 'ios' ? insets.top + 20 : 40 }]}>
         <Text style={styles.title}>Edit Trip</Text>
         
         <View style={styles.formContainer}>
-          <TextInput
-            label="Location"
-            value={location}
-            onChangeText={setLocation}
-            placeholder="Enter destination"
-            size="medium"
-          />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Location</Text>
+            <LocationAutocomplete
+              initialValue={location}
+              onLocationSelect={(locationString) => {
+                console.log('📍 Location selected:', locationString);
+                setLocation(locationString);
+              }}
+              placeholder="Enter destination"
+            />
+          </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Trip Dates</Text>
@@ -172,8 +177,9 @@ export default function EditTripModal() {
             </View>
           </View>
         </View>
+        
 
-        <View style={styles.buttonContainer}>
+        <View style={[styles.buttonContainer, { marginBottom: insets.bottom + theme.spacing.xl }]}>
           <Button
             title={saving ? 'Updating...' : 'Update Trip'}
             onPress={handleSaveTrip}
@@ -185,12 +191,12 @@ export default function EditTripModal() {
         </View>
       </View>
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: theme.colors.white,
   },
@@ -219,7 +225,8 @@ const styles = StyleSheet.create({
     color: theme.colors.black,
   },
   buttonContainer: {
-    paddingBottom: theme.spacing.lg,
+    marginHorizontal: theme.spacing.sm,
+    marginBottom: theme.spacing.xl,
   },
   datePickerContainer: {
     backgroundColor: theme.colors.white,

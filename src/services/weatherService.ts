@@ -1,17 +1,14 @@
-import { Weather, mockWeather } from '@/types/weather';
 import { weatherRateLimiter } from './rateLimiter';
+import { Weather } from '@/types/weather';
 
-interface OneCallResponse {
+interface OpenWeatherOneCallResponse {
   current: {
     temp: number;
     feels_like: number;
     humidity: number;
     uvi: number;
     wind_speed: number;
-    wind_deg?: number;
-    clouds: number;
     weather: Array<{
-      id: number;
       main: string;
       description: string;
       icon: string;
@@ -22,96 +19,136 @@ interface OneCallResponse {
       min: number;
       max: number;
     };
-    pop: number; // Probability of precipitation
+    pop: number; // Probability of precipitation (0-1)
+    clouds: number; // Cloudiness percentage
   }>;
 }
 
-const mapCondition = (weatherMain: string): Weather['condition'] => {
-  switch (weatherMain.toLowerCase()) {
-    case 'clear':
-      return 'sunny';
-    case 'clouds':
-      return 'cloudy';
-    case 'rain':
-    case 'drizzle':
-      return 'rainy';
-    case 'thunderstorm':
-      return 'stormy';
-    case 'snow':
-      return 'snowy';
-    case 'mist':
-    case 'fog':
-      return 'foggy';
-    default:
-      return 'partly-cloudy';
-  }
-};
+class WeatherService {
+  private cache = new Map<string, { weather: Weather; timestamp: number }>();
+  private readonly CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+  private apiKey: string;
+  private baseUrl: string;
 
-export const getWeatherByCoordinates = async (lat: number, lon: number, locationName?: string): Promise<Weather> => {
-  console.log('🌍 getWeatherByCoordinates called with:', { lat, lon, locationName });
-  
-  const apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
-  const oneCallUrl = process.env.EXPO_PUBLIC_OPENWEATHER_ONECALL_URL;
-
-  console.log('🔑 Environment check:', { 
-    hasApiKey: !!apiKey, 
-    apiKeyPrefix: apiKey ? apiKey.substring(0, 8) + '...' : 'MISSING',
-    oneCallUrl: oneCallUrl || 'MISSING'
-  });
-
-  if (!apiKey) {
-    console.warn('OpenWeather API key not configured, using mock weather');
-    return { ...mockWeather, location: 'Mock Location' };
+  constructor() {
+    this.apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
+    this.baseUrl = process.env.EXPO_PUBLIC_OPENWEATHER_ONECALL_URL || 'https://api.openweathermap.org/data/3.0/onecall';
+    
+    if (!this.apiKey) {
+      console.warn('⚠️ OpenWeather API key not found in environment variables');
+    }
   }
 
-  if (!oneCallUrl) {
-    console.warn('OpenWeather One Call URL not configured, using mock weather');
-    return { ...mockWeather, location: 'Mock Location' };
-  }
+  async fetchWeatherByCoordinates(lat: number, lon: number): Promise<Weather> {
+    if (!lat || !lon) {
+      throw new Error('Latitude and longitude are required');
+    }
 
-  try {
+    const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
+    
+    // Check cache first
+    const cached = this.cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      console.log('🌤️ Weather cache hit for coordinates:', { lat, lon });
+      return cached.weather;
+    }
+
+    if (!this.apiKey) {
+      throw new Error('OpenWeather API key not configured');
+    }
+
     // Apply rate limiting
     await weatherRateLimiter.checkRateLimit();
 
-    const response = await fetch(
-      `${oneCallUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
-    );
+    try {
+      console.log('🌍 Fetching weather for coordinates:', { lat, lon });
+      
+      const url = `${this.baseUrl}?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=imperial&exclude=minutely,hourly,alerts`;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status} ${response.statusText}`);
+      }
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const data: OpenWeatherOneCallResponse = await response.json();
+      
+      const weather = this.transformToWeatherInterface(data);
+
+      // Cache the result
+      this.cache.set(cacheKey, {
+        weather,
+        timestamp: Date.now()
+      });
+      
+      console.log('✅ Weather fetched successfully:', weather);
+      return weather;
+
+    } catch (error) {
+      console.error('❌ Weather fetch error:', error);
+      throw error;
     }
+  }
 
-    const data: OneCallResponse = await response.json();
+  private transformToWeatherInterface(data: OpenWeatherOneCallResponse): Weather {
     const current = data.current;
     const today = data.daily[0];
-
-    // Calculate sunniness based on cloud coverage
-    const sunniness = Math.max(0, 100 - current.clouds);
     
-    // Get probability of precipitation from daily data
-    const rainChance = Math.round((today?.pop || 0) * 100);
+    // Convert main weather condition to our enum
+    const mainCondition = current.weather[0]?.main?.toLowerCase() || 'unknown';
+    let condition: Weather['condition'];
+    
+    switch (mainCondition) {
+      case 'clear':
+        condition = 'sunny';
+        break;
+      case 'clouds':
+        condition = today.clouds > 70 ? 'cloudy' : 'partly-cloudy';
+        break;
+      case 'rain':
+      case 'drizzle':
+        condition = 'rainy';
+        break;
+      case 'thunderstorm':
+        condition = 'stormy';
+        break;
+      case 'snow':
+        condition = 'snowy';
+        break;
+      case 'mist':
+      case 'fog':
+      case 'haze':
+        condition = 'foggy';
+        break;
+      default:
+        condition = 'partly-cloudy';
+    }
+
+    // Calculate sunniness based on cloudiness (inverse)
+    const sunniness = Math.max(0, 100 - today.clouds);
 
     return {
-      dailyHighTemp: Math.round(today?.temp.max || current.temp),
-      dailyLowTemp: Math.round(today?.temp.min || current.temp),
-      highestChanceOfRain: rainChance,
+      dailyHighTemp: Math.round(today.temp.max),
+      dailyLowTemp: Math.round(today.temp.min),
+      highestChanceOfRain: Math.round(today.pop * 100),
       windiness: Math.round(current.wind_speed),
-      sunniness: Math.round(sunniness),
+      sunniness,
       feelsLikeTemp: Math.round(current.feels_like),
       humidity: current.humidity,
       uvIndex: Math.round(current.uvi),
-      condition: mapCondition(current.weather[0].main),
-      location: locationName || 'Current Location',
-      icon: current.weather[0].icon,
+      condition,
+      icon: current.weather[0]?.icon
     };
-  } catch (error) {
-    console.error('Weather fetch error:', error);
-    console.warn('Falling back to mock weather data');
-    return { ...mockWeather, location: 'Error - Using Mock Data' };
   }
-};
 
-// Default weather for Blue Jean, Missouri
-export const getDefaultWeather = (): Weather => {
-  return { ...mockWeather, location: 'Blue Jean, Missouri' };
-};
+  clearCache(): void {
+    this.cache.clear();
+    console.log('🗑️ Weather cache cleared');
+  }
+
+  getCacheSize(): number {
+    return this.cache.size;
+  }
+}
+
+export const weatherService = new WeatherService();

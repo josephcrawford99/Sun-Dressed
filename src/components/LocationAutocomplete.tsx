@@ -1,26 +1,29 @@
+import { useDeviceLocation } from '@hooks/useDeviceLocation';
 import { theme, typography } from '@styles';
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 interface LocationAutocompleteProps {
   initialValue?: string;
-  onLocationSelect: (locationString: string) => void;
+  onLocationSelect: (locationString: string, coordinates?: { lat: number; lon: number }) => void;
   onTextChange?: (text: string) => void;
   placeholder?: string;
 }
 
-export default function LocationAutocomplete({
+const LocationAutocomplete = React.memo(function LocationAutocomplete({
   initialValue,
   onLocationSelect,
   onTextChange,
   placeholder = "Enter location"
 }: LocationAutocompleteProps) {
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
-  const ref = useRef<any>();
+  const ref = useRef<any>(null);
+  const { location: deviceLocation } = useDeviceLocation();
   
   console.log('🏗️ LocationAutocomplete render:', { 
     initialValue, 
+    deviceLocation,
     apiKey: apiKey ? `EXISTS (${apiKey.substring(0, 8)}...)` : 'MISSING' 
   });
 
@@ -33,6 +36,14 @@ export default function LocationAutocomplete({
     }
   }, [initialValue]);
 
+  // Auto-trigger onLocationSelect with initial value on mount
+  useEffect(() => {
+    if (initialValue) {
+      console.log('🚀 Auto-triggering location select with initial value:', initialValue);
+      onLocationSelect(initialValue); // No coordinates for initial load - will use geocoding service
+    }
+  }, []); // Empty dependency array to run only on mount
+
   return (
     <GooglePlacesAutocomplete
       ref={ref}
@@ -40,8 +51,16 @@ export default function LocationAutocomplete({
       onPress={(data, details) => {
         console.log('🎯 GooglePlacesAutocomplete onPress:', { data, details });
         const locationString = details?.formatted_address || data?.description || '';
+        
+        // Extract coordinates from Google Places response
+        const coordinates = details?.geometry?.location ? {
+          lat: details.geometry.location.lat,
+          lon: details.geometry.location.lng
+        } : undefined;
+        
         console.log('📍 Emitting location string:', locationString);
-        onLocationSelect(locationString);
+        console.log('🎯 Emitting coordinates:', coordinates);
+        onLocationSelect(locationString, coordinates);
       }}
       textInputProps={{
         onChangeText: (text) => {
@@ -55,7 +74,11 @@ export default function LocationAutocomplete({
         key: apiKey,
         language: 'en',
         types: '(cities)',
-        components: 'country:us',
+        // Location biasing - prioritize results near device location or US center
+        location: deviceLocation ? 
+          `${deviceLocation.latitude},${deviceLocation.longitude}` : 
+          '39.8283,-98.5795', // US center fallback
+        radius: 2000000, // 2000km radius for biasing
       }}
       fetchDetails={true}
       enablePoweredByContainer={false}
@@ -82,7 +105,9 @@ export default function LocationAutocomplete({
       }}
     />
   );
-}
+});
+
+export default LocationAutocomplete;
 
 const styles = StyleSheet.create({
   container: {
