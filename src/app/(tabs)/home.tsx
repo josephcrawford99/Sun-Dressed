@@ -43,8 +43,7 @@ export default function HomeScreen() {
     loadOutfitForDate,
     regenerateOutfit: regenerateOutfitContext,
     setDateOffset,
-    setActivity,
-    cacheStats
+    setActivity
   } = useOutfit();
 
   const [isFlipped, setIsFlipped] = useState(false);
@@ -55,7 +54,6 @@ export default function HomeScreen() {
   // Fetch weather for the saved location on mount
   useEffect(() => {
     if (lastLocation && !isInitialized) {
-      console.log('🌍 Initial weather fetch for saved location:', lastLocation);
       fetchWeatherByLocationString(lastLocation);
       setIsInitialized(true);
     }
@@ -86,13 +84,6 @@ export default function HomeScreen() {
       return;
     }
     
-    console.log('👔 Loading outfit for current context:', {
-      dateOffset: currentDateOffset,
-      hasWeather: !!weather,
-      location: lastLocation,
-      activity: currentActivity
-    });
-    
     loadOutfitForDate(currentDateOffset, weather, currentActivity, lastLocation);
   }, [currentDateOffset, weather, currentActivity, lastLocation, isInitialized, isLoading, loadOutfitForDate]);
 
@@ -102,11 +93,9 @@ export default function HomeScreen() {
 
   const handleOutfitRefresh = async () => {
     if (!weather || !lastLocation) {
-      console.log('⚠️ Cannot regenerate outfit - missing weather or location');
       return;
     }
     
-    console.log('🔄 Manual outfit regeneration via swipe down');
     await regenerateOutfitContext(weather, currentActivity, lastLocation);
   };
 
@@ -169,11 +158,8 @@ export default function HomeScreen() {
             size="medium"
             value={activityInput}
             onChangeText={(text) => {
-              console.log('Activity text changed:', text);
               setActivityInput(text);
             }}
-            onFocus={() => console.log('Activity input focused')}
-            onBlur={() => console.log('Activity input blurred')}
             editable={true}
             returnKeyType="done"
             blurOnSubmit={true}

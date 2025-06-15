@@ -29,7 +29,6 @@ export class CacheService {
     
     // Check if cache entry is expired
     if (new Date() > entry.expiresAt) {
-      console.log('🕒 Cache entry expired, removing...');
       this.cache.delete(key);
       return null;
     }
@@ -38,7 +37,6 @@ export class CacheService {
     this.cache.delete(key);
     this.cache.set(key, entry);
     
-    console.log('💾 Memory cache hit for key:', key);
     return entry.outfit;
   }
   
@@ -53,7 +51,6 @@ export class CacheService {
       const firstKey = this.cache.keys().next().value;
       if (firstKey) {
         this.cache.delete(firstKey);
-        console.log('🗑️ Evicted oldest cache entry:', firstKey);
       }
     }
     
@@ -65,7 +62,6 @@ export class CacheService {
     };
     
     this.cache.set(key, entry);
-    console.log('💾 Added to memory cache:', key);
   }
   
   /**
@@ -75,7 +71,6 @@ export class CacheService {
     const key = this.generateCacheKey(context);
     const deleted = this.cache.delete(key);
     if (deleted) {
-      console.log('🗑️ Invalidated cache entry:', key);
     }
   }
   
@@ -85,7 +80,6 @@ export class CacheService {
   clearAll(): void {
     const size = this.cache.size;
     this.cache.clear();
-    console.log(`🧹 Cleared ${size} cache entries`);
   }
   
   /**
@@ -103,7 +97,6 @@ export class CacheService {
     }
     
     if (removed > 0) {
-      console.log(`🧹 Cleaned up ${removed} expired cache entries`);
     }
   }
   

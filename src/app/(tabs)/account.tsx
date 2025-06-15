@@ -31,8 +31,8 @@ export default function AccountScreen() {
     setName(value);
     try {
       await updateSetting('name', value);
-    } catch (error) {
-      console.error('Failed to update name:', error);
+    } catch {
+      // Failed to update name
     }
   };
 
@@ -40,8 +40,8 @@ export default function AccountScreen() {
     setEmail(value);
     try {
       await updateSetting('email', value);
-    } catch (error) {
-      console.error('Failed to update email:', error);
+    } catch {
+      // Failed to update email
     }
   };
 

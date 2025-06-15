@@ -1,180 +1,113 @@
-import { TripStorageService } from '@/services/tripStorageService';
+import { useCallback } from 'react';
 import { Trip } from '@/types/trip';
 import { Weather } from '@/types/weather';
-import { useCallback, useEffect, useState } from 'react';
+import { 
+  useTripsQuery, 
+  useAddTripMutation, 
+  useUpdateTripMutation, 
+  useDeleteTripMutation, 
+  useClearAllTripsMutation,
+  useUpdateTripPackingListMutation,
+  useUpdateTripWeatherForecastMutation
+} from '@/hooks/queries/useTripsQuery';
 
 /**
  * Custom hook for managing trip state and operations
+ * Powered by TanStack Query for caching and state management
  */
 export const useTrips = () => {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Use TanStack Query hooks
+  const { data: trips = [], isLoading: loading, error: queryError, refetch } = useTripsQuery();
+  const addTripMutation = useAddTripMutation();
+  const updateTripMutation = useUpdateTripMutation();
+  const deleteTripMutation = useDeleteTripMutation();
+  const clearAllTripsMutation = useClearAllTripsMutation();
+  const updateTripPackingListMutation = useUpdateTripPackingListMutation();
+  const updateTripWeatherForecastMutation = useUpdateTripWeatherForecastMutation();
 
-
-
-  /**
-   * Load all trips from AsyncStorage
-   */
-  const loadTrips = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('useTrips: Loading trips from storage...');
-      const storedTrips = await TripStorageService.getTrips();
-      console.log('useTrips: Loaded trips:', storedTrips);
-      setTrips(storedTrips);
-    } catch (err) {
-      setError('Failed to load trips');
-      console.error('Error loading trips:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Convert query error to string
+  const error = queryError ? `${queryError}` : null;
 
   /**
    * Add a new trip
    */
-  const addTrip = async (trip: Trip) => {
+  const addTrip = useCallback(async (trip: Trip) => {
     try {
-      setError(null);
-      console.log('useTrips: Adding trip:', trip);
-      await TripStorageService.saveTrip(trip);
-      console.log('useTrips: Trip saved to storage successfully');
-      setTrips(prevTrips => {
-        const newTrips = [...prevTrips, trip];
-        console.log('useTrips: Updated trips state:', newTrips);
-        return newTrips;
-      });
+      await addTripMutation.mutateAsync(trip);
     } catch (err) {
-      setError('Failed to save trip');
-      console.error('Error saving trip:', err);
       throw err;
     }
-  };
-  /**
-   * Load trips from storage on mount
-   */
-  useEffect(() => {
-    loadTrips();
-  }, [loadTrips]);
+  }, [addTripMutation]);
+
   /**
    * Update an existing trip
    */
-  const updateTrip = async (updatedTrip: Trip) => {
+  const updateTrip = useCallback(async (updatedTrip: Trip) => {
     try {
-      setError(null);
-      await TripStorageService.updateTrip(updatedTrip);
-      setTrips(prevTrips =>
-        prevTrips.map(trip =>
-          trip.id === updatedTrip.id ? updatedTrip : trip
-        )
-      );
+      await updateTripMutation.mutateAsync(updatedTrip);
     } catch (err) {
-      setError('Failed to update trip');
-      console.error('Error updating trip:', err);
       throw err;
     }
-  };
+  }, [updateTripMutation]);
 
   /**
    * Delete a trip
    */
-  const deleteTrip = async (tripId: string) => {
+  const deleteTrip = useCallback(async (tripId: string) => {
     try {
-      setError(null);
-      await TripStorageService.deleteTrip(tripId);
-      setTrips(prevTrips => prevTrips.filter(trip => trip.id !== tripId));
+      await deleteTripMutation.mutateAsync(tripId);
     } catch (err) {
-      setError('Failed to delete trip');
-      console.error('Error deleting trip:', err);
       throw err;
     }
-  };
+  }, [deleteTripMutation]);
 
   /**
    * Get a specific trip by ID
    */
-  const getTrip = (tripId: string): Trip | null => {
-    console.log(`useTrips: getTrip called with id: ${tripId}`, 'Available trips:', trips);
+  const getTrip = useCallback((tripId: string): Trip | null => {
     const trip = trips.find(t => t.id === tripId);
     return trip || null;
-  };
+  }, [trips]);
 
   /**
    * Update a trip's packing list
    */
-  const updateTripPackingList = async (tripId: string, packingList: string[]) => {
+  const updateTripPackingList = useCallback(async (tripId: string, packingList: string[]) => {
     try {
-      setError(null);
-      const trip = trips.find(t => t.id === tripId);
-      if (!trip) {
-        throw new Error('Trip not found');
-      }
-      
-      const updatedTrip: Trip = {
-        ...trip,
-        packingList,
-        updatedAt: new Date(),
-      };
-      
-      await TripStorageService.updateTrip(updatedTrip);
-      setTrips(prevTrips =>
-        prevTrips.map(t =>
-          t.id === tripId ? updatedTrip : t
-        )
-      );
+      await updateTripPackingListMutation.mutateAsync({ tripId, packingList });
     } catch (err) {
-      setError('Failed to update packing list');
-      console.error('Error updating packing list:', err);
       throw err;
     }
-  };
+  }, [updateTripPackingListMutation]);
 
   /**
    * Update a trip's weather forecast
    */
-  const updateTripWeatherForecast = async (tripId: string, weatherForecast: Weather[]) => {
+  const updateTripWeatherForecast = useCallback(async (tripId: string, weatherForecast: Weather[]) => {
     try {
-      setError(null);
-      const trip = trips.find(t => t.id === tripId);
-      if (!trip) {
-        throw new Error('Trip not found');
-      }
-      
-      const updatedTrip: Trip = {
-        ...trip,
-        weatherForecast,
-        updatedAt: new Date(),
-      };
-      
-      await TripStorageService.updateTrip(updatedTrip);
-      setTrips(prevTrips =>
-        prevTrips.map(t =>
-          t.id === tripId ? updatedTrip : t
-        )
-      );
+      await updateTripWeatherForecastMutation.mutateAsync({ tripId, weatherForecast });
     } catch (err) {
-      setError('Failed to update weather forecast');
-      console.error('Error updating weather forecast:', err);
       throw err;
     }
-  };
+  }, [updateTripWeatherForecastMutation]);
 
   /**
    * Clear all trips
    */
-  const clearAllTrips = async () => {
+  const clearAllTrips = useCallback(async () => {
     try {
-      setError(null);
-      await TripStorageService.clearAllTrips();
-      setTrips([]);
+      await clearAllTripsMutation.mutateAsync();
     } catch (err) {
-      setError('Failed to clear trips');
-      console.error('Error clearing trips:', err);
       throw err;
     }
-  };
+  }, [clearAllTripsMutation]);
+
+  /**
+   * Refresh trips (refetch)
+   */
+  const refreshTrips = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   return {
     trips,
@@ -187,6 +120,6 @@ export const useTrips = () => {
     updateTripPackingList,
     updateTripWeatherForecast,
     clearAllTrips,
-    refreshTrips: loadTrips,
+    refreshTrips,
   };
 };

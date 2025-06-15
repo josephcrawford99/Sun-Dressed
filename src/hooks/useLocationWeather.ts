@@ -46,7 +46,7 @@ export function useLocationWeather(): UseLocationWeatherReturn {
     coordinates?: { lat: number; lon: number }
   ) => {
     if (!locationString?.trim()) {
-      console.warn('⚠️ Empty location string provided');
+      // Empty location string provided
       return;
     }
 
@@ -54,19 +54,15 @@ export function useLocationWeather(): UseLocationWeatherReturn {
     setError(null);
 
     try {
-      console.log('🌍 Starting weather fetch for:', locationString);
       
       let finalCoordinates;
       
       if (coordinates) {
         // Use coordinates from Google Places if available
-        console.log('🎯 Using coordinates from Google Places:', coordinates);
         finalCoordinates = coordinates;
       } else {
         // Fallback to geocoding service
-        console.log('🔄 Fallback to geocoding service');
         finalCoordinates = await geocodeService.geocode(locationString);
-        console.log('📍 Coordinates from geocoding:', finalCoordinates);
       }
       
       // Fetch weather data using coordinates
@@ -74,13 +70,12 @@ export function useLocationWeather(): UseLocationWeatherReturn {
         finalCoordinates.lat, 
         finalCoordinates.lon
       );
-      console.log('🌤️ Weather data received:', weatherData);
       
       setWeather(weatherData);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      console.error('❌ Weather fetch failed:', errorMessage);
+      // Weather fetch failed, error will be thrown
       setError(errorMessage);
     } finally {
       setIsLoading(false);

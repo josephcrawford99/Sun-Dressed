@@ -92,7 +92,7 @@ export const OutfitProvider: React.FC<OutfitProviderProps> = ({ children }) => {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load outfit';
       setError(errorMessage);
       setOutfit(null);
-      console.error('❌ Error loading outfit:', err);
+      // Error loading outfit
     } finally {
       setLoading(false);
     }
@@ -126,7 +126,7 @@ export const OutfitProvider: React.FC<OutfitProviderProps> = ({ children }) => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to regenerate outfit';
       setError(errorMessage);
-      console.error('❌ Error regenerating outfit:', err);
+      // Error regenerating outfit
     } finally {
       setLoading(false);
     }

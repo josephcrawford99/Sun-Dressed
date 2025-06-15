@@ -35,7 +35,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         const loadedSettings = await SettingsService.loadSettings();
         setSettings(loadedSettings);
       } catch (error) {
-        console.error('Failed to load initial settings:', error);
+        // Failed to load initial settings
       } finally {
         setLoading(false);
       }
@@ -52,7 +52,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       await SettingsService.updateSetting(key, value);
       setSettings(prev => ({ ...prev, [key]: value }));
     } catch (error) {
-      console.error(`Failed to update setting ${key}:`, error);
+      // Failed to update setting
       throw error;
     }
   }, []);
@@ -63,7 +63,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       await SettingsService.saveSettings(updatedSettings);
       setSettings(updatedSettings);
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      // Failed to update settings
       throw error;
     }
   }, [settings]);
@@ -73,7 +73,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       await SettingsService.resetSettings();
       setSettings(DEFAULT_SETTINGS);
     } catch (error) {
-      console.error('Failed to reset settings:', error);
+      // Failed to reset settings
       throw error;
     }
   }, []);

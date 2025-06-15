@@ -34,12 +34,6 @@ export const useOutfitGenerator = () => {
     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
     const dateOffset = diffDays as DateOffset;
     
-    console.log('🔄 Loading outfit via context:', {
-      date: date.toDateString(),
-      dateOffset,
-      activity,
-      location
-    });
     
     await loadOutfitForDate(dateOffset, weather, activity, location);
   }, [loadOutfitForDate]);
@@ -51,7 +45,6 @@ export const useOutfitGenerator = () => {
     activity: string = 'daily activities',
     location?: string
   ) => {
-    console.log('🔄 Manual outfit regeneration via context');
     await contextRegenerate(weather, activity, location);
   }, [contextRegenerate]);
 

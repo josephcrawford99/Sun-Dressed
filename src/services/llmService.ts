@@ -13,8 +13,6 @@ const promptCache = new Map<string, { outfit: Outfit; timestamp: number }>();
 const CACHE_DURATION = 300000; // 5 minutes
 
 export const generateOutfitLLM = async (weather?: Weather, activity?: string, stylePreference?: StylePreference): Promise<Outfit> => {
-  console.log('🔄 Starting outfit generation...');
-  console.log('📊 Input params:', { weather, activity, stylePreference });
   
   // Generate cache key from inputs
   const cacheKey = generateCacheKey(weather, activity, stylePreference);
@@ -22,14 +20,12 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
   // Check prompt cache first
   const cached = promptCache.get(cacheKey);
   if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-    console.log('📦 Returning cached outfit for identical prompt');
     return cached.outfit;
   }
   
   // Use API optimizer to coalesce concurrent identical requests
   return apiOptimizer.coalesceRequest(cacheKey, async () => {
     await geminiRateLimiter.checkRateLimit();
-    console.log('✅ Rate limit check passed');
   
   const weatherDescription = weather 
     ? `${weather.condition} weather with high of ${weather.dailyHighTemp}°F, low of ${weather.dailyLowTemp}°F, feels like ${weather.feelsLikeTemp}°F, ${weather.highestChanceOfRain}% chance of rain, wind at ${weather.windiness}mph, ${weather.sunniness}% sunny`
@@ -41,14 +37,9 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
   
   const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}.${styleInstruction} Return only a JSON object with: top, bottom, outerwear (array), accessories (array), shoes, explanation (brief 1-2 sentence reason for this outfit choice based on weather/activity).`;
   
-  console.log('📝 Generated prompt:', prompt);
-  
   const requestPayload = {
     contents: [{ parts: [{ text: prompt }] }]
   };
-  
-  console.log('🚀 Sending API request to Gemini...');
-  console.log('📦 Request payload:', JSON.stringify(requestPayload, null, 2));
 
   try {
     const response = await axios.post(
@@ -60,23 +51,17 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
       }
     );
     
-    console.log('✅ API response received');
-    console.log('📨 Full response:', JSON.stringify(response.data, null, 2));
-    
     if (!response.data.candidates || !response.data.candidates[0]) {
       throw new Error('No candidates in API response');
     }
     
     const rawText = response.data.candidates[0].content.parts[0].text;
-    console.log('🔤 Raw text from API:', rawText);
     
     // Clean the text before parsing - remove markdown code blocks if present
     const cleanedText = rawText.replace(/```json\s*|\s*```/g, '').trim();
-    console.log('🧹 Cleaned text for parsing:', cleanedText);
     
     try {
       const parsedOutfit = JSON.parse(cleanedText);
-      console.log('👕 Parsed outfit:', parsedOutfit);
       
       // Cache the result
       promptCache.set(cacheKey, { outfit: parsedOutfit, timestamp: Date.now() });
@@ -86,16 +71,15 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
       
       return parsedOutfit;
     } catch (parseError) {
-      console.error('❌ JSON parsing failed:', parseError);
-      console.error('🔤 Failed to parse text:', cleanedText);
+      // JSON parsing failed
+      // Failed to parse text
       throw new Error(`Failed to parse outfit JSON: ${parseError}`);
     }
   } catch (error) {
-    console.error('❌ Error in outfit generation:', error);
+    // Error in outfit generation
     if (axios.isAxiosError(error) && error.response) {
-      console.log('🔍 Error response:', error.response);
-      console.error('📨 Error response data:', error.response.data);
-      console.error('📊 Error response status:', error.response.status);
+      // Error response data available
+      // Error response status available
     }
     throw error;
   }
@@ -134,11 +118,7 @@ export const generatePackingListLLM = async (
   weatherData?: Weather[],
   stylePreference?: StylePreference
 ): Promise<string[]> => {
-  console.log('🧳 Starting packing list generation...');
-  console.log('📊 Input params:', { location, startDate, endDate, weatherData, stylePreference });
-  
   await geminiRateLimiter.checkRateLimit();
-  console.log('✅ Rate limit check passed');
   
   const tripDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   const weatherDescription = weatherData && weatherData.length > 0
@@ -151,13 +131,9 @@ export const generatePackingListLLM = async (
   
   const prompt = `Generate a packing list for a ${tripDays}-day trip to ${location} from ${startDate.toDateString()} to ${endDate.toDateString()}. ${weatherDescription}.${styleInstruction} Return only a JSON array of clothing items needed, like ["item1", "item2", "item3"].`;
   
-  console.log('📝 Generated prompt:', prompt);
-  
   const requestPayload = {
     contents: [{ parts: [{ text: prompt }] }]
   };
-  
-  console.log('🚀 Sending API request to Gemini...');
 
   try {
     const response = await axios.post(
@@ -169,28 +145,23 @@ export const generatePackingListLLM = async (
       }
     );
     
-    console.log('✅ API response received');
-    
     if (!response.data.candidates || !response.data.candidates[0]) {
       throw new Error('No candidates in API response');
     }
     
     const rawText = response.data.candidates[0].content.parts[0].text;
-    console.log('🔤 Raw text from API:', rawText);
     
     const cleanedText = rawText.replace(/```json\s*|\s*```/g, '').trim();
-    console.log('🧹 Cleaned text for parsing:', cleanedText);
     
     try {
       const parsedList = JSON.parse(cleanedText);
-      console.log('🧳 Parsed packing list:', parsedList);
       return Array.isArray(parsedList) ? parsedList : [];
     } catch (parseError) {
-      console.error('❌ JSON parsing failed:', parseError);
+      // JSON parsing failed
       throw new Error(`Failed to parse packing list JSON: ${parseError}`);
     }
   } catch (error) {
-    console.error('❌ Error in packing list generation:', error);
+    // Error in packing list generation
     throw error;
   }
 };

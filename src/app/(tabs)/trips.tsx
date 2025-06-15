@@ -12,7 +12,7 @@ import { Trip } from '@/types/trip';
 
 export default function TripsScreen() {
   const insets = useSafeAreaInsets();
-  const { trips, loading, refreshTrips, deleteTrip } = useTrips();
+  const { trips, refreshTrips, deleteTrip } = useTrips();
 
   // Refresh trips when screen comes into focus (e.g., after returning from create-trip modal)
   useFocusEffect(
@@ -23,25 +23,25 @@ export default function TripsScreen() {
 
   const handleAddTrip = () => {
     try {
-      router.push('/create-trip');
-    } catch (error) {
-      console.error('Failed to navigate to create trip:', error);
+      router.push('/edit-trip?mode=create');
+    } catch {
+      // Failed to navigate to create trip
     }
   };
 
   const handleEditTrip = (trip: Trip) => {
     try {
-      router.push(`/edit-trip?tripId=${trip.id}`);
-    } catch (error) {
-      console.error('Failed to navigate to edit trip:', error);
+      router.push(`/edit-trip?mode=edit&tripId=${trip.id}`);
+    } catch {
+      // Failed to navigate to edit trip
     }
   };
 
   const handleViewPackingList = (trip: Trip) => {
     try {
       router.push(`/packing-list?tripId=${trip.id}`);
-    } catch (error) {
-      console.error('Failed to navigate to packing list:', error);
+    } catch {
+      // Failed to navigate to packing list
     }
   };
 

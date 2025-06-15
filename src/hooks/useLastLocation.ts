@@ -23,7 +23,7 @@ export const useLastLocation = (): UseLastLocationReturn => {
         const stored = await LocationStorageService.getLastLocation();
         setLastLocation(stored);
       } catch (error) {
-        console.error('Error loading last location:', error);
+        // Error loading last location, return null
         // Keep default location on error
       }
     };
@@ -37,7 +37,7 @@ export const useLastLocation = (): UseLastLocationReturn => {
       await LocationStorageService.saveLastLocation(locationString);
       setLastLocation(locationString);
     } catch (error) {
-      console.error('Error saving last location:', error);
+      // Error saving last location
       // Don't throw - allow the app to continue functioning
     }
   }, []);

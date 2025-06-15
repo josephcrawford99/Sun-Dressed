@@ -14,7 +14,7 @@ import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-date
 export default function EditTripModal() {
   const insets = useSafeAreaInsets();
   const defaultStyles = useDefaultStyles();
-  const { tripId } = useLocalSearchParams<{ tripId: string }>();
+  const { mode, tripId } = useLocalSearchParams<{ mode: 'create' | 'edit'; tripId?: string }>();
   const [location, setLocation] = useState('');
   const [dateRange, setDateRange] = useState<{
     startDate: Date | null;
@@ -25,15 +25,18 @@ export default function EditTripModal() {
   });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { trips, updateTrip } = useTrips();
+  const { trips, addTrip, updateTrip } = useTrips();
+  
+  const isEditMode = mode === 'edit';
+  const title = isEditMode ? 'Edit Trip' : 'Create Trip';
+  const buttonText = isEditMode ? 'Update Trip' : 'Save Trip';
+  const loadingText = isEditMode ? 'Updating...' : 'Saving...';
 
-  // Load trip data when component mounts
+  // Load trip data when component mounts (only in edit mode)
   useEffect(() => {
-    console.log('EditTripModal - useEffect called with tripId:', tripId, 'trips.length:', trips.length);
-    if (tripId && trips.length > 0) {
+    if (isEditMode && tripId && trips.length > 0) {
       const tripToEdit = trips.find(trip => trip.id === tripId);
       if (tripToEdit) {
-        console.log('EditTripModal - Loading trip data:', tripToEdit);
         setLocation(tripToEdit.location);
         setDateRange({
           startDate: tripToEdit.startDate as Date,
@@ -41,30 +44,19 @@ export default function EditTripModal() {
         });
         setLoading(false);
       } else {
-        console.error('EditTripModal - Trip not found:', tripId);
+        // Trip not found
         Alert.alert('Error', 'Trip not found');
         router.back();
       }
+    } else if (!isEditMode) {
+      // In create mode, no loading needed - start with empty form
+      setLoading(false);
     }
-  }, [tripId, trips]);
-
-  console.log('EditTripModal - Current state:', {
-    location,
-    dateRange,
-    saving,
-    loading,
-    tripId
-  });
+  }, [isEditMode, tripId, trips]);
 
   const handleSaveTrip = async () => {
-    console.log('handleSaveTrip called with:', {
-      location: location.trim(),
-      dateRange
-    });
-
     // Validation
     if (!location.trim()) {
-      console.log('Validation failed: Missing location');
       setTimeout(() => {
         Alert.alert('Missing Location', 'Please enter a destination for your trip.');
       }, 100);
@@ -72,7 +64,6 @@ export default function EditTripModal() {
     }
 
     if (!dateRange.startDate || !dateRange.endDate) {
-      console.log('Validation failed: Missing date range');
       setTimeout(() => {
         Alert.alert('Missing Dates', 'Please select both start and end dates for your trip.');
       }, 100);
@@ -83,7 +74,6 @@ export default function EditTripModal() {
     const endDate = dateRange.endDate;
 
     if (endDate <= startDate) {
-      console.log('Validation failed: Invalid dates');
       setTimeout(() => {
         Alert.alert('Invalid Dates', 'End date must be after start date.');
       }, 100);
@@ -92,30 +82,42 @@ export default function EditTripModal() {
 
     try {
       setSaving(true);
-      console.log('Updating trip...');
       
-      const originalTrip = trips.find(trip => trip.id === tripId);
-      if (!originalTrip) {
-        throw new Error('Original trip not found');
+      if (isEditMode) {
+        // Edit mode: update existing trip
+        const originalTrip = trips.find(trip => trip.id === tripId);
+        if (!originalTrip) {
+          throw new Error('Original trip not found');
+        }
+
+        const updatedTrip: Trip = {
+          ...originalTrip,
+          location: location.trim(),
+          startDate,
+          endDate,
+          updatedAt: new Date(),
+        };
+
+        await updateTrip(updatedTrip);
+      } else {
+        // Create mode: add new trip
+        const newTrip: Trip = {
+          id: Date.now().toString(),
+          location: location.trim(),
+          startDate,
+          endDate,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        await addTrip(newTrip);
       }
-
-      const updatedTrip: Trip = {
-        ...originalTrip,
-        location: location.trim(),
-        startDate,
-        endDate,
-        updatedAt: new Date(),
-      };
-
-      console.log('Updating trip:', updatedTrip);
-      await updateTrip(updatedTrip);
-      console.log('Trip updated successfully');
       
       router.back();
-    } catch (error) {
-      console.error('Error updating trip:', error);
+    } catch {
+      // Error saving/updating trip
       setTimeout(() => {
-        Alert.alert('Error', 'Failed to update trip. Please try again.');
+        Alert.alert('Error', `Failed to ${isEditMode ? 'update' : 'save'} trip. Please try again.`);
       }, 100);
     } finally {
       setSaving(false);
@@ -136,7 +138,7 @@ export default function EditTripModal() {
     <SafeAreaView style={styles.safeArea}>
 
       <View style={[styles.content, { paddingTop: Platform.OS === 'ios' ? insets.top + 20 : 40 }]}>
-        <Text style={styles.title}>Edit Trip</Text>
+        <Text style={styles.title}>{title}</Text>
         
         <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
@@ -144,7 +146,6 @@ export default function EditTripModal() {
             <LocationAutocomplete
               initialValue={location}
               onLocationSelect={(locationString) => {
-                console.log('📍 Location selected:', locationString);
                 setLocation(locationString);
               }}
               placeholder="Enter destination"
@@ -159,7 +160,6 @@ export default function EditTripModal() {
                 startDate={dateRange.startDate as DateType}
                 endDate={dateRange.endDate as DateType}
                 onChange={({ startDate, endDate }: { startDate: DateType; endDate: DateType }) => {
-                  console.log('DateTimePicker onChange called with:', { startDate, endDate });
                   setDateRange({ 
                     startDate: startDate as Date, 
                     endDate: endDate as Date 
@@ -181,7 +181,7 @@ export default function EditTripModal() {
 
         <View style={[styles.buttonContainer, { marginBottom: insets.bottom + theme.spacing.xl }]}>
           <Button
-            title={saving ? 'Updating...' : 'Update Trip'}
+            title={saving ? loadingText : buttonText}
             onPress={handleSaveTrip}
             disabled={saving}
             loading={saving}

@@ -47,7 +47,7 @@ class WeatherService {
     this.baseUrl = process.env.EXPO_PUBLIC_OPENWEATHER_ONECALL_URL || 'https://api.openweathermap.org/data/3.0/onecall';
     
     if (!this.apiKey) {
-      console.warn('⚠️ OpenWeather API key not found in environment variables');
+      // OpenWeather API key not found
     }
   }
 
@@ -61,7 +61,6 @@ class WeatherService {
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      console.log('🌤️ Weather cache hit for coordinates:', { lat, lon });
       return cached.weather;
     }
 
@@ -73,7 +72,6 @@ class WeatherService {
     await weatherRateLimiter.checkRateLimit();
 
     try {
-      console.log('🌍 Fetching weather for coordinates:', { lat, lon });
       
       const url = `${this.baseUrl}?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=imperial&exclude=minutely,hourly,alerts`;
       
@@ -93,11 +91,10 @@ class WeatherService {
         timestamp: Date.now()
       });
       
-      console.log('✅ Weather fetched successfully:', weather);
       return weather;
 
     } catch (error) {
-      console.error('❌ Weather fetch error:', error);
+      // Weather fetch error
       throw error;
     }
   }
@@ -155,7 +152,6 @@ class WeatherService {
 
   clearCache(): void {
     this.cache.clear();
-    console.log('🗑️ Weather cache cleared');
   }
 
   async fetchForecastByCoordinates(lat: number, lon: number, days: number): Promise<Weather[]> {
@@ -172,7 +168,6 @@ class WeatherService {
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-      console.log('🌤️ Weather forecast cache hit for coordinates:', { lat, lon, days });
       return Array.isArray(cached.weather) ? cached.weather : [cached.weather];
     }
 
@@ -184,7 +179,6 @@ class WeatherService {
     await weatherRateLimiter.checkRateLimit();
 
     try {
-      console.log('🌍 Fetching weather forecast for coordinates:', { lat, lon, days });
       
       const url = `${this.baseUrl}?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=imperial&exclude=minutely,hourly,alerts`;
       
@@ -204,11 +198,10 @@ class WeatherService {
         timestamp: Date.now()
       });
       
-      console.log('✅ Weather forecast fetched successfully:', { days: forecasts.length, data: forecasts });
       return forecasts;
 
     } catch (error) {
-      console.error('❌ Weather forecast fetch error:', error);
+      // Weather forecast fetch error
       throw error;
     }
   }

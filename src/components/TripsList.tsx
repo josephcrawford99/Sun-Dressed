@@ -7,7 +7,7 @@ import { Trip } from '@/types/trip';
 
 interface TripsListProps {
   trips: Trip[];
-  onDelete: (tripId: string) => void;
+  onDelete: (tripId: string) => Promise<void>;
   onEdit: (trip: Trip) => void;
   onViewPackingList: (trip: Trip) => void;
 }

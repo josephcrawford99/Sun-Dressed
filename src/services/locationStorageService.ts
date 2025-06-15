@@ -24,7 +24,7 @@ export class LocationStorageService {
     try {
       await AsyncStorage.setItem(LAST_LOCATION_KEY, locationString);
     } catch (error) {
-      console.error('Failed to save last location:', error);
+      // Failed to save last location
       throw error;
     }
   }
@@ -48,12 +48,12 @@ export class LocationStorageService {
         return DEFAULT_LOCATION;
       }
     } catch (error) {
-      console.error('Failed to retrieve last location:', error);
+      // Failed to retrieve last location
       // On error, try to save default and return it
       try {
         await this.saveLastLocation(DEFAULT_LOCATION);
       } catch (saveError) {
-        console.error('Failed to save default location:', saveError);
+        // Failed to save default location
       }
       return DEFAULT_LOCATION;
     }
@@ -66,7 +66,7 @@ export class LocationStorageService {
     try {
       await AsyncStorage.removeItem(LAST_LOCATION_KEY);
     } catch (error) {
-      console.error('Failed to clear last location:', error);
+      // Failed to clear last location
       throw error;
     }
   }

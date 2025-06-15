@@ -11,55 +11,40 @@ import { typography } from '@styles/typography';
 import { convertTemperature, getTemperatureSymbol } from '@utils/unitConversions';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PackingListModal() {
   const insets = useSafeAreaInsets();
   const { tripId } = useLocalSearchParams();
-  const { getTrip, updateTripPackingList, updateTripWeatherForecast } = useTrips();
+  const { getTrip } = useTrips();
   const { 
     packingList, 
     weatherForecast,
     loading, 
     error, 
     generatePackingList, 
-    setStoredPackingList,
-    setStoredWeatherForecast
-  } = usePackingList(updateTripPackingList, updateTripWeatherForecast);
+    refetch
+  } = usePackingList(tripId as string);
   const { convertToDisplayArray } = useWeatherDisplayArray();
   const { settings } = useSettings();
   const [isFlipped, setIsFlipped] = useState(false);
-  
-  console.log('PackingListModal - tripId:', tripId);
 
   const trip = tripId ? getTrip(tripId as string) : null;
   
-  // Load stored packing list and weather when component mounts or trip changes
-  useEffect(() => {
-    if (trip?.packingList && trip.packingList.length > 0) {
-      console.log('🧳 Loading stored packing list:', trip.packingList);
-      setStoredPackingList(trip.packingList);
-    }
-    if (trip?.weatherForecast && trip.weatherForecast.length > 0) {
-      console.log('🌤️ Loading stored weather forecast:', trip.weatherForecast);
-      setStoredWeatherForecast(trip.weatherForecast);
-    }
-  }, [trip?.packingList, trip?.weatherForecast, setStoredPackingList, setStoredWeatherForecast]);
+  // TanStack Query automatically handles loading stored data
   
   const handleGeneratePackingList = async () => {
-    console.log('Button pressed - checking trip:', { trip, tripId, loading });
     if (!trip) {
-      console.error('No trip found for ID:', tripId);
+      // No trip found for ID
       return;
     }
     
-    console.log('Generate Packing List pressed for trip:', trip.location);
     try {
       await generatePackingList(trip.location, trip.startDate, trip.endDate, trip.id);
-    } catch (error) {
-      console.error('Error generating packing list:', error);
+    } catch {
+      // Error generating packing list
     }
   };
 
@@ -82,7 +67,6 @@ export default function PackingListModal() {
   );
 
   const renderEmptyState = () => {
-    console.log('Rendering empty state. Is loading:', loading, 'Is trip available:', !!trip);
     return (
       <View style={styles.emptyContainer}>
         <TouchableOpacity
@@ -139,7 +123,13 @@ export default function PackingListModal() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={handleGeneratePackingList}
+            onRefresh={() => {
+              // Refetch data from cache and optionally regenerate
+              refetch();
+              if (trip) {
+                handleGeneratePackingList();
+              }
+            }}
             tintColor={theme.colors.black}
             title="Pull to regenerate"
             titleColor={theme.colors.black}
@@ -213,17 +203,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.white,
-    overflow: 'hidden',
   },
   content: {
     flex: 1,
+    paddingHorizontal: theme.spacing.lg,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.lg,
   },
   backButton: {
     padding: theme.spacing.sm,
@@ -262,19 +251,13 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    marginHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    overflow: 'hidden',
+    backgroundColor: 'transparent',
   },
   flipContainer: {
     flex: 1,
-    backgroundColor: 'transparent',
   },
   flipContent: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.large,
-    overflow: 'hidden',
   },
   emptyContainer: {
     flex: 1,

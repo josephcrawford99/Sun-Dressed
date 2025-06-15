@@ -13,12 +13,10 @@ export default function AuthScreen() {
 
   const handleAppleLogin = () => {
     // TODO: Implement Apple OAuth
-    console.log('Apple OAuth login');
   };
 
   const handleGoogleLogin = () => {
     // TODO: Implement Google OAuth
-    console.log('Google OAuth login');
   };
 
   return (

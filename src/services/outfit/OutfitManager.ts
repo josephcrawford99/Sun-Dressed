@@ -43,12 +43,6 @@ export class OutfitManager {
    * Get outfit for given context with smart caching and change detection
    */
   async getOutfit(context: OutfitContext): Promise<OutfitResult> {
-    console.log('🎯 OutfitManager: Getting outfit for context:', {
-      date: context.date.toDateString(),
-      activity: context.activity,
-      location: context.location,
-      hasWeather: !!context.weather
-    });
     
     // Check if this is a past date
     const isPastDate = this.isPastDate(context.date);
@@ -59,14 +53,12 @@ export class OutfitManager {
     
     // For current/future dates, check weather availability
     if (!context.weather) {
-      console.log('⚠️ No weather data available');
       return { outfit: null, source: 'none', stats: this.stats };
     }
     
     // Try memory cache first
     const memoryCached = await this.cacheService.getFromMemory(context);
     if (memoryCached) {
-      console.log('💾 Memory cache hit!');
       this.stats.hits++;
       return { outfit: memoryCached, source: 'memory-cache', stats: this.stats };
     }
@@ -80,14 +72,12 @@ export class OutfitManager {
       );
       
       if (!shouldRegenerate) {
-        console.log('📦 Storage hit with valid context!');
         this.stats.hits++;
         // Add to memory cache for faster future access
         await this.cacheService.addToMemory(context, storedData.outfit);
         return { outfit: storedData.outfit, source: 'storage', stats: this.stats };
       }
       
-      console.log('🔄 Context changed, regenerating...');
     }
     
     // Generate new outfit
@@ -98,7 +88,6 @@ export class OutfitManager {
    * Force regenerate outfit regardless of cache
    */
   async forceRegenerate(context: OutfitContext): Promise<OutfitResult> {
-    console.log('🔄 Force regenerating outfit...');
     
     if (!context.weather) {
       throw new Error('Weather data required for outfit generation');
@@ -114,7 +103,6 @@ export class OutfitManager {
    * Handle past dates - only load from storage, no generation
    */
   private async handlePastDate(context: OutfitContext): Promise<OutfitResult> {
-    console.log('📅 Handling past date:', context.date.toDateString());
     
     const storedData = await OutfitStorageService.getOutfitByDate(context.date);
     if (storedData) {
@@ -122,7 +110,6 @@ export class OutfitManager {
       return { outfit: storedData.outfit, source: 'storage', stats: this.stats };
     }
     
-    console.log('📭 No stored outfit for past date');
     this.stats.misses++;
     return { outfit: null, source: 'none', stats: this.stats };
   }
@@ -136,7 +123,6 @@ export class OutfitManager {
     }
     
     try {
-      console.log('🤖 Generating new outfit via LLM...');
       this.stats.misses++;
       this.stats.apiCalls++;
       
@@ -165,11 +151,10 @@ export class OutfitManager {
       // Add to memory cache
       await this.cacheService.addToMemory(context, outfit);
       
-      console.log('✅ New outfit generated and cached');
       return { outfit, source: 'api', stats: this.stats };
       
     } catch (error) {
-      console.error('❌ Failed to generate outfit:', error);
+      // Failed to generate outfit, error will be thrown
       throw error;
     }
   }
@@ -205,11 +190,10 @@ export class OutfitManager {
       dateOffset: 1
     };
     
-    console.log('🔮 Prefetching tomorrow\'s outfit...');
     
     // Run in background, don't await
     this.getOutfit(tomorrowContext).catch(err => {
-      console.error('Failed to prefetch tomorrow\'s outfit:', err);
+      // Failed to prefetch tomorrow's outfit
     });
   }
   

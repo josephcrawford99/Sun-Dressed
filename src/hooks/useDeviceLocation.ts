@@ -35,7 +35,6 @@ export function useDeviceLocation(): UseDeviceLocationReturn {
       setHasPermission(status === 'granted');
       
       if (status !== 'granted') {
-        console.log('📍 Location permission denied, using US center fallback');
         setLocation(US_CENTER_COORDINATES);
         return;
       }
@@ -51,12 +50,11 @@ export function useDeviceLocation(): UseDeviceLocationReturn {
         longitude: position.coords.longitude
       };
 
-      console.log('📍 Device location obtained:', deviceLocation);
       setLocation(deviceLocation);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to get device location';
-      console.warn('⚠️ Device location failed, using US center fallback:', errorMessage);
+      // Device location failed, using US center fallback
       setError(errorMessage);
       setLocation(US_CENTER_COORDINATES);
     } finally {

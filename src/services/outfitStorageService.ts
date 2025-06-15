@@ -50,7 +50,6 @@ export class OutfitStorageService {
       });
       return outfits;
     } catch (error) {
-      console.error('Error getting weather outfits from storage:', error);
       return {};
     }
   }
@@ -62,7 +61,6 @@ export class OutfitStorageService {
     try {
       await AsyncStorage.setItem(OUTFITS_WITH_WEATHER_STORAGE_KEY, JSON.stringify(outfits));
     } catch (error) {
-      console.error('Error saving weather outfits to storage:', error);
       throw error;
     }
   }
@@ -95,9 +93,7 @@ export class OutfitStorageService {
       weatherOutfits[dateKey] = storedOutfit;
       await this.saveAllWeatherOutfits(weatherOutfits);
       
-      console.log(`Outfit with weather context saved for ${dateKey}`);
     } catch (error) {
-      console.error('Error saving outfit with weather:', error);
       throw error;
     }
   }
@@ -117,7 +113,6 @@ export class OutfitStorageService {
       
       return storedOutfit;
     } catch (error) {
-      console.error('Error getting outfit with weather by date:', error);
       return null;
     }
   }
@@ -131,9 +126,7 @@ export class OutfitStorageService {
       const allOutfits = await this.getAllStoredWeatherOutfits();
       delete allOutfits[dateKey];
       await this.saveAllWeatherOutfits(allOutfits);
-      console.log(`Outfit deleted for ${dateKey}`);
     } catch (error) {
-      console.error('Error deleting outfit for date:', error);
       throw error;
     }
   }
@@ -151,9 +144,7 @@ export class OutfitStorageService {
   static async clearAllOutfits(): Promise<void> {
     try {
       await AsyncStorage.removeItem(OUTFITS_WITH_WEATHER_STORAGE_KEY);
-      console.log('All weather outfits cleared from storage.');
     } catch (error) {
-      console.error('Error clearing weather outfits from storage:', error);
       throw error;
     }
   }

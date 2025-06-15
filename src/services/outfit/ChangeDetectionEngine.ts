@@ -19,33 +19,27 @@ export class ChangeDetectionEngine {
     storedData: StoredOutfitWithWeather,
     currentContext: OutfitContext
   ): boolean {
-    console.log('🔍 Analyzing context changes...');
     
     // Check location change
     if (this.hasLocationChanged(storedData, currentContext)) {
-      console.log('📍 Location changed - regeneration needed');
       return true;
     }
     
     // Check activity change
     if (this.hasActivityChanged(storedData, currentContext)) {
-      console.log('🎯 Activity changed - regeneration needed');
       return true;
     }
     
     // Check weather changes
     if (currentContext.weather && this.hasSignificantWeatherChange(storedData, currentContext)) {
-      console.log('🌡️ Significant weather change - regeneration needed');
       return true;
     }
     
     // Check time-based expiration (outfits older than 24 hours)
     if (this.isOutfitExpired(storedData)) {
-      console.log('⏰ Outfit expired - regeneration needed');
       return true;
     }
     
-    console.log('✅ No significant changes detected');
     return false;
   }
   
@@ -61,11 +55,6 @@ export class ChangeDetectionEngine {
     
     const changed = storedLocation !== currentLocation;
     
-    console.log('📍 Location comparison:', {
-      stored: storedLocation,
-      current: currentLocation,
-      changed
-    });
     
     return changed;
   }
@@ -79,11 +68,6 @@ export class ChangeDetectionEngine {
   ): boolean {
     const changed = storedData.activity !== currentContext.activity;
     
-    console.log('🎯 Activity comparison:', {
-      stored: storedData.activity,
-      current: currentContext.activity,
-      changed
-    });
     
     return changed;
   }
@@ -108,34 +92,6 @@ export class ChangeDetectionEngine {
     const windDiff = Math.abs(currentWeather.windiness - storedWeather.windiness);
     const conditionChanged = currentWeather.condition !== storedWeather.condition;
     
-    console.log('🌡️ Weather comparison:', {
-      temperature: {
-        stored: storedWeather.feelsLikeTemp,
-        current: currentWeather.feelsLikeTemp,
-        diff: `${tempDiff}°F`,
-        threshold: `${WEATHER_THRESHOLDS.temperature}°F`,
-        exceeds: tempDiff > WEATHER_THRESHOLDS.temperature
-      },
-      precipitation: {
-        stored: storedWeather.highestChanceOfRain,
-        current: currentWeather.highestChanceOfRain,
-        diff: `${precipDiff}%`,
-        threshold: `${WEATHER_THRESHOLDS.precipitation}%`,
-        exceeds: precipDiff > WEATHER_THRESHOLDS.precipitation
-      },
-      wind: {
-        stored: storedWeather.windiness,
-        current: currentWeather.windiness,
-        diff: `${windDiff}mph`,
-        threshold: `${WEATHER_THRESHOLDS.wind}mph`,
-        exceeds: windDiff > WEATHER_THRESHOLDS.wind
-      },
-      condition: {
-        stored: storedWeather.condition,
-        current: currentWeather.condition,
-        changed: conditionChanged
-      }
-    });
     
     // Return true if any threshold is exceeded
     return (
@@ -156,11 +112,6 @@ export class ChangeDetectionEngine {
     
     const expired = hoursOld > 24;
     
-    console.log('⏰ Outfit age check:', {
-      createdAt: createdAt.toISOString(),
-      hoursOld: hoursOld.toFixed(1),
-      expired
-    });
     
     return expired;
   }

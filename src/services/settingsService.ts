@@ -14,7 +14,7 @@ export class SettingsService {
       }
       return DEFAULT_SETTINGS;
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      // Failed to load settings
       return DEFAULT_SETTINGS;
     }
   }
@@ -23,7 +23,7 @@ export class SettingsService {
     try {
       await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      // Failed to save settings
       throw error;
     }
   }
@@ -37,7 +37,7 @@ export class SettingsService {
       const updatedSettings = { ...currentSettings, [key]: value };
       await this.saveSettings(updatedSettings);
     } catch (error) {
-      console.error(`Failed to update setting ${key}:`, error);
+      // Failed to update setting
       throw error;
     }
   }
@@ -46,7 +46,7 @@ export class SettingsService {
     try {
       await AsyncStorage.removeItem(SETTINGS_KEY);
     } catch (error) {
-      console.error('Failed to reset settings:', error);
+      // Failed to reset settings
       throw error;
     }
   }

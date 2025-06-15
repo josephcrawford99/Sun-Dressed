@@ -23,13 +23,6 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
   const ref = useRef<any>(null);
   const { location: deviceLocation, requestLocation, hasPermission } = useDeviceLocation();
   const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
-  
-  console.log('🏗️ LocationAutocomplete render:', { 
-    initialValue, 
-    deviceLocation,
-    hasPermission,
-    apiKey: apiKey ? `EXISTS (${apiKey.substring(0, 8)}...)` : 'MISSING' 
-  });
 
   // Set initial value using ref after component mounts
   useEffect(() => {
@@ -51,19 +44,15 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       await requestLocation();
       
       if (!deviceLocation) {
-        console.warn('⚠️ Device location not available');
+        // Device location not available
         return;
       }
-      
-      console.log('📍 Using device location:', deviceLocation);
       
       // Reverse geocode the coordinates using OpenWeather API
       const formattedAddress = await geocodeService.reverseGeocode(
         deviceLocation.latitude, 
         deviceLocation.longitude
       );
-      
-      console.log('🗺️ Reverse geocode result:', formattedAddress);
       
       // Set the text in the autocomplete field
       if (ref.current) {
@@ -77,7 +66,7 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       });
       
     } catch (error) {
-      console.error('❌ Device location error:', error);
+      // Device location error
       
       // Fallback: use device coordinates with generic name if reverse geocoding fails
       if (deviceLocation) {
@@ -104,7 +93,6 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       ref={ref}
       placeholder={placeholder}
       onPress={(data, details) => {
-        console.log('🎯 GooglePlacesAutocomplete onPress:', { data, details });
         const locationString = details?.formatted_address || data?.description || '';
         
         // Extract coordinates from Google Places response
@@ -113,13 +101,10 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
           lon: details.geometry.location.lng
         } : undefined;
         
-        console.log('📍 Emitting location string:', locationString);
-        console.log('🎯 Emitting coordinates:', coordinates);
         onLocationSelect(locationString, coordinates);
       }}
       textInputProps={{
         onChangeText: (text) => {
-          console.log('⌨️ GooglePlacesAutocomplete onChangeText:', text);
           onTextChange?.(text);
         },
         style: styles.textInput,
@@ -152,11 +137,11 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       predefinedPlaces={[]}
       currentLocation={false}
       suppressDefaultStyles={true}
-      onFail={(error) => {
-        console.error('❌ GooglePlacesAutocomplete error:', error);
+      onFail={() => {
+        // GooglePlacesAutocomplete error
       }}
       onNotFound={() => {
-        console.log('🔍 GooglePlacesAutocomplete no results found');
+        // No results found - silent handling
       }}
     />
       <TouchableOpacity 

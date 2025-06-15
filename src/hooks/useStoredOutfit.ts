@@ -32,10 +32,9 @@ export const useStoredOutfit = () => {
       const storedOutfit = await OutfitStorageService.getOutfitByDate(targetDate);
       setOutfit(storedOutfit);
       
-      console.log(`Loaded stored outfit for offset ${dateOffset}:`, storedOutfit);
     } catch (err) {
       setError('Failed to load stored outfit');
-      console.error('Error loading stored outfit:', err);
+      // Error loading stored outfit
       setOutfit(null);
     } finally {
       setLoading(false);
@@ -51,7 +50,7 @@ export const useStoredOutfit = () => {
       const outfitItems = await OutfitStorageService.getOutfitItemsByDate(targetDate);
       return outfitItems !== null && outfitItems.length > 0;
     } catch (err) {
-      console.error('Error checking stored outfit:', err);
+      // Error checking stored outfit
       return false;
     }
   }, []);

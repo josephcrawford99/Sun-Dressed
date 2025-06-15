@@ -1,14 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Trip } from '../types/trip';
+import { Trip } from '@/types/trip';
 
 const TRIPS_STORAGE_KEY = 'user_trips';
 
+export interface TripsData {
+  trips: Trip[];
+  lastUpdated: Date;
+}
+
 /**
- * Service for managing trip data persistence using AsyncStorage
+ * TanStack Query service for trips AsyncStorage operations
+ * Handles all trip persistence with proper date handling
  */
-export class TripStorageService {
+export class TripsQueryService {
   /**
-   * Retrieve all trips from AsyncStorage
+   * Get all trips from AsyncStorage
    */
   static async getTrips(): Promise<Trip[]> {
     try {
@@ -16,6 +22,7 @@ export class TripStorageService {
       if (!tripsJson) {
         return [];
       }
+      
       const trips = JSON.parse(tripsJson);
       // Convert date strings back to Date objects
       return trips.map((trip: any) => ({
@@ -26,7 +33,7 @@ export class TripStorageService {
         updatedAt: new Date(trip.updatedAt),
       }));
     } catch (error) {
-      console.error('Error getting trips from storage:', error);
+      // Return empty array on error - let the UI handle error states
       return [];
     }
   }
@@ -34,13 +41,13 @@ export class TripStorageService {
   /**
    * Save a new trip to AsyncStorage
    */
-  static async saveTrip(trip: Trip): Promise<void> {
+  static async addTrip(trip: Trip): Promise<Trip> {
     try {
       const existingTrips = await this.getTrips();
       const newTrips = [...existingTrips, trip];
       await AsyncStorage.setItem(TRIPS_STORAGE_KEY, JSON.stringify(newTrips));
+      return trip;
     } catch (error) {
-      console.error('Error saving trip to storage:', error);
       throw error;
     }
   }
@@ -48,15 +55,15 @@ export class TripStorageService {
   /**
    * Update an existing trip in AsyncStorage
    */
-  static async updateTrip(updatedTrip: Trip): Promise<void> {
+  static async updateTrip(updatedTrip: Trip): Promise<Trip> {
     try {
       const existingTrips = await this.getTrips();
       const updatedTrips = existingTrips.map(trip =>
         trip.id === updatedTrip.id ? updatedTrip : trip
       );
       await AsyncStorage.setItem(TRIPS_STORAGE_KEY, JSON.stringify(updatedTrips));
+      return updatedTrip;
     } catch (error) {
-      console.error('Error updating trip in storage:', error);
       throw error;
     }
   }
@@ -70,7 +77,6 @@ export class TripStorageService {
       const filteredTrips = existingTrips.filter(trip => trip.id !== tripId);
       await AsyncStorage.setItem(TRIPS_STORAGE_KEY, JSON.stringify(filteredTrips));
     } catch (error) {
-      console.error('Error deleting trip from storage:', error);
       throw error;
     }
   }
@@ -82,7 +88,6 @@ export class TripStorageService {
     try {
       await AsyncStorage.removeItem(TRIPS_STORAGE_KEY);
     } catch (error) {
-      console.error('Error clearing trips from storage:', error);
       throw error;
     }
   }

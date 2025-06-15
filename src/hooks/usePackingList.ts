@@ -3,76 +3,100 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { generatePackingListLLM } from '@services/llmService';
 import { useCallback, useState } from 'react';
 import { useWeatherForecast } from './useWeatherForecast';
+import { 
+  usePackingDataQuery, 
+  usePackingListMutation, 
+  useWeatherForecastMutation 
+} from './queries/usePackingListQuery';
+
+// TypeScript interface for the hook return type
+interface UsePackingListReturn {
+  packingList: string[];
+  weatherForecast: Weather[];
+  loading: boolean;
+  error: string | null;
+  generatePackingList: (location: string, startDate: Date, endDate: Date, currentTripId?: string) => Promise<void>;
+  refetch: () => void;
+}
 
 export const usePackingList = (
-  updateTripPackingList?: (tripId: string, packingList: string[]) => Promise<void>,
-  updateTripWeatherForecast?: (tripId: string, weatherForecast: Weather[]) => Promise<void>
-) => {
+  tripId?: string
+): UsePackingListReturn => {
   const { settings } = useSettings();
-  const [packingList, setPackingList] = useState<string[]>([]);
-  const [weatherForecast, setWeatherForecast] = useState<Weather[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Use TanStack Query for data management
+  const packingDataQuery = usePackingDataQuery(tripId || null);
+  const packingListMutation = usePackingListMutation();
+  const weatherForecastMutation = useWeatherForecastMutation();
+  
+  // Local state for generation process
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const { fetchWeatherForecast } = useWeatherForecast();
+  
+  // Combine TanStack Query loading states with generation state
+  const loading = packingDataQuery.isLoading || isGenerating;
+  const error = generationError || (packingDataQuery.error as Error)?.message || null;
+  
+  // Get data from TanStack Query
+  const packingList = packingDataQuery.packingList;
+  const weatherForecast = packingDataQuery.weatherForecast;
 
-  const generatePackingList = useCallback(async (location: string, startDate: Date, endDate: Date, tripId?: string) => {
-    setLoading(true);
-    setError(null);
+  const generatePackingList = useCallback(async (location: string, startDate: Date, endDate: Date, currentTripId?: string) => {
+    setIsGenerating(true);
+    setGenerationError(null);
     
     try {
-      console.log('🧳 Generating packing list for:', { location, startDate, endDate });
-      
       let weatherArray: Weather[] = [];
       
       try {
         // Fetch real weather forecast data
-        console.log('🌤️ Fetching weather forecast for packing list...');
         weatherArray = await fetchWeatherForecast(location, startDate, endDate);
-        console.log('✅ Weather forecast obtained for packing list:', weatherArray.length, 'days');
-      } catch (weatherError) {
-        console.warn('⚠️ Failed to fetch weather forecast, proceeding without weather data:', weatherError);
+      } catch {
+        // Failed to fetch weather forecast, proceeding without weather data
         // Continue without weather data - the LLM can still generate a basic packing list
         weatherArray = [];
       }
       
       // Hook automatically includes user's style preference
       const newPackingList = await generatePackingListLLM(location, startDate, endDate, weatherArray, settings.stylePreference);
-      setPackingList(newPackingList);
-      setWeatherForecast(weatherArray);
       
-      // Save to trip storage if tripId and update functions are provided
-      if (tripId) {
-        if (updateTripPackingList) {
-          await updateTripPackingList(tripId, newPackingList);
-          console.log('🧳 Packing list saved to trip storage');
+      // Use the passed tripId or the hook's tripId
+      const targetTripId = currentTripId || tripId;
+      
+      if (targetTripId) {
+        // Save using TanStack Query mutations for better state management
+        await packingListMutation.mutateAsync({
+          tripId: targetTripId,
+          packingList: newPackingList,
+        });
+        
+        if (weatherArray.length > 0) {
+          await weatherForecastMutation.mutateAsync({
+            tripId: targetTripId,
+            weatherForecast: weatherArray,
+            location,
+          });
         }
-        if (updateTripWeatherForecast && weatherArray.length > 0) {
-          await updateTripWeatherForecast(tripId, weatherArray);
-          console.log('🌤️ Weather forecast saved to trip storage');
-        }
+        
+        // Trip storage is now handled entirely by TanStack Query
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate packing list');
+      setGenerationError(err instanceof Error ? err.message : 'Failed to generate packing list');
     } finally {
-      setLoading(false);
+      setIsGenerating(false);
     }
-  }, [updateTripPackingList, updateTripWeatherForecast, fetchWeatherForecast, settings.stylePreference]);
+  }, [tripId, fetchWeatherForecast, settings.stylePreference, packingListMutation, weatherForecastMutation]);
 
-  const setStoredPackingList = useCallback((storedList: string[]) => {
-    setPackingList(storedList);
-  }, []);
 
-  const setStoredWeatherForecast = useCallback((storedForecast: Weather[]) => {
-    setWeatherForecast(storedForecast);
-  }, []);
-
-  return { 
+  // Explicitly return all properties to match the interface
+  const result: UsePackingListReturn = {
     packingList, 
     weatherForecast,
     loading, 
     error, 
     generatePackingList, 
-    setStoredPackingList,
-    setStoredWeatherForecast
+    refetch: packingDataQuery.refetch
   };
+
+  return result;
 };

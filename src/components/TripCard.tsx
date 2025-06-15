@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
 import { Trip } from '@/types/trip';
 import { theme, typography } from '@/styles';
@@ -28,34 +28,40 @@ const formatDateRange = (startDate: Date | string, endDate: Date | string): stri
 };
 
 export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit, onViewPackingList }) => {
-  console.log('TripCard FULL START render for trip:', trip.id, trip.location);
   const [menuVisible, setMenuVisible] = useState(false);
+
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
 
+  const handleCardPress = () => {
+    if (!menuVisible) {
+      openMenu();
+    }
+  };
+
   const handleEdit = () => {
-    console.log('TripCard handleEdit called for trip:', trip.id);
     closeMenu();
     onEdit(trip);
   };
 
   const handleDelete = async () => {
-    console.log('TripCard handleDelete called for trip:', trip.id);
     closeMenu();
     await onDelete(trip.id);
   };
 
-  console.log('TripCard about to render JSX for trip:', trip.id);
-
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
+    <View style={[styles.container, menuVisible && styles.containerWithMenu]}>
+      <TouchableOpacity 
+        style={styles.content} 
+        onPress={handleCardPress}
+        activeOpacity={0.7}
+      >
         <Text style={styles.location}>{trip.location}</Text>
         <Text style={styles.dates}>
           {formatDateRange(trip.startDate, trip.endDate)}
         </Text>
-      </View>
+      </TouchableOpacity>
       
       <Menu
         visible={menuVisible}
@@ -79,7 +85,6 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit, onVi
         />
         <Menu.Item 
           onPress={() => {
-            console.log('View Packing List pressed for trip:', trip.id);
             closeMenu();
             onViewPackingList(trip);
           }} 
@@ -109,6 +114,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...theme.shadows.medium,
   },
+  containerWithMenu: {
+    zIndex: 1000,
+    elevation: 10,
+  },
   content: {
     flex: 1,
   },
@@ -130,6 +139,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.medium,
     marginTop: theme.spacing.sm,
+    elevation: 8,
+    zIndex: 1000,
   },
   menuItemText: {
     color: theme.colors.black,

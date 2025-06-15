@@ -479,5 +479,144 @@ This pattern ensures:
 - **Navigation Separation**: Components emit events, screens handle routing
 - **Expo Router**: Use file-based routing with URL parameters for data passing
 
+## TanStack Query & Performance Patterns
+
+### Re-render Loop Prevention with useCallback
+
+**Problem Pattern**: TanStack Query hooks cause constant re-renders when functions are recreated on every render.
+
+**Symptom Detection**:
+```typescript
+// Console logs showing constant re-renders:
+LOG  🔄 TripCard RENDER for trip [id] - menuVisible: false
+LOG  🔄 TripCard RENDER for trip [id] - menuVisible: false
+LOG  👆 CARD PRESSED - menuVisible: false
+LOG  🔵 OPENING MENU
+LOG  🔄 TripCard RENDER for trip [id] - menuVisible: true  // State set
+LOG  🔄 TripCard RENDER for trip [id] - menuVisible: false // Immediately reset!
+```
+
+**Root Cause**: Functions in custom hooks are recreated on every render, causing:
+1. `useFocusEffect` dependencies to change constantly
+2. TanStack Query refetch triggers
+3. Component re-renders that reset local state
+
+**❌ WRONG: Functions recreated on every render**
+```typescript
+export const useTrips = () => {
+  const { data: trips = [], refetch } = useTripsQuery();
+  
+  // ❌ BAD - Function recreated every render
+  const refreshTrips = async () => {
+    await refetch();
+  };
+  
+  const deleteTrip = async (tripId: string) => {
+    await deleteTripMutation.mutateAsync(tripId);
+  };
+  
+  return { trips, refreshTrips, deleteTrip };
+};
+```
+
+**✅ CORRECT: Memoized functions with useCallback**
+```typescript
+import { useCallback } from 'react';
+
+export const useTrips = () => {
+  const { data: trips = [], refetch } = useTripsQuery();
+  const deleteTripMutation = useDeleteTripMutation();
+  
+  // ✅ GOOD - Function memoized with dependencies
+  const refreshTrips = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+  
+  const deleteTrip = useCallback(async (tripId: string) => {
+    try {
+      await deleteTripMutation.mutateAsync(tripId);
+    } catch (err) {
+      console.error('Error deleting trip:', err);
+      throw err;
+    }
+  }, [deleteTripMutation]);
+  
+  return { trips, refreshTrips, deleteTrip };
+};
+```
+
+### TanStack Query Hook Memoization Rules
+
+**1. Always memoize functions returned from custom hooks:**
+```typescript
+// ✅ All functions wrapped in useCallback
+const addTrip = useCallback(async (trip: Trip) => {
+  await addTripMutation.mutateAsync(trip);
+}, [addTripMutation]);
+
+const updateTrip = useCallback(async (updatedTrip: Trip) => {
+  await updateTripMutation.mutateAsync(updatedTrip);
+}, [updateTripMutation]);
+
+const getTrip = useCallback((tripId: string): Trip | null => {
+  return trips.find(t => t.id === tripId) || null;
+}, [trips]);
+```
+
+**2. Include proper dependencies in dependency arrays:**
+- TanStack Query mutation hooks: `[mutationHook]`
+- Functions using data: `[dataArray]`
+- Functions using refetch: `[refetch]`
+
+**3. Watch for useFocusEffect re-render loops:**
+```typescript
+// ❌ BAD - Will cause constant re-renders
+useFocusEffect(
+  useCallback(() => {
+    refreshTrips(); // If refreshTrips not memoized, this runs constantly
+  }, [refreshTrips])
+);
+
+// ✅ GOOD - Stable dependency prevents loop
+const refreshTrips = useCallback(async () => {
+  await refetch();
+}, [refetch]); // Stable dependency
+```
+
+### Component State Preservation
+
+**Problem**: Local component state (like `menuVisible`) gets reset during re-renders.
+
+**Solution**: Prevent parent component re-renders by:
+1. Memoizing all functions in custom hooks
+2. Using stable dependencies in useCallback
+3. Avoiding unnecessary refetch calls
+
+**Debugging Pattern**:
+```typescript
+// Add useEffect to track renders
+useEffect(() => {
+  console.log(`🔄 Component RENDER - state: ${localState}`);
+});
+
+// Add useEffect to track specific state changes
+useEffect(() => {
+  console.log(`📱 State CHANGE - localState: ${localState}`);
+}, [localState]);
+```
+
+### Performance Best Practices
+
+**1. Memoize all functions in custom hooks that use TanStack Query**
+**2. Use stable dependencies in useCallback dependency arrays**
+**3. Avoid calling refetch in useFocusEffect unless absolutely necessary**
+**4. Test for re-render loops by adding console logs to track renders**
+**5. Remember: Function recreation causes dependency changes → triggers effects → causes re-renders**
+
+This pattern is critical for any hook that returns functions, especially when those functions are used in:
+- `useFocusEffect` dependencies
+- Component props that could trigger re-renders
+- Other hooks' dependency arrays
+
 Your role is crucial for maintaining code quality while delivering user-facing value. Focus on clean, maintainable implementations that integrate seamlessly with the existing codebase.
 

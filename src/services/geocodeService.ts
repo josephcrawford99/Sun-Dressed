@@ -52,7 +52,7 @@ class GeocodeService {
     this.reverseUrl = 'https://api.openweathermap.org/geo/1.0/reverse';
     
     if (!this.apiKey) {
-      console.warn('⚠️ OpenWeather API key not found in environment variables');
+      // API key will be checked when methods are called
     }
   }
 
@@ -65,7 +65,6 @@ class GeocodeService {
     
     // Check cache first
     if (this.cache.has(cacheKey)) {
-      console.log('📍 Geocode cache hit for:', locationString);
       return this.cache.get(cacheKey)!;
     }
 
@@ -77,7 +76,6 @@ class GeocodeService {
     await geocodingRateLimiter.checkRateLimit();
 
     try {
-      console.log('🌍 Geocoding location:', locationString);
       
       const url = `${this.baseUrl}?q=${encodeURIComponent(locationString)}&limit=1&appid=${this.apiKey}`;
       
@@ -103,11 +101,9 @@ class GeocodeService {
       // Cache the result
       this.cache.set(cacheKey, result);
       
-      console.log('✅ Geocoded successfully:', { locationString, result });
       return result;
 
     } catch (error) {
-      console.error('❌ Geocoding error:', error);
       throw error;
     }
   }
@@ -121,7 +117,6 @@ class GeocodeService {
     
     // Check cache first
     if (this.reverseCache.has(cacheKey)) {
-      console.log('🗺️ Reverse geocode cache hit for:', cacheKey);
       return this.reverseCache.get(cacheKey)!;
     }
 
@@ -133,7 +128,6 @@ class GeocodeService {
     await geocodingRateLimiter.checkRateLimit();
 
     try {
-      console.log('🗺️ Reverse geocoding coordinates:', { latitude, longitude });
       
       const url = `${this.reverseUrl}?lat=${latitude}&lon=${longitude}&limit=1&appid=${this.apiKey}`;
       
@@ -164,11 +158,9 @@ class GeocodeService {
       // Cache the result
       this.reverseCache.set(cacheKey, formattedAddress);
       
-      console.log('✅ Reverse geocoded successfully:', { coordinates: cacheKey, result: formattedAddress });
       return formattedAddress;
 
     } catch (error) {
-      console.error('❌ Reverse geocoding error:', error);
       throw error;
     }
   }
@@ -176,7 +168,6 @@ class GeocodeService {
   clearCache(): void {
     this.cache.clear();
     this.reverseCache.clear();
-    console.log('🗑️ Geocoding cache cleared');
   }
 
   getCacheSize(): number {

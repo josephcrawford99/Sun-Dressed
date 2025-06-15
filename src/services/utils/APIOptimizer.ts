@@ -13,7 +13,6 @@ export class APIOptimizer {
     fn: () => Promise<T>,
     delay: number = 500
   ): Promise<T> {
-    console.log(`⏱️ Debouncing request for key: ${key}`);
     
     // Clear existing timer if any
     const existingTimer = this.debounceTimers.get(key);
@@ -24,7 +23,6 @@ export class APIOptimizer {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(async () => {
         try {
-          console.log(`🚀 Executing debounced request: ${key}`);
           const result = await fn();
           resolve(result);
         } catch (error) {
@@ -48,11 +46,9 @@ export class APIOptimizer {
     // Check if request is already pending
     const pending = this.pendingRequests.get(key);
     if (pending) {
-      console.log(`🔄 Reusing pending request for key: ${key}`);
       return pending as Promise<T>;
     }
     
-    console.log(`🆕 Creating new request for key: ${key}`);
     
     // Create new request
     const request = fn().finally(() => {
@@ -72,7 +68,6 @@ export class APIOptimizer {
     if (timer) {
       clearTimeout(timer);
       this.debounceTimers.delete(key);
-      console.log(`❌ Cancelled debounced request: ${key}`);
     }
   }
   
@@ -87,7 +82,6 @@ export class APIOptimizer {
     this.debounceTimers.clear();
     
     // Note: We don't clear pending requests as they're already in-flight
-    console.log('🧹 Cleared all debounce timers');
   }
   
   /**
