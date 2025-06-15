@@ -44,23 +44,23 @@ export default function ToggleSwitch({ label, value, options, onValueChange }: T
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   label: {
     ...typography.label,
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   toggleContainer: {
     flexDirection: 'row',
-    borderRadius: 8,
+    borderRadius: theme.borderRadius.medium,
     borderWidth: 1,
     borderColor: theme.colors.gray,
     overflow: 'hidden',
   },
   toggleOption: {
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
     backgroundColor: theme.colors.white,
   },

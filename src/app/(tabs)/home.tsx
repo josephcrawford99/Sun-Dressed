@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     ...typography.headingItalic,
     marginTop: -4,
     paddingLeft: theme.spacing.xs,
-    fontSize: 32,
+    fontSize: theme.fontSize.display,
   },
   locationRow: {
     flexDirection: 'row',

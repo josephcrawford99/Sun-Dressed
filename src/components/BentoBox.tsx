@@ -65,21 +65,43 @@ const BentoBox: React.FC<BentoBoxProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.column}>
-        {renderOutfitItem(outfit?.top, 'Top')}
-        {renderOutfitItem(outfit?.bottom, 'Bottom')}
+    <View style={styles.outerContainer}>
+      <View style={styles.container}>
+        <View style={styles.column}>
+          {renderOutfitItem(outfit?.top, 'Top')}
+          {renderOutfitItem(outfit?.bottom, 'Bottom')}
+        </View>
+        <View style={styles.column}>
+          {renderOutfitItem(outfit?.outerwear?.[0], 'Outerwear')}
+          {renderOutfitItem(outfit?.accessories?.[0], 'Accessories')}
+          {renderOutfitItem(outfit?.shoes, 'Shoes')}
+        </View>
       </View>
-      <View style={styles.column}>
-        {renderOutfitItem(outfit?.outerwear?.[0], 'Outerwear')}
-        {renderOutfitItem(outfit?.accessories?.[0], 'Accessories')}
-        {renderOutfitItem(outfit?.shoes, 'Shoes')}
-      </View>
+      
+      {/* Explanation Section */}
+      {outfit?.explanation && (
+        <View style={styles.explanationContainer}>
+          <Text style={styles.explanationText}>
+            {outfit.explanation}
+          </Text>
+        </View>
+      )}
+      
+      {loading && (
+        <View style={styles.explanationContainer}>
+          <Text style={styles.explanationLoadingText}>
+            Generating outfit explanation...
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+  },
   container: {
     flexDirection: 'row',
     flex: 1,
@@ -140,6 +162,26 @@ const styles = StyleSheet.create({
     color: theme.colors.gray,
     textAlign: 'center',
     fontWeight: '500',
+    fontStyle: 'italic',
+  },
+  explanationContainer: {
+    marginTop: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.small,
+  },
+  explanationText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.black,
+    textAlign: 'center',
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  explanationLoadingText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.gray,
+    textAlign: 'center',
     fontStyle: 'italic',
   },
 });

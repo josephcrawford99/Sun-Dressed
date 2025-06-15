@@ -10,6 +10,7 @@ import Animated, {
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { theme } from '@/styles/theme';
 
 const HEADER_HEIGHT = 250;
 
@@ -75,8 +76,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: theme.spacing.xl,
+    gap: theme.spacing.md,
     overflow: 'hidden',
   },
 });

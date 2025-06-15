@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   dateContent: {
     alignItems: 'center',
-    gap: 4,
+    gap: theme.spacing.xs,
   },
   dayText: {
     ...typography.caption,

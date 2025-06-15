@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     ...typography.heading,
     fontSize: theme.fontSize.lg,
     color: theme.colors.black,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   dates: {
     ...typography.body,
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
   },
   menuContent: {
     backgroundColor: theme.colors.white,
-    borderRadius: 8,
-    marginTop: 8,
+    borderRadius: theme.borderRadius.medium,
+    marginTop: theme.spacing.sm,
   },
   menuItemText: {
     color: theme.colors.black,

@@ -19,7 +19,7 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
     ? ` Focus on ${stylePreference} style clothing options.`
     : '';
   
-  const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}.${styleInstruction} Return only a JSON object with: top, bottom, outerwear (array), accessories (array), shoes.`;
+  const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}.${styleInstruction} Return only a JSON object with: top, bottom, outerwear (array), accessories (array), shoes, explanation (brief 1-2 sentence reason for this outfit choice based on weather/activity).`;
   
   console.log('📝 Generated prompt:', prompt);
   

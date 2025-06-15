@@ -4,4 +4,5 @@ export interface Outfit {
   outerwear?: string[];
   accessories?: string[];
   shoes: string;
+  explanation: string;
 }

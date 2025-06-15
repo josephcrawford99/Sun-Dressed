@@ -1,4 +1,5 @@
 import { TextStyle } from 'react-native';
+import { theme } from './theme';
 
 export const fonts = {
   primary: 'LibreBaskerville_400Regular',
@@ -18,14 +19,14 @@ export const typography: { [key: string]: TextStyle } = {
     letterSpacing: -3.5,
     textAlign: 'left',
     transform: [{ scaleY: 1.3 }],
-    color: '#000',
+    color: theme.colors.black,
   },
   heading: {
     fontFamily: fonts.primaryBold,
     fontWeight: '700',
     letterSpacing: -1.25,
     fontSize: 28,
-    color: '#000',
+    color: theme.colors.black,
   },
   headingItalic: {
     fontFamily: fonts.primaryItalic,
@@ -33,42 +34,42 @@ export const typography: { [key: string]: TextStyle } = {
     fontWeight: '600',
     letterSpacing: -1.25,
     fontSize: 28,
-    color: '#000',
+    color: theme.colors.black,
   },
   subheading: {
     fontFamily: fonts.secondaryBold,
     fontWeight: '600',
     fontSize: 18,
-    color: '#000',
+    color: theme.colors.black,
   },
   body: {
     fontFamily: fonts.secondary,
     fontWeight: '400',
     fontSize: 16,
-    color: '#000',
+    color: theme.colors.black,
   },
   label: {
     fontFamily: fonts.secondaryMedium,
     fontWeight: '500',
     fontSize: 14,
-    color: '#757575',
+    color: theme.colors.gray,
   },
   button: {
     fontFamily: fonts.secondaryBold,
     fontWeight: '700',
     fontSize: 16,
-    color: '#fff',
+    color: theme.colors.white,
   },
   
   caption: {
     fontFamily: fonts.secondary,
     fontWeight: '400',
     fontSize: 12,
-    color: '#757575',
+    color: theme.colors.gray,
   },
   placeholderText: {
     fontSize: 18,
-    color: '#757575',
+    color: theme.colors.gray,
     fontFamily: fonts.secondary,
     fontStyle: 'italic',
   },
@@ -76,7 +77,7 @@ export const typography: { [key: string]: TextStyle } = {
     fontFamily: fonts.primary,
     fontWeight: '400',
     fontSize: 24,
-    color: '#FFF',
+    color: theme.colors.white,
     letterSpacing: 0.5,
   },
 };

@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   location: {
     ...typography.subheading,
-    marginBottom: 2,
+    marginBottom: theme.spacing.xs,
   },
   condition: {
     ...typography.label,
@@ -181,12 +181,12 @@ const styles = StyleSheet.create({
   },
   tempValue: {
     ...typography.heading,
-    fontSize: 20,
-    marginBottom: 2,
+    fontSize: theme.fontSize.xl,
+    marginBottom: theme.spacing.xs,
   },
   tempLabel: {
     ...typography.caption,
-    fontSize: 10,
+    fontSize: theme.fontSize.xxs,
     textAlign: 'center',
   },
   detailsGrid: {
@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     ...typography.body,
-    fontSize: 14,
+    fontSize: theme.fontSize.sm,
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: theme.spacing.xs,
     marginBottom: 1,
   },
   detailLabel: {
     ...typography.caption,
-    fontSize: 9,
+    fontSize: theme.fontSize.xxs,
     textAlign: 'center',
   },
 });
