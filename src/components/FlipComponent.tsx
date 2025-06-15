@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
-  withTiming 
+import { StyleSheet, View, ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
 interface FlipComponentProps {
@@ -60,12 +60,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+    zIndex: 1000,
+    elevation: 10,
+    overflow: 'visible',
   },
   card: {
     width: '100%',
     height: '100%',
     backfaceVisibility: 'hidden',
     backgroundColor: 'transparent',
+    zIndex: 100,
+    elevation: 5,
   },
   frontCard: {
     position: 'absolute',
@@ -73,13 +78,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    zIndex: 101,
   },
   backCard: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 0,  
+    zIndex: 100,
   },
 });
 

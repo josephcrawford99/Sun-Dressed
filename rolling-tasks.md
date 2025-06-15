@@ -15,8 +15,8 @@ This file tracks development priorities for MVP completion and serves as a high-
 2.  **Packing List Weather Card Missing**: Weather forecast card/button no longer displays on packing list screen after generation completes.
 
 ### 📋 Immediate Next Steps
-1.  **Optimize Login Flow**: Address the race condition between weather loading and outfit restoration on the home screen to prevent unnecessary regeneration.
-2.  **Production Cleanup**: Systematically remove all debug logs and perform final code cleanup.
+1.  **Fix Packing List Weather Display**: Restore weather forecast card/button visibility on packing list screen.
+2.  **Optimize Login Flow**: Address the race condition between weather loading and outfit restoration on the home screen to prevent unnecessary regeneration.
 3.  **Final Testing**: Conduct end-to-end testing of all user flows.
 4.  **Submit**: Prepare for App Store submission.
 
@@ -35,6 +35,7 @@ This file tracks development priorities for MVP completion and serves as a high-
 - **Packing Lists**: Weather-aware packing list generation with TanStack Query.
 - **TanStack Query Migration**: Successfully migrated trips and packing list storage from custom AsyncStorage hooks to TanStack Query for better caching and state management.
 - **Trip Card Interactions**: Fixed 3-dot menu functionality that broke during TanStack Query migration. Issue was caused by useCallback re-render loops - resolved by memoizing all functions in useTrips hook.
+- **Legacy Code Cleanup**: Removed all backward compatibility layers, no-op functions, and unused parameters from the TanStack Query migration. Reduced codebase by ~50-70 lines and eliminated console.log statements for production readiness.
 
 ### ⚠️ Known Issues (Deferred Post-MVP)
 - **TextInput in BentoBox**: Touch events are blocked inside the `FlipComponent`. A workaround is currently in place.

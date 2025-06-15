@@ -1,14 +1,11 @@
 import FlipComponent from '@components/FlipComponent';
 import WeatherForecastCard from '@components/WeatherForecastCard';
-import { useSettings } from '@contexts/SettingsContext';
 import { Ionicons } from '@expo/vector-icons';
 import { usePackingList } from '@hooks/usePackingList';
 import { useTrips } from '@hooks/useTrips';
 import { useWeatherDisplayArray } from '@hooks/useWeatherDisplayArray';
-import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme } from '@styles/theme';
 import { typography } from '@styles/typography';
-import { convertTemperature, getTemperatureSymbol } from '@utils/unitConversions';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
@@ -28,7 +25,6 @@ export default function PackingListModal() {
     refetch
   } = usePackingList(tripId as string);
   const { convertToDisplayArray } = useWeatherDisplayArray();
-  const { settings } = useSettings();
   const [isFlipped, setIsFlipped] = useState(false);
 
   const trip = tripId ? getTrip(tripId as string) : null;
@@ -54,16 +50,35 @@ export default function PackingListModal() {
 
   // Get weather display data
   const weatherDisplayArray = weatherForecast.length > 0 ? convertToDisplayArray(weatherForecast) : [];
-  const firstDayWeather = weatherDisplayArray[0];
-  const tempSymbol = getTemperatureSymbol(settings.temperatureUnit);
-  const currentTemp = firstDayWeather 
-    ? `${convertTemperature(firstDayWeather.feelsLikeTemp, settings.temperatureUnit)}${tempSymbol}`
-    : '--°';
 
   const renderPackingItem = ({ item }: { item: string }) => (
     <View style={styles.packingItem}>
       <Text style={styles.packingItemText}>{item}</Text>
     </View>
+  );
+
+  const renderPackingList = () => (
+    <FlatList
+      data={packingList}
+      renderItem={renderPackingItem}
+      keyExtractor={(item, index) => `${index}-${item}`}
+      contentContainerStyle={styles.listContentContainer}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading}
+          onRefresh={() => {
+            refetch();
+            if (trip) {
+              handleGeneratePackingList();
+            }
+          }}
+          tintColor={theme.colors.black}
+          title="Pull to regenerate"
+          titleColor={theme.colors.black}
+        />
+      }
+    />
   );
 
   const renderEmptyState = () => {
@@ -114,27 +129,18 @@ export default function PackingListModal() {
     }
 
     return (
-      <FlatList
-        data={packingList}
-        renderItem={renderPackingItem}
-        keyExtractor={(item, index) => `${index}-${item}`}
-        contentContainerStyle={styles.listContentContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={() => {
-              // Refetch data from cache and optionally regenerate
-              refetch();
-              if (trip) {
-                handleGeneratePackingList();
-              }
-            }}
-            tintColor={theme.colors.black}
-            title="Pull to regenerate"
-            titleColor={theme.colors.black}
+      <FlipComponent
+        isFlipped={isFlipped}
+        frontComponent={renderPackingList()}
+        backComponent={
+          <WeatherForecastCard
+            weatherDisplayArray={weatherDisplayArray}
+            loading={loading}
+            error={error}
+            location={trip?.location}
           />
         }
+        style={styles.flipContainer}
       />
     );
   };
@@ -147,23 +153,11 @@ export default function PackingListModal() {
             <Ionicons name="arrow-back" size={24} color={theme.colors.black} />
           </TouchableOpacity>
           <Text style={styles.title}>Packing List</Text>
-          {weatherForecast.length > 0 ? (
+          {trip && packingList.length > 0 ? (
             <TouchableOpacity style={styles.weatherButton} onPress={handleWeatherButtonPress}>
-              {loading ? (
-                <ActivityIndicator size="small" color={theme.colors.white} />
-              ) : (
-                <View style={styles.weatherButtonContent}>
-                  <Ionicons
-                    name={getIoniconForWeather(firstDayWeather?.icon)}
-                    size={20}
-                    color={theme.colors.white}
-                    style={styles.weatherIcon}
-                  />
-                  <Text style={styles.weatherButtonText}>
-                    {currentTemp}
-                  </Text>
-                </View>
-              )}
+              <Text style={styles.weatherButtonText}>
+                {isFlipped ? 'List' : 'Weather'}
+              </Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.spacer} />
@@ -171,27 +165,7 @@ export default function PackingListModal() {
         </View>
         
         <View style={styles.listContainer}>
-          {weatherForecast.length > 0 ? (
-            <FlipComponent
-              isFlipped={isFlipped}
-              frontComponent={
-                <View style={styles.flipContent}>
-                  {renderContent()}
-                </View>
-              }
-              backComponent={
-                <WeatherForecastCard
-                  weatherDisplayArray={weatherDisplayArray}
-                  loading={loading}
-                  error={error}
-                  location={trip?.location}
-                />
-              }
-              style={styles.flipContainer}
-            />
-          ) : (
-            renderContent()
-          )}
+          {renderContent()}
         </View>
       </View>
       <StatusBar style="auto" />
@@ -230,24 +204,17 @@ const styles = StyleSheet.create({
   weatherButton: {
     backgroundColor: theme.colors.black,
     borderRadius: theme.borderRadius.medium,
-    paddingHorizontal: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     minHeight: 40,
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: 80,
   },
-  weatherButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  weatherIcon: {
-    marginRight: theme.spacing.xs,
-  },
   weatherButtonText: {
-    ...typography.tempButton,
+    ...typography.body,
     fontSize: theme.fontSize.sm,
-    alignSelf: 'center',
+    fontWeight: '600',
+    color: theme.colors.white,
   },
   listContainer: {
     flex: 1,
@@ -255,9 +222,9 @@ const styles = StyleSheet.create({
   },
   flipContainer: {
     flex: 1,
-  },
-  flipContent: {
-    flex: 1,
+    minHeight: 400,
+    backgroundColor: 'transparent',
+    borderRadius: theme.borderRadius.large,
   },
   emptyContainer: {
     flex: 1,

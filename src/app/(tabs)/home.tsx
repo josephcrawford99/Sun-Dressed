@@ -208,14 +208,6 @@ export default function HomeScreen() {
           />
         </View>
         
-        {/* Debug: Cache Statistics
-        {__DEV__ && (
-          <View style={styles.debugStats}>
-            <Text style={styles.debugStatsText}>
-              Cache: {cacheStats.hits} hits, {cacheStats.misses} misses, {cacheStats.apiCalls} API calls
-            </Text>
-          </View>
-        )} */}
       </ScrollView>
     </SafeAreaView>
   );
