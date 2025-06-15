@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Trip } from '@/types/trip';
 import { TripStorageService } from '@/services/tripStorageService';
+import { Trip } from '@/types/trip';
+import { Weather } from '@/types/weather';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * Custom hook for managing trip state and operations
@@ -95,6 +96,7 @@ export const useTrips = () => {
    * Get a specific trip by ID
    */
   const getTrip = (tripId: string): Trip | null => {
+    console.log(`useTrips: getTrip called with id: ${tripId}`, 'Available trips:', trips);
     const trip = trips.find(t => t.id === tripId);
     return trip || null;
   };
@@ -130,6 +132,36 @@ export const useTrips = () => {
   };
 
   /**
+   * Update a trip's weather forecast
+   */
+  const updateTripWeatherForecast = async (tripId: string, weatherForecast: Weather[]) => {
+    try {
+      setError(null);
+      const trip = trips.find(t => t.id === tripId);
+      if (!trip) {
+        throw new Error('Trip not found');
+      }
+      
+      const updatedTrip: Trip = {
+        ...trip,
+        weatherForecast,
+        updatedAt: new Date(),
+      };
+      
+      await TripStorageService.updateTrip(updatedTrip);
+      setTrips(prevTrips =>
+        prevTrips.map(t =>
+          t.id === tripId ? updatedTrip : t
+        )
+      );
+    } catch (err) {
+      setError('Failed to update weather forecast');
+      console.error('Error updating weather forecast:', err);
+      throw err;
+    }
+  };
+
+  /**
    * Clear all trips
    */
   const clearAllTrips = async () => {
@@ -153,6 +185,7 @@ export const useTrips = () => {
     deleteTrip,
     getTrip,
     updateTripPackingList,
+    updateTripWeatherForecast,
     clearAllTrips,
     refreshTrips: loadTrips,
   };

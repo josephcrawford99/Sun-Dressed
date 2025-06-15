@@ -308,8 +308,8 @@ const styles = StyleSheet.create({
   flipContainer: {
     flex: 1,
     minHeight: 400,
+    backgroundColor: 'transparent',
     borderRadius: theme.borderRadius.large,
-
   },
   debugStats: {
     padding: theme.spacing.sm,

@@ -59,11 +59,13 @@ const FlipComponent: React.FC<FlipComponentProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'transparent',
   },
   card: {
     width: '100%',
     height: '100%',
     backfaceVisibility: 'hidden',
+    backgroundColor: 'transparent',
   },
   frontCard: {
     position: 'absolute',

@@ -4,9 +4,13 @@ import { generatePackingListLLM } from '@services/llmService';
 import { useCallback, useState } from 'react';
 import { useWeatherForecast } from './useWeatherForecast';
 
-export const usePackingList = (updateTripPackingList?: (tripId: string, packingList: string[]) => Promise<void>) => {
+export const usePackingList = (
+  updateTripPackingList?: (tripId: string, packingList: string[]) => Promise<void>,
+  updateTripWeatherForecast?: (tripId: string, weatherForecast: Weather[]) => Promise<void>
+) => {
   const { settings } = useSettings();
   const [packingList, setPackingList] = useState<string[]>([]);
+  const [weatherForecast, setWeatherForecast] = useState<Weather[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { fetchWeatherForecast } = useWeatherForecast();
@@ -34,22 +38,41 @@ export const usePackingList = (updateTripPackingList?: (tripId: string, packingL
       // Hook automatically includes user's style preference
       const newPackingList = await generatePackingListLLM(location, startDate, endDate, weatherArray, settings.stylePreference);
       setPackingList(newPackingList);
+      setWeatherForecast(weatherArray);
       
-      // Save to trip storage if tripId and update function are provided
-      if (tripId && updateTripPackingList) {
-        await updateTripPackingList(tripId, newPackingList);
-        console.log('🧳 Packing list saved to trip storage');
+      // Save to trip storage if tripId and update functions are provided
+      if (tripId) {
+        if (updateTripPackingList) {
+          await updateTripPackingList(tripId, newPackingList);
+          console.log('🧳 Packing list saved to trip storage');
+        }
+        if (updateTripWeatherForecast && weatherArray.length > 0) {
+          await updateTripWeatherForecast(tripId, weatherArray);
+          console.log('🌤️ Weather forecast saved to trip storage');
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate packing list');
     } finally {
       setLoading(false);
     }
-  }, [updateTripPackingList, fetchWeatherForecast, settings.stylePreference]);
+  }, [updateTripPackingList, updateTripWeatherForecast, fetchWeatherForecast, settings.stylePreference]);
 
   const setStoredPackingList = useCallback((storedList: string[]) => {
     setPackingList(storedList);
   }, []);
 
-  return { packingList, loading, error, generatePackingList, setStoredPackingList };
+  const setStoredWeatherForecast = useCallback((storedForecast: Weather[]) => {
+    setWeatherForecast(storedForecast);
+  }, []);
+
+  return { 
+    packingList, 
+    weatherForecast,
+    loading, 
+    error, 
+    generatePackingList, 
+    setStoredPackingList,
+    setStoredWeatherForecast
+  };
 };

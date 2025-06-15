@@ -6,6 +6,8 @@
  * Basic Trip interface for MVP trip creation
  * Used for simple trip creation with location and date range
  */
+import { Weather } from './weather';
+
 export interface Trip {
   id: string;
   location: string;
@@ -14,4 +16,5 @@ export interface Trip {
   createdAt: Date;
   updatedAt: Date;
   packingList?: string[];
+  weatherForecast?: Weather[];
 }

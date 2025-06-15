@@ -96,6 +96,9 @@ const BentoBox: React.FC<BentoBoxProps> = ({
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.large,
+    padding: theme.spacing.lg,
   },
   container: {
     flexDirection: 'row',
