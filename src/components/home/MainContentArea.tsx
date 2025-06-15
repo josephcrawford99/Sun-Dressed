@@ -1,8 +1,9 @@
 import React from 'react';
-import { ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import { ScrollView, RefreshControl, StyleSheet, View } from 'react-native';
 import BentoBox from '@components/BentoBox';
 import FlipComponent from '@components/FlipComponent';
 import WeatherCard from '@components/WeatherCard';
+import { FeedbackSection } from '@components/home/FeedbackSection';
 import { theme } from '@styles';
 import { DateOffset } from '@components/CalendarBar';
 import { Outfit } from '@/types/Outfit';
@@ -48,29 +49,35 @@ export const MainContentArea: React.FC<MainContentAreaProps> = ({
         ) : undefined
       }
     >
-      <FlipComponent
-        isFlipped={isFlipped}
-        frontComponent={
-          <BentoBox 
-            outfit={outfit}
-            loading={outfitLoading}
-            error={outfitError}
-            showNoOutfit={!outfitLoading && !outfit}
-            noOutfitDate={
-              new Date(new Date().setDate(new Date().getDate() + currentDateOffset))
-                .toISOString().split('T')[0]
-            }
-          />
-        }
-        backComponent={
-          <WeatherCard 
-            weatherDisplay={weatherDisplay || undefined}
-            loading={isWeatherLoading}
-            error={weatherError}
-          />
-        }
-        style={styles.flipContainer}
-      />
+      <View>
+        <FlipComponent
+          isFlipped={isFlipped}
+          frontComponent={
+            <BentoBox 
+              outfit={outfit}
+              loading={outfitLoading}
+              error={outfitError}
+              showNoOutfit={!outfitLoading && !outfit}
+              noOutfitDate={
+                new Date(new Date().setDate(new Date().getDate() + currentDateOffset))
+                  .toISOString().split('T')[0]
+              }
+            />
+          }
+          backComponent={
+            <WeatherCard 
+              weatherDisplay={weatherDisplay || undefined}
+              loading={isWeatherLoading}
+              error={weatherError}
+            />
+          }
+          style={styles.flipContainer}
+        />
+        
+        <FeedbackSection 
+          isVisible={!isFlipped && !outfitLoading && !!outfit && !outfitError}
+        />
+      </View>
     </ScrollView>
   );
 };

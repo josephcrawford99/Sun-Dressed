@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Outfit } from '../types/Outfit';
+import { Outfit, OutfitFeedback } from '../types/Outfit';
 import { Weather } from '../types/weather';
 
 const OUTFITS_WITH_WEATHER_STORAGE_KEY = 'user_outfits_with_weather';
@@ -18,6 +18,7 @@ export interface StoredOutfitWithWeather {
   };
   activity: string;
   createdAt: Date;
+  feedback?: OutfitFeedback;
 }
 
 /**
@@ -136,6 +137,25 @@ export class OutfitStorageService {
    */
   static async getAllOutfits(): Promise<{ [dateKey:string]: StoredOutfitWithWeather }> {
     return this.getAllStoredWeatherOutfits();
+  }
+
+  /**
+   * Save feedback for an outfit on a specific date
+   */
+  static async saveFeedbackForDate(date: Date, feedback: OutfitFeedback): Promise<void> {
+    try {
+      const dateKey = this.getDateKey(date);
+      const allOutfits = await this.getAllStoredWeatherOutfits();
+      
+      if (!allOutfits[dateKey]) {
+        throw new Error('No outfit found for this date');
+      }
+      
+      allOutfits[dateKey].feedback = feedback;
+      await this.saveAllWeatherOutfits(allOutfits);
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**

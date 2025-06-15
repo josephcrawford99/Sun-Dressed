@@ -3,6 +3,7 @@ import { Outfit } from '@/types/Outfit';
 import { Weather } from '@/types/weather';
 import { OutfitManager } from '@/services/outfit/OutfitManager';
 import { DateOffset } from '@/components/CalendarBar';
+import { StoredOutfitWithWeather } from '@/services/outfitStorageService';
 
 interface OutfitContextValue {
   // State
@@ -11,6 +12,7 @@ interface OutfitContextValue {
   error: string | null;
   currentDateOffset: DateOffset;
   currentActivity: string;
+  storedOutfit: StoredOutfitWithWeather | null;
   
   // Actions
   loadOutfitForDate: (dateOffset: DateOffset, weather: Weather | null, activity: string, location?: string) => Promise<void>;
@@ -18,6 +20,7 @@ interface OutfitContextValue {
   setDateOffset: (offset: DateOffset) => void;
   setActivity: (activity: string) => void;
   clearError: () => void;
+  getCurrentDate: () => Date;
   
   // Cache info
   cacheStats: {
@@ -48,6 +51,7 @@ export const OutfitProvider: React.FC<OutfitProviderProps> = ({ children }) => {
   const [currentDateOffset, setCurrentDateOffset] = useState<DateOffset>(0);
   const [currentActivity, setCurrentActivity] = useState('daily activities');
   const [cacheStats, setCacheStats] = useState({ hits: 0, misses: 0, apiCalls: 0 });
+  const [storedOutfit, setStoredOutfit] = useState<StoredOutfitWithWeather | null>(null);
   
   const outfitManagerRef = useRef<OutfitManager>();
   
@@ -88,10 +92,16 @@ export const OutfitProvider: React.FC<OutfitProviderProps> = ({ children }) => {
       setOutfit(result.outfit);
       setCacheStats(result.stats);
       
+      // Also load the stored outfit data (including feedback)
+      const { OutfitStorageService } = await import('@/services/outfitStorageService');
+      const storedData = await OutfitStorageService.getOutfitByDate(targetDate);
+      setStoredOutfit(storedData);
+      
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load outfit';
       setError(errorMessage);
       setOutfit(null);
+      setStoredOutfit(null);
       // Error loading outfit
     } finally {
       setLoading(false);
@@ -123,6 +133,9 @@ export const OutfitProvider: React.FC<OutfitProviderProps> = ({ children }) => {
       setOutfit(result.outfit);
       setCacheStats(result.stats);
       
+      // Clear stored outfit to remove any existing feedback
+      setStoredOutfit(null);
+      
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to regenerate outfit';
       setError(errorMessage);
@@ -144,17 +157,25 @@ export const OutfitProvider: React.FC<OutfitProviderProps> = ({ children }) => {
     setError(null);
   }, []);
   
+  const getCurrentDate = useCallback(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + currentDateOffset);
+    return date;
+  }, [currentDateOffset]);
+  
   const contextValue: OutfitContextValue = {
     outfit,
     loading,
     error,
     currentDateOffset,
     currentActivity,
+    storedOutfit,
     loadOutfitForDate,
     regenerateOutfit,
     setDateOffset,
     setActivity,
     clearError,
+    getCurrentDate,
     cacheStats
   };
   

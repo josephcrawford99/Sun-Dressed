@@ -10,11 +10,15 @@ import { LocationWeatherBar } from '@components/home/LocationWeatherBar';
 import { ActivityInputSection } from '@components/home/ActivityInputSection';
 import { MainContentArea } from '@components/home/MainContentArea';
 import { theme } from '@styles';
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useShouldShowDailyFeedback, useSaveDailyFeedbackMutation } from '@/hooks/queries/useDailyFeedbackQuery';
+import { DailyFeedbackModal } from '@/components/DailyFeedbackModal';
+import { OutfitFeedback } from '@/types/Outfit';
 
 
 export default function HomeScreen() {
@@ -32,6 +36,11 @@ export default function HomeScreen() {
     setDateOffset,
     setActivity
   } = useOutfit();
+  
+  // Daily feedback modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const { data: feedbackData, refetch: refetchShouldShow } = useShouldShowDailyFeedback();
+  const saveFeedback = useSaveDailyFeedbackMutation();
 
   // Initialize home screen state and handle initialization
   const { isFlipped, isInitialized, toggleFlipped } = useHomeScreenState({
@@ -43,6 +52,22 @@ export default function HomeScreen() {
   const { activityInput, setActivityInput } = useActivityInput({
     onActivityChange: setActivity
   });
+  
+  // Check if we should show daily feedback modal on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      if (feedbackData?.shouldShow) {
+        setModalVisible(true);
+      }
+    }, [feedbackData])
+  );
+  
+  // Handle feedback submission
+  const handleFeedbackSubmit = useCallback(async (feedback: Partial<OutfitFeedback>) => {
+    await saveFeedback.mutateAsync(feedback);
+    setModalVisible(false);
+    refetchShouldShow(); // Ensure state is updated
+  }, [saveFeedback, refetchShouldShow]);
 
 
   // Load outfit when conditions change
@@ -113,6 +138,14 @@ export default function HomeScreen() {
         weatherError={error}
         currentDateOffset={currentDateOffset}
         onRefresh={handleOutfitRefresh}
+      />
+      
+      <DailyFeedbackModal
+        visible={modalVisible && feedbackData?.shouldShow}
+        outfit={feedbackData?.outfit || null}
+        date={feedbackData?.date || ''}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleFeedbackSubmit}
       />
     </SafeAreaView>
   );

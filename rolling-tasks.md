@@ -36,6 +36,7 @@ This file tracks development priorities for MVP completion and serves as a high-
 - **TanStack Query Migration**: Successfully migrated trips and packing list storage from custom AsyncStorage hooks to TanStack Query for better caching and state management.
 - **Trip Card Interactions**: Fixed 3-dot menu functionality that broke during TanStack Query migration. Issue was caused by useCallback re-render loops - resolved by memoizing all functions in useTrips hook.
 - **Legacy Code Cleanup**: Removed all backward compatibility layers, no-op functions, and unused parameters from the TanStack Query migration. Reduced codebase by ~50-70 lines and eliminated console.log statements for production readiness.
+- **Daily Outfit Feedback (MVP)**: Initial implementation of daily feedback modal system with 1-10 rating slider and LLM integration. *Commit: 1aec603*
 
 ### ⚠️ Known Issues (Deferred Post-MVP)
 - **TextInput in BentoBox**: Touch events are blocked inside the `FlipComponent`. A workaround is currently in place.
@@ -47,7 +48,30 @@ This file tracks development priorities for MVP completion and serves as a high-
 - Interactive BentoBox component state machine.
 - Weather estimation for trips longer than 8 days.
 - A unified geocoding service to replace Google Places autocomplete.
+- **Daily Feedback UX Improvements**: Enhanced feedback system with better styling, state management, and structured selectors.
 
 ---
+
+## Future Daily Feedback Improvements (Post-MVP)
+
+### UX & Design Issues
+1. **Yesterday-Only Scope**: Restrict feedback to previous day only, no future dates
+2. **App Style Consistency**: Match existing design system colors, typography, and spacing
+3. **Modal Design**: Implement proper rounded-top modal with backdrop (like packing list modal)
+4. **Scroll Issue**: Fix infinite scroll/empty space below feedback form
+
+### State Management Issues  
+5. **Feedback Persistence**: Clarify when feedback is stored and ensure it persists with outfit data
+6. **State Confusion**: Fix rating state persistence when switching between good/bad ratings
+7. **Form Validation**: Ensure single submission and proper state clearing
+
+### Feature Enhancements
+8. **Structured Feedback**: Replace free-text with predefined selectors (too warm/cold, too formal/casual, etc.)
+9. **Better Integration**: Seamless integration with existing outfit storage patterns
+
+### Technical Debt
+- **Rollback Point**: Commit `1aec603` contains working MVP implementation
+- **Dependencies**: Added `@react-native-community/slider` package
+- **Architecture**: Built on TanStack Query with backward compatibility for existing feedback system
 
 *This document has been condensed to focus on actionable tasks. The previous version's detailed, chronological log of completed work has been removed for clarity.*
