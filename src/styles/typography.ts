@@ -32,7 +32,7 @@ export const typography: { [key: string]: TextStyle } = {
     fontFamily: fonts.primaryItalic,
     fontStyle: 'italic',
     fontWeight: '600',
-    letterSpacing: -1.25,
+    letterSpacing: -1,
     fontSize: 28,
     color: theme.colors.black,
   },

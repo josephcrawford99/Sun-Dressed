@@ -1,17 +1,17 @@
+import { TextInput } from '@/components/ui/TextInput';
+import { useOutfit } from '@/contexts/OutfitContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import BentoBox from '@components/BentoBox';
 import CalendarBar, { DateOffset } from '@components/CalendarBar';
 import FlipComponent from '@components/FlipComponent';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import WeatherCard from '@components/WeatherCard';
-import { TextInput } from '@/components/ui/TextInput';
 import { Ionicons } from '@expo/vector-icons';
 import { useLastLocation } from '@hooks/useLastLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
-import { useOutfit } from '@/contexts/OutfitContext';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
@@ -163,22 +163,7 @@ export default function HomeScreen() {
         selectedDateOffset={currentDateOffset}
         onDateSelect={handleDateSelect}
       />
-
-      <ScrollView
-        style={styles.mainScrollView}
-        contentContainerStyle={styles.mainScrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={outfitLoading}
-            onRefresh={handleOutfitRefresh}
-            tintColor={theme.colors.black}
-            title="Pull to regenerate"
-            titleColor={theme.colors.black}
-          />
-        }
-      >
-        <View style={styles.activityContainer}>
+      <View style={styles.activityContainer}>
           <TextInput
             placeholder="Activity"
             size="medium"
@@ -194,6 +179,22 @@ export default function HomeScreen() {
             blurOnSubmit={true}
           />
         </View>
+
+      <ScrollView
+        style={styles.mainScrollView}
+        contentContainerStyle={styles.mainScrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={outfitLoading}
+            onRefresh={handleOutfitRefresh}
+            tintColor={theme.colors.black}
+            title="Pull to regenerate"
+            titleColor={theme.colors.black}
+          />
+        }
+      >
+        
 
         <View style={styles.contentContainer}>
           <FlipComponent
@@ -221,14 +222,14 @@ export default function HomeScreen() {
           />
         </View>
         
-        {/* Debug: Cache Statistics */}
+        {/* Debug: Cache Statistics
         {__DEV__ && (
           <View style={styles.debugStats}>
             <Text style={styles.debugStatsText}>
               Cache: {cacheStats.hits} hits, {cacheStats.misses} misses, {cacheStats.apiCalls} API calls
             </Text>
           </View>
-        )}
+        )} */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -287,10 +288,13 @@ const styles = StyleSheet.create({
   },
   mainScrollContent: {
     flexGrow: 1,
+    paddingBottom: 100, // Account for tab bar height + safe area
   },
   activityContainer: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
+    display: 'flex',
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.none,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.lightGray,
     backgroundColor: theme.colors.white,
@@ -298,15 +302,14 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     marginHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.lg,
+    marginTop: theme.spacing.md,
     minHeight: 450,
   },
   flipContainer: {
     flex: 1,
     minHeight: 400,
-    backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.large,
-    padding: theme.spacing.lg,
+
   },
   debugStats: {
     padding: theme.spacing.sm,
