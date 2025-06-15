@@ -35,7 +35,7 @@ export function HelloWave() {
 const styles = StyleSheet.create({
   text: {
     fontSize: theme.fontSize.xxl,
-    lineHeight: theme.fontSize.xxl + 4,
-    marginTop: -theme.spacing.xs / 2,
+    lineHeight: theme.fontSize.xxxl,
+    marginTop: -theme.spacing.xs,
   },
 });

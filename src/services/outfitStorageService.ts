@@ -16,6 +16,7 @@ export interface StoredOutfitWithWeather {
     condition: string;
     location: string;
   };
+  activity: string;
   createdAt: Date;
 }
 
@@ -72,7 +73,8 @@ export class OutfitStorageService {
   static async saveOutfit(
     outfit: Outfit, 
     weather: Weather, 
-    date: Date = new Date()
+    date: Date = new Date(),
+    activity: string = 'daily activities'
   ): Promise<void> {
     try {
       const dateKey = this.getDateKey(date);
@@ -85,6 +87,7 @@ export class OutfitStorageService {
           condition: weather.condition,
           location: weather.location || 'Unknown Location'
         },
+        activity,
         createdAt: new Date()
       };
       

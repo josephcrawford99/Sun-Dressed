@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white
   },
   logoRow: {
-    paddingVertical: 25,
-    paddingLeft: 25,
+    paddingVertical: theme.spacing.lg,
+    paddingLeft: theme.spacing.lg,
     maxWidth: '90%'
   },
   formContainer: {

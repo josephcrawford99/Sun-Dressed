@@ -56,7 +56,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
             >
               <Ionicons 
                 name={item.icon} 
-                size={16} 
+                size={theme.fontSize.sm} 
                 color={item.color || theme.colors.black} 
               />
               <Text style={[styles.dropdownText, { color: item.color || theme.colors.black }]}>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.medium,
     ...theme.shadows.large,
-    minWidth: 120,
+    minWidth: theme.spacing.xl * 4,
     borderWidth: 1,
     borderColor: theme.colors.lightGray,
   },

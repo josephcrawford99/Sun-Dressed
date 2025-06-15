@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SettingsProvider } from '@/contexts/SettingsContext';
+import { OutfitProvider } from '@/contexts/OutfitContext';
 
 import {
   LibreBaskerville_400Regular,
@@ -53,30 +54,32 @@ export default function RootLayout() {
 
   return (
     <SettingsProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <SafeAreaProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen 
-              name="create-trip" 
-              options={{ 
-                presentation: 'modal',
-                headerShown: false
-              }} 
-            />
-            <Stack.Screen 
-              name="edit-trip" 
-              options={{ 
-                presentation: 'modal',
-                headerShown: false
-              }} 
-            />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </SafeAreaProvider>
-      </ThemeProvider>
+      <OutfitProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <SafeAreaProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen 
+                name="create-trip" 
+                options={{ 
+                  presentation: 'modal',
+                  headerShown: false
+                }} 
+              />
+              <Stack.Screen 
+                name="edit-trip" 
+                options={{ 
+                  presentation: 'modal',
+                  headerShown: false
+                }} 
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </OutfitProvider>
     </SettingsProvider>
   );
 }

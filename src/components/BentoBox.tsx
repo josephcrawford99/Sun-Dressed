@@ -1,12 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { theme } from '../styles';
-import { Weather } from '../types/weather';
 import { Outfit } from '../types/Outfit';
 
 interface BentoBoxProps {
-  weather?: Weather;
-  activity?: string;
   outfit?: Outfit | null;
   loading?: boolean;
   error?: string | null;
@@ -15,8 +12,6 @@ interface BentoBoxProps {
 }
 
 const BentoBox: React.FC<BentoBoxProps> = ({ 
-  weather, 
-  activity = 'daily activities',
   outfit,
   loading = false,
   error = null,
@@ -133,7 +128,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: theme.colors.black,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   labelText: {
     fontSize: theme.fontSize.xxs,
@@ -145,7 +140,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     color: theme.colors.error,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   noOutfitContainer: {
     flex: 1,

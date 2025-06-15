@@ -3,13 +3,33 @@ import { Outfit } from '../types/Outfit';
 import { Weather } from '../types/weather';
 import { StylePreference } from '../types/settings';
 import { geminiRateLimiter } from './rateLimiter';
+import { APIOptimizer } from './utils/APIOptimizer';
+
+// Initialize API optimizer
+const apiOptimizer = new APIOptimizer();
+
+// Simple in-memory cache for recent prompts
+const promptCache = new Map<string, { outfit: Outfit; timestamp: number }>();
+const CACHE_DURATION = 300000; // 5 minutes
 
 export const generateOutfitLLM = async (weather?: Weather, activity?: string, stylePreference?: StylePreference): Promise<Outfit> => {
   console.log('🔄 Starting outfit generation...');
   console.log('📊 Input params:', { weather, activity, stylePreference });
   
-  await geminiRateLimiter.checkRateLimit();
-  console.log('✅ Rate limit check passed');
+  // Generate cache key from inputs
+  const cacheKey = generateCacheKey(weather, activity, stylePreference);
+  
+  // Check prompt cache first
+  const cached = promptCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+    console.log('📦 Returning cached outfit for identical prompt');
+    return cached.outfit;
+  }
+  
+  // Use API optimizer to coalesce concurrent identical requests
+  return apiOptimizer.coalesceRequest(cacheKey, async () => {
+    await geminiRateLimiter.checkRateLimit();
+    console.log('✅ Rate limit check passed');
   
   const weatherDescription = weather 
     ? `${weather.condition} weather with high of ${weather.dailyHighTemp}°F, low of ${weather.dailyLowTemp}°F, feels like ${weather.feelsLikeTemp}°F, ${weather.highestChanceOfRain}% chance of rain, wind at ${weather.windiness}mph, ${weather.sunniness}% sunny`
@@ -57,6 +77,13 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
     try {
       const parsedOutfit = JSON.parse(cleanedText);
       console.log('👕 Parsed outfit:', parsedOutfit);
+      
+      // Cache the result
+      promptCache.set(cacheKey, { outfit: parsedOutfit, timestamp: Date.now() });
+      
+      // Clean old cache entries
+      cleanPromptCache();
+      
       return parsedOutfit;
     } catch (parseError) {
       console.error('❌ JSON parsing failed:', parseError);
@@ -72,7 +99,33 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
     }
     throw error;
   }
+  });
 };
+
+/**
+ * Generate consistent cache key from inputs
+ */
+function generateCacheKey(weather?: Weather, activity?: string, stylePreference?: StylePreference): string {
+  const weatherKey = weather 
+    ? `${Math.round(weather.feelsLikeTemp)}_${weather.condition}_${weather.highestChanceOfRain}_${weather.windiness}`
+    : 'no-weather';
+  const activityKey = (activity || 'daily-activities').toLowerCase().replace(/\s+/g, '-');
+  const styleKey = stylePreference || 'neutral';
+  
+  return `outfit_${weatherKey}_${activityKey}_${styleKey}`;
+}
+
+/**
+ * Clean old entries from prompt cache
+ */
+function cleanPromptCache(): void {
+  const now = Date.now();
+  for (const [key, value] of promptCache.entries()) {
+    if (now - value.timestamp > CACHE_DURATION) {
+      promptCache.delete(key);
+    }
+  }
+}
 
 export const generatePackingListLLM = async (
   location: string, 

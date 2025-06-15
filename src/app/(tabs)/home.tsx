@@ -4,15 +4,17 @@ import CalendarBar, { DateOffset } from '@components/CalendarBar';
 import FlipComponent from '@components/FlipComponent';
 import LocationAutocomplete from '@components/LocationAutocomplete';
 import WeatherCard from '@components/WeatherCard';
+import { TextInput } from '@/components/ui/TextInput';
 import { Ionicons } from '@expo/vector-icons';
 import { useLastLocation } from '@hooks/useLastLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
-import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
+import { useOutfit } from '@/contexts/OutfitContext';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   ActivityIndicator,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -31,47 +33,85 @@ const getTimeBasedGreeting = (): string => {
 export default function HomeScreen() {
   const { settings } = useSettings();
   const { lastLocation, saveLastLocation } = useLastLocation();
-  const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
   const { weather, weatherDisplay, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
+  const { 
+    outfit, 
+    loading: outfitLoading, 
+    error: outfitError, 
+    currentDateOffset,
+    currentActivity,
+    loadOutfitForDate,
+    regenerateOutfit: regenerateOutfitContext,
+    setDateOffset,
+    setActivity,
+    cacheStats
+  } = useOutfit();
 
   const [isFlipped, setIsFlipped] = useState(false);
-  const [selectedDateOffset, setSelectedDateOffset] = useState<DateOffset>(0); // Default to today
+  const [activityInput, setActivityInput] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
+  const activityDebounceRef = useRef<NodeJS.Timeout>();
 
   // Fetch weather for the saved location on mount
   useEffect(() => {
-    if (lastLocation) {
+    if (lastLocation && !isInitialized) {
       console.log('🌍 Initial weather fetch for saved location:', lastLocation);
       fetchWeatherByLocationString(lastLocation);
+      setIsInitialized(true);
     }
-  }, [lastLocation]);
+  }, [lastLocation, isInitialized, fetchWeatherByLocationString]);
 
-
-  // Handle outfit loading based on selected date
+  // Debounce activity input and update context
   useEffect(() => {
-    console.log('👕 Calendar/weather effect triggered - offset:', selectedDateOffset, 'hasWeather:', !!weather);
-    
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + selectedDateOffset);
-    
-    let activity = 'daily activities';
-    if (selectedDateOffset === 1) {
-      activity = 'daily activities (tomorrow)';
-    } else if (selectedDateOffset === -1) {
-      activity = "yesterday's activities";
+    if (activityDebounceRef.current) {
+      clearTimeout(activityDebounceRef.current);
     }
 
-    // For today/tomorrow, we need weather. For yesterday, we don't.
-    if (selectedDateOffset === -1) {
-      // For yesterday, weather is not required to load from storage
-      generateOutfit(targetDate, undefined, activity);
-    } else if (weather && lastLocation) {
-      // For today or tomorrow, generate live outfit only if we have weather
-      generateOutfit(targetDate, weather, activity, lastLocation);
+    activityDebounceRef.current = setTimeout(() => {
+      const activity = activityInput || 'daily activities';
+      setActivity(activity);
+    }, 800); // 800ms delay
+
+    return () => {
+      if (activityDebounceRef.current) {
+        clearTimeout(activityDebounceRef.current);
+      }
+    };
+  }, [activityInput, setActivity]);
+
+  // Load outfit when conditions change
+  useEffect(() => {
+    // Skip if we're still loading initial weather
+    if (!isInitialized || isLoading) {
+      return;
     }
-  }, [selectedDateOffset, weather, generateOutfit, lastLocation]);
+    
+    console.log('👔 Loading outfit for current context:', {
+      dateOffset: currentDateOffset,
+      hasWeather: !!weather,
+      location: lastLocation,
+      activity: currentActivity
+    });
+    
+    loadOutfitForDate(currentDateOffset, weather, currentActivity, lastLocation);
+  }, [currentDateOffset, weather, currentActivity, lastLocation, isInitialized, isLoading, loadOutfitForDate]);
 
   const handleWeatherButtonPress = () => {
     setIsFlipped(!isFlipped);
+  };
+
+  const handleOutfitRefresh = async () => {
+    if (!weather || !lastLocation) {
+      console.log('⚠️ Cannot regenerate outfit - missing weather or location');
+      return;
+    }
+    
+    console.log('🔄 Manual outfit regeneration via swipe down');
+    await regenerateOutfitContext(weather, currentActivity, lastLocation);
+  };
+
+  const handleDateSelect = (offset: DateOffset) => {
+    setDateOffset(offset);
   };
 
   // Get current temperature from weatherDisplay (already in user's preferred unit)
@@ -120,43 +160,75 @@ export default function HomeScreen() {
       </View>
 
       <CalendarBar
-        selectedDateOffset={selectedDateOffset}
-        onDateSelect={setSelectedDateOffset}
+        selectedDateOffset={currentDateOffset}
+        onDateSelect={handleDateSelect}
       />
 
       <ScrollView
-        style={styles.mainContainer}
-        contentContainerStyle={styles.scrollContent}
+        style={styles.mainScrollView}
+        contentContainerStyle={styles.mainScrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={outfitLoading}
+            onRefresh={handleOutfitRefresh}
+            tintColor={theme.colors.black}
+            title="Pull to regenerate"
+            titleColor={theme.colors.black}
+          />
+        }
       >
-        <FlipComponent
-          isFlipped={isFlipped}
-          frontComponent={
-            <BentoBox 
-              weather={weather || undefined}
-              activity={
-                selectedDateOffset === -1 ? "yesterday's outfit" :
-                selectedDateOffset === 1 ? "tomorrow's outfit" : "today's outfit"
-              }
-              outfit={outfit}
-              loading={outfitLoading}
-              error={outfitError}
-              showNoOutfit={!outfitLoading && !outfit}
-              noOutfitDate={
-                new Date(new Date().setDate(new Date().getDate() + selectedDateOffset))
-                  .toISOString().split('T')[0]
-              }
-            />
-          }
-          backComponent={
-            <WeatherCard 
-              weatherDisplay={weatherDisplay || undefined}
-              loading={isLoading}
-              error={error}
-            />
-          }
-          style={styles.flipContainer}
-        />
+        <View style={styles.activityContainer}>
+          <TextInput
+            placeholder="Activity"
+            size="medium"
+            value={activityInput}
+            onChangeText={(text) => {
+              console.log('Activity text changed:', text);
+              setActivityInput(text);
+            }}
+            onFocus={() => console.log('Activity input focused')}
+            onBlur={() => console.log('Activity input blurred')}
+            editable={true}
+            returnKeyType="done"
+            blurOnSubmit={true}
+          />
+        </View>
+
+        <View style={styles.contentContainer}>
+          <FlipComponent
+            isFlipped={isFlipped}
+            frontComponent={
+              <BentoBox 
+                outfit={outfit}
+                loading={outfitLoading}
+                error={outfitError}
+                showNoOutfit={!outfitLoading && !outfit}
+                noOutfitDate={
+                  new Date(new Date().setDate(new Date().getDate() + currentDateOffset))
+                    .toISOString().split('T')[0]
+                }
+              />
+            }
+            backComponent={
+              <WeatherCard 
+                weatherDisplay={weatherDisplay || undefined}
+                loading={isLoading}
+                error={error}
+              />
+            }
+            style={styles.flipContainer}
+          />
+        </View>
+        
+        {/* Debug: Cache Statistics */}
+        {__DEV__ && (
+          <View style={styles.debugStats}>
+            <Text style={styles.debugStatsText}>
+              Cache: {cacheStats.hits} hits, {cacheStats.misses} misses, {cacheStats.apiCalls} API calls
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -210,32 +282,41 @@ const styles = StyleSheet.create({
     ...typography.tempButton,
     alignSelf: 'center',
   },
-  mainContainer: {
+  mainScrollView: {
+    flex: 1,
+  },
+  mainScrollContent: {
+    flexGrow: 1,
+  },
+  activityContainer: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.lightGray,
+    backgroundColor: theme.colors.white,
+  },
+  contentContainer: {
     flex: 1,
     marginHorizontal: theme.spacing.md,
-    backgroundColor: theme.colors.white,
-    borderRadius: theme.borderRadius.large,
-  },
-  scrollContent: {
-    padding: theme.spacing.lg,
-    minHeight: 400,
+    marginTop: theme.spacing.lg,
+    minHeight: 450,
   },
   flipContainer: {
-    minHeight: 400,
-  },
-  contentPlaceholder: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    minHeight: 400,
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.large,
+    padding: theme.spacing.lg,
   },
-  debugContainer: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.sm,
+  debugStats: {
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.borderRadius.small,
+    marginTop: theme.spacing.sm,
   },
-  debugText: {
-    ...typography.body,
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.black,
+  debugStatsText: {
+    fontSize: theme.fontSize.xs,
+    color: theme.colors.gray,
     textAlign: 'center',
   },
 });

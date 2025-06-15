@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   spacer: {
-    width: 40, // Same width as back button for centering
+    width: theme.spacing.xl + theme.spacing.sm, // Same width as back button for centering
   },
   listContainer: {
     flex: 1,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.black,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: 8,
+    borderRadius: theme.borderRadius.medium,
     alignItems: 'center',
     minHeight: 48,
     justifyContent: 'center',
