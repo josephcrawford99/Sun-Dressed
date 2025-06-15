@@ -4,6 +4,7 @@ import { theme } from './theme';
 export const fonts = {
   primary: 'LibreBaskerville_400Regular',
   primaryItalic: 'LibreBaskerville_400Regular_Italic',
+  primaryDisplay: 'LibreBaskerville_700Bold_Italic',
   primaryBold: 'LibreBaskerville_700Bold',
   secondary: 'Montserrat_400Regular',
   secondaryMedium: 'Montserrat_500Medium',
@@ -31,9 +32,9 @@ export const typography: { [key: string]: TextStyle } = {
   headingItalic: {
     fontFamily: fonts.primaryItalic,
     fontStyle: 'italic',
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: -1,
-    fontSize: 28,
+    fontSize: theme.fontSize.display,
     color: theme.colors.black,
   },
   subheading: {

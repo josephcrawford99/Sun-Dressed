@@ -149,6 +149,7 @@ export default function EditTripModal() {
                 setLocation(locationString);
               }}
               placeholder="Enter destination"
+              showLocationPin={false}
             />
           </View>
 

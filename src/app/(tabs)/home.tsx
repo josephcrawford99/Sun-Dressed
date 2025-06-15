@@ -92,6 +92,11 @@ export default function HomeScreen() {
   };
 
   const handleOutfitRefresh = async () => {
+    // Don't allow refresh for past dates (including yesterday)
+    if (currentDateOffset < 0) {
+      return;
+    }
+    
     if (!weather || !lastLocation) {
       return;
     }
@@ -171,43 +176,40 @@ export default function HomeScreen() {
         contentContainerStyle={styles.mainScrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl
-            refreshing={outfitLoading}
-            onRefresh={handleOutfitRefresh}
-            tintColor={theme.colors.black}
-            title="Pull to regenerate"
-            titleColor={theme.colors.black}
-          />
+          currentDateOffset >= 0 ? (
+            <RefreshControl
+              refreshing={outfitLoading}
+              onRefresh={handleOutfitRefresh}
+              tintColor={theme.colors.black}
+              title="Pull to regenerate"
+              titleColor={theme.colors.black}
+            />
+          ) : undefined
         }
       >
-        
-
-        <View style={styles.contentContainer}>
-          <FlipComponent
-            isFlipped={isFlipped}
-            frontComponent={
-              <BentoBox 
-                outfit={outfit}
-                loading={outfitLoading}
-                error={outfitError}
-                showNoOutfit={!outfitLoading && !outfit}
-                noOutfitDate={
-                  new Date(new Date().setDate(new Date().getDate() + currentDateOffset))
-                    .toISOString().split('T')[0]
-                }
-              />
-            }
-            backComponent={
-              <WeatherCard 
-                weatherDisplay={weatherDisplay || undefined}
-                loading={isLoading}
-                error={error}
-              />
-            }
-            style={styles.flipContainer}
-          />
-        </View>
-        
+        <FlipComponent
+          isFlipped={isFlipped}
+          frontComponent={
+            <BentoBox 
+              outfit={outfit}
+              loading={outfitLoading}
+              error={outfitError}
+              showNoOutfit={!outfitLoading && !outfit}
+              noOutfitDate={
+                new Date(new Date().setDate(new Date().getDate() + currentDateOffset))
+                  .toISOString().split('T')[0]
+              }
+            />
+          }
+          backComponent={
+            <WeatherCard 
+              weatherDisplay={weatherDisplay || undefined}
+              loading={isLoading}
+              error={error}
+            />
+          }
+          style={styles.flipContainer}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
   },
   greetingRow: {
     marginHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.md,
     paddingLeft: theme.spacing.xs,
   },
@@ -266,6 +268,9 @@ const styles = StyleSheet.create({
   },
   mainScrollContent: {
     flexGrow: 1,
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    minHeight: 450,
     paddingBottom: 100, // Account for tab bar height + safe area
   },
   activityContainer: {
@@ -276,12 +281,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.lightGray,
     backgroundColor: theme.colors.white,
-  },
-  contentContainer: {
-    flex: 1,
-    marginHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.md,
-    minHeight: 450,
   },
   flipContainer: {
     flex: 1,

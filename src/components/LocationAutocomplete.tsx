@@ -11,13 +11,15 @@ interface LocationAutocompleteProps {
   onLocationSelect: (locationString: string, coordinates?: { lat: number; lon: number }) => void;
   onTextChange?: (text: string) => void;
   placeholder?: string;
+  showLocationPin?: boolean;
 }
 
 const LocationAutocomplete = React.memo(function LocationAutocomplete({
   initialValue,
   onLocationSelect,
   onTextChange,
-  placeholder = "Enter location"
+  placeholder = "Enter location",
+  showLocationPin = true
 }: LocationAutocompleteProps) {
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
   const ref = useRef<any>(null);
@@ -144,24 +146,26 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
         // No results found - silent handling
       }}
     />
-      <TouchableOpacity 
-        style={[
-          styles.locationButton,
-          (hasPermission === false || isReverseGeocoding) && styles.locationButtonDisabled
-        ]}
-        onPress={handleDeviceLocationPress}
-        disabled={hasPermission === false || isReverseGeocoding}
-      >
-        {isReverseGeocoding ? (
-          <ActivityIndicator size="small" color={theme.colors.gray} />
-        ) : (
-          <Ionicons 
-            name="location" 
-            size={20} 
-            color={hasPermission === false ? theme.colors.lightGray : theme.colors.gray} 
-          />
-        )}
-      </TouchableOpacity>
+      {showLocationPin && (
+        <TouchableOpacity 
+          style={[
+            styles.locationButton,
+            (hasPermission === false || isReverseGeocoding) && styles.locationButtonDisabled
+          ]}
+          onPress={handleDeviceLocationPress}
+          disabled={hasPermission === false || isReverseGeocoding}
+        >
+          {isReverseGeocoding ? (
+            <ActivityIndicator size="small" color={theme.colors.gray} />
+          ) : (
+            <Ionicons 
+              name="location" 
+              size={20} 
+              color={hasPermission === false ? theme.colors.lightGray : theme.colors.gray} 
+            />
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
 });
