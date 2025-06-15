@@ -1,74 +1,29 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Outfit } from '../types/Outfit';
+import { Weather } from '../types/weather';
 
-const OUTFITS_STORAGE_KEY = 'user_outfits';
+const OUTFITS_WITH_WEATHER_STORAGE_KEY = 'user_outfits_with_weather';
 
 /**
- * Service for managing outfit data persistence using AsyncStorage
- * Stores outfits as string arrays keyed by ISO date strings
+ * Interface for storing outfits with weather context for comparison
+ */
+export interface StoredOutfitWithWeather {
+  outfit: Outfit;
+  weather: {
+    feelsLikeTemp: number;
+    highestChanceOfRain: number;
+    windiness: number;
+    condition: string;
+    location: string;
+  };
+  createdAt: Date;
+}
+
+/**
+ * Service for managing outfit data persistence using AsyncStorage.
+ * Stores outfits with weather context for smart restoration.
  */
 export class OutfitStorageService {
-  /**
-   * Convert Outfit object to string array for storage
-   */
-  private static outfitToStringArray(outfit: Outfit): string[] {
-    const items: string[] = [];
-    
-    if (outfit.top) items.push(outfit.top);
-    if (outfit.bottom) items.push(outfit.bottom);
-    if (outfit.shoes) items.push(outfit.shoes);
-    
-    // Add outerwear items
-    if (outfit.outerwear && outfit.outerwear.length > 0) {
-      items.push(...outfit.outerwear);
-    }
-    
-    // Add accessories
-    if (outfit.accessories && outfit.accessories.length > 0) {
-      items.push(...outfit.accessories);
-    }
-    
-    return items;
-  }
-
-  /**
-   * Convert string array back to Outfit object
-   * Note: This is a simplified conversion - we lose the original structure
-   */
-  private static stringArrayToOutfit(items: string[]): Outfit {
-    // Simple heuristic: first item is top, second is bottom, third is shoes
-    // Rest are treated as outerwear or accessories based on keywords
-    const outfit: Outfit = {
-      top: items[0] || '',
-      shoes: items[2] || ''
-    };
-    
-    if (items[1]) {
-      outfit.bottom = items[1];
-    }
-    
-    // Simple categorization for remaining items
-    const remaining = items.slice(3);
-    const outerwear: string[] = [];
-    const accessories: string[] = [];
-    
-    remaining.forEach(item => {
-      const lowerItem = item.toLowerCase();
-      if (lowerItem.includes('jacket') || lowerItem.includes('coat') || 
-          lowerItem.includes('sweater') || lowerItem.includes('cardigan') ||
-          lowerItem.includes('hoodie') || lowerItem.includes('blazer')) {
-        outerwear.push(item);
-      } else {
-        accessories.push(item);
-      }
-    });
-    
-    if (outerwear.length > 0) outfit.outerwear = outerwear;
-    if (accessories.length > 0) outfit.accessories = accessories;
-    
-    return outfit;
-  }
-
   /**
    * Get date key in ISO format (YYYY-MM-DD)
    */
@@ -77,82 +32,89 @@ export class OutfitStorageService {
   }
 
   /**
-   * Retrieve all stored outfits from AsyncStorage
+   * Retrieve all stored outfits with weather context from AsyncStorage
    */
-  private static async getAllStoredOutfits(): Promise<{ [dateKey: string]: string[] }> {
+  private static async getAllStoredWeatherOutfits(): Promise<{ [dateKey: string]: StoredOutfitWithWeather }> {
     try {
-      const outfitsJson = await AsyncStorage.getItem(OUTFITS_STORAGE_KEY);
+      const outfitsJson = await AsyncStorage.getItem(OUTFITS_WITH_WEATHER_STORAGE_KEY);
       if (!outfitsJson) {
         return {};
       }
-      return JSON.parse(outfitsJson);
+      // Ensure all createdAt fields are Date objects
+      const outfits = JSON.parse(outfitsJson);
+      Object.keys(outfits).forEach(key => {
+        if (outfits[key].createdAt) {
+          outfits[key].createdAt = new Date(outfits[key].createdAt);
+        }
+      });
+      return outfits;
     } catch (error) {
-      console.error('Error getting outfits from storage:', error);
+      console.error('Error getting weather outfits from storage:', error);
       return {};
     }
   }
 
   /**
-   * Save all outfits to AsyncStorage
+   * Save all outfits with weather context to AsyncStorage
    */
-  private static async saveAllOutfits(outfits: { [dateKey: string]: string[] }): Promise<void> {
+  private static async saveAllWeatherOutfits(outfits: { [dateKey: string]: StoredOutfitWithWeather }): Promise<void> {
     try {
-      await AsyncStorage.setItem(OUTFITS_STORAGE_KEY, JSON.stringify(outfits));
+      await AsyncStorage.setItem(OUTFITS_WITH_WEATHER_STORAGE_KEY, JSON.stringify(outfits));
     } catch (error) {
-      console.error('Error saving outfits to storage:', error);
+      console.error('Error saving weather outfits to storage:', error);
       throw error;
     }
   }
 
   /**
-   * Save an outfit for a specific date
+   * Save an outfit with its weather context for a specific date
    */
-  static async saveOutfitForDate(outfit: Outfit, date: Date = new Date()): Promise<void> {
+  static async saveOutfit(
+    outfit: Outfit, 
+    weather: Weather, 
+    date: Date = new Date()
+  ): Promise<void> {
     try {
       const dateKey = this.getDateKey(date);
-      const outfitItems = this.outfitToStringArray(outfit);
-      const allOutfits = await this.getAllStoredOutfits();
+      const storedOutfit: StoredOutfitWithWeather = {
+        outfit,
+        weather: {
+          feelsLikeTemp: weather.feelsLikeTemp,
+          highestChanceOfRain: weather.highestChanceOfRain,
+          windiness: weather.windiness,
+          condition: weather.condition,
+          location: weather.location || 'Unknown Location'
+        },
+        createdAt: new Date()
+      };
       
-      allOutfits[dateKey] = outfitItems;
-      await this.saveAllOutfits(allOutfits);
+      const weatherOutfits = await this.getAllStoredWeatherOutfits();
+      weatherOutfits[dateKey] = storedOutfit;
+      await this.saveAllWeatherOutfits(weatherOutfits);
       
-      console.log(`Outfit saved for ${dateKey}:`, outfitItems);
+      console.log(`Outfit with weather context saved for ${dateKey}`);
     } catch (error) {
-      console.error('Error saving outfit for date:', error);
+      console.error('Error saving outfit with weather:', error);
       throw error;
     }
   }
 
   /**
-   * Get outfit for a specific date
+   * Get an outfit with its weather context for a specific date
    */
-  static async getOutfitByDate(date: Date): Promise<Outfit | null> {
+  static async getOutfitByDate(date: Date): Promise<StoredOutfitWithWeather | null> {
     try {
       const dateKey = this.getDateKey(date);
-      const allOutfits = await this.getAllStoredOutfits();
-      const outfitItems = allOutfits[dateKey];
+      const weatherOutfits = await this.getAllStoredWeatherOutfits();
+      const storedOutfit = weatherOutfits[dateKey];
       
-      if (!outfitItems || outfitItems.length === 0) {
+      if (!storedOutfit) {
         return null;
       }
       
-      return this.stringArrayToOutfit(outfitItems);
+      return storedOutfit;
     } catch (error) {
-      console.error('Error getting outfit by date:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Get raw outfit items (string array) for a specific date
-   */
-  static async getOutfitItemsByDate(date: Date): Promise<string[] | null> {
-    try {
-      const dateKey = this.getDateKey(date);
-      const allOutfits = await this.getAllStoredOutfits();
-      return allOutfits[dateKey] || null;
-    } catch (error) {
-      console.error('Error getting outfit items by date:', error);
+      console.error('Error getting outfit with weather by date:', error);
       return null;
     }
   }
@@ -163,9 +125,10 @@ export class OutfitStorageService {
   static async deleteOutfitForDate(date: Date): Promise<void> {
     try {
       const dateKey = this.getDateKey(date);
-      const allOutfits = await this.getAllStoredOutfits();
+      const allOutfits = await this.getAllStoredWeatherOutfits();
       delete allOutfits[dateKey];
-      await this.saveAllOutfits(allOutfits);
+      await this.saveAllWeatherOutfits(allOutfits);
+      console.log(`Outfit deleted for ${dateKey}`);
     } catch (error) {
       console.error('Error deleting outfit for date:', error);
       throw error;
@@ -173,10 +136,10 @@ export class OutfitStorageService {
   }
 
   /**
-   * Get all stored outfits
+   * Get all stored outfits with weather context
    */
-  static async getAllOutfits(): Promise<{ [dateKey: string]: string[] }> {
-    return this.getAllStoredOutfits();
+  static async getAllOutfits(): Promise<{ [dateKey:string]: StoredOutfitWithWeather }> {
+    return this.getAllStoredWeatherOutfits();
   }
 
   /**
@@ -184,9 +147,10 @@ export class OutfitStorageService {
    */
   static async clearAllOutfits(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(OUTFITS_STORAGE_KEY);
+      await AsyncStorage.removeItem(OUTFITS_WITH_WEATHER_STORAGE_KEY);
+      console.log('All weather outfits cleared from storage.');
     } catch (error) {
-      console.error('Error clearing outfits from storage:', error);
+      console.error('Error clearing weather outfits from storage:', error);
       throw error;
     }
   }

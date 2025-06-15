@@ -8,7 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLastLocation } from '@hooks/useLastLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
 import { useOutfitGenerator } from '@hooks/useOutfitGenerator';
-import { useStoredOutfit } from '@hooks/useStoredOutfit';
 import { getIoniconForWeather } from '@services/weatherIconService';
 import { theme, typography } from '@styles';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -34,42 +33,42 @@ export default function HomeScreen() {
   const { lastLocation, saveLastLocation } = useLastLocation();
   const { outfit, loading: outfitLoading, error: outfitError, generateOutfit } = useOutfitGenerator();
   const { weather, weatherDisplay, isLoading, error, fetchWeatherByLocationString } = useLocationWeather();
-  const { 
-    outfit: storedOutfit, 
-    loading: storedLoading, 
-    error: storedError, 
-    loadStoredOutfit, 
-    getDateString 
-  } = useStoredOutfit();
+
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedDateOffset, setSelectedDateOffset] = useState<DateOffset>(0); // Default to today
 
   // Fetch weather for the saved location on mount
   useEffect(() => {
     if (lastLocation) {
+      console.log('🌍 Initial weather fetch for saved location:', lastLocation);
       fetchWeatherByLocationString(lastLocation);
     }
-  }, [lastLocation, fetchWeatherByLocationString]);
+  }, [lastLocation]);
 
 
   // Handle outfit loading based on selected date
   useEffect(() => {
-    if (weather) {
-      console.log('👕 Date/weather updated, handling outfit for offset:', selectedDateOffset);
-      
-      if (selectedDateOffset === -1) {
-        // Yesterday: Load stored outfit
-        loadStoredOutfit(-1);
-      } else {
-        // Today (0) or Tomorrow (1): Generate live outfit
-        let activity = 'daily activities';
-        if (selectedDateOffset === 1) {
-          activity = 'daily activities (tomorrow)';
-        }
-        generateOutfit(weather, activity);
-      }
+    console.log('👕 Calendar/weather effect triggered - offset:', selectedDateOffset, 'hasWeather:', !!weather);
+    
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + selectedDateOffset);
+    
+    let activity = 'daily activities';
+    if (selectedDateOffset === 1) {
+      activity = 'daily activities (tomorrow)';
+    } else if (selectedDateOffset === -1) {
+      activity = "yesterday's activities";
     }
-  }, [weather, generateOutfit, selectedDateOffset, loadStoredOutfit]);
+
+    // For today/tomorrow, we need weather. For yesterday, we don't.
+    if (selectedDateOffset === -1) {
+      // For yesterday, weather is not required to load from storage
+      generateOutfit(targetDate, undefined, activity);
+    } else if (weather && lastLocation) {
+      // For today or tomorrow, generate live outfit only if we have weather
+      generateOutfit(targetDate, weather, activity, lastLocation);
+    }
+  }, [selectedDateOffset, weather, generateOutfit, lastLocation]);
 
   const handleWeatherButtonPress = () => {
     setIsFlipped(!isFlipped);
@@ -133,33 +132,25 @@ export default function HomeScreen() {
         <FlipComponent
           isFlipped={isFlipped}
           frontComponent={
-            selectedDateOffset === -1 ? (
-              // Yesterday: Show stored outfit or no-outfit message
-              <BentoBox 
-                weather={weather}
-                activity="yesterday's outfit"
-                outfit={storedOutfit}
-                loading={storedLoading}
-                error={storedError}
-                showNoOutfit={!storedLoading && !storedOutfit}
-                noOutfitDate={getDateString(-1)}
-              />
-            ) : (
-              // Today or Tomorrow: Show generated outfit
-              <BentoBox 
-                weather={weather}
-                activity={
-                  selectedDateOffset === 1 ? 'tomorrow\'s outfit' : 'today\'s outfit'
-                }
-                outfit={outfit}
-                loading={outfitLoading}
-                error={outfitError}
-              />
-            )
+            <BentoBox 
+              weather={weather || undefined}
+              activity={
+                selectedDateOffset === -1 ? "yesterday's outfit" :
+                selectedDateOffset === 1 ? "tomorrow's outfit" : "today's outfit"
+              }
+              outfit={outfit}
+              loading={outfitLoading}
+              error={outfitError}
+              showNoOutfit={!outfitLoading && !outfit}
+              noOutfitDate={
+                new Date(new Date().setDate(new Date().getDate() + selectedDateOffset))
+                  .toISOString().split('T')[0]
+              }
+            />
           }
           backComponent={
             <WeatherCard 
-              weatherDisplay={weatherDisplay}
+              weatherDisplay={weatherDisplay || undefined}
               loading={isLoading}
               error={error}
             />

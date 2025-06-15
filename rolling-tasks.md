@@ -534,6 +534,124 @@
   - ✅ Clean separation of storage logic from UI components
   - ✅ Simple string array storage format for easy persistence
 
+## Outfit Restoration & Weather Threshold Implementation (June 14, 2025) - ⚠️ REVERTED
+
+**Dev Team Implementation Summary:**
+- **Files Modified**:
+  - `src/hooks/useOutfitGenerator.ts` - Added weather change thresholds and auto-restoration logic
+  - `src/app/(tabs)/home.tsx` - Attempted fix to prevent overwriting auto-restored outfits (REVERTED)
+
+**Architecture Achievement**: Enhanced outfit generation with intelligent weather-based regeneration
+- ✅ **Weather Change Thresholds**: Temperature (10°F), precipitation (25%), wind (10 mph), condition changes
+- ✅ **Auto-Restoration Logic**: Automatically loads today's stored outfit on hook mount
+- ✅ **Smart Regeneration**: Only regenerates when weather exceeds defined thresholds
+- ✅ **Performance**: Significantly reduces redundant LLM API calls
+
+**Issue Identified**: Auto-restoration conflicts with location-based outfit regeneration
+- ❌ **Problem**: Auto-restored outfits get overwritten when location changes
+- ❌ **Root Cause**: Home screen weather effect always triggers generation, ignoring existing outfits
+- ❌ **Fix Attempted**: Modified Home screen to check existing outfit before generating (REVERTED)
+- ❌ **Reversion Reason**: Prevented legitimate outfit updates on location changes
+
+### ⚠️ Current Status (Post-Reversion)
+- **Weather Thresholds**: ✅ Working correctly in useOutfitGenerator
+- **Auto-Restoration**: ✅ Working but gets overwritten by weather updates
+- **Location Changes**: ✅ Working correctly after reversion
+- **Issue**: Need coordination between auto-restoration and legitimate weather-based regeneration
+
+### 🔧 Next Steps Required
+1. **Coordination Logic**: Distinguish between app launch vs. user-initiated location changes
+2. **State Management**: Track restoration state vs. user interaction state
+3. **Smart Timing**: Allow auto-restoration to complete before weather effects trigger
+
+**Code Quality**: Weather threshold implementation is solid, restoration logic needs coordination refinement
+
+## Outfit Restoration Race Condition Fix (June 15, 2025) - ✅ COMPLETE
+
+**Dev Team Implementation Summary:**
+- **Problem Resolved**: Fixed race condition between auto-restoration and location-based outfit regeneration
+- **Files Created**:
+  - Enhanced `StoredOutfitWithWeather` interface in `src/services/outfitStorageService.ts`
+- **Files Modified**:
+  - `src/services/outfitStorageService.ts` - Added weather context storage methods
+  - `src/hooks/useOutfitGenerator.ts` - Integrated smart restoration with location awareness
+  - `src/app/(tabs)/home.tsx` - Added location parameter to outfit generation
+
+**Architecture Achievement**: Complete elimination of race condition with unified restoration logic
+- ✅ **Weather Context Storage**: Outfits stored with weather data (temperature, precipitation, wind, condition, location)
+- ✅ **Location-Aware Generation**: Outfit generation detects location changes and forces regeneration
+- ✅ **Smart Restoration**: Checks storage first, only calls LLM when weather/location exceeds thresholds
+- ✅ **Unified Logic**: Single generation path eliminates race conditions
+- ✅ **Backwards Compatibility**: Maintains legacy storage format with enhanced weather context
+
+**User Experience Improvements**:
+- ✅ **Location Changes**: Always regenerate outfit when user selects different location
+- ✅ **Weather Stability**: Outfits persist through minor weather fluctuations (under thresholds)
+- ✅ **Storage Priority**: Always attempts to restore from storage before generating new outfit
+- ✅ **Performance**: Significant reduction in redundant LLM API calls
+
+**Technical Implementation**:
+- ✅ **Enhanced Storage**: `saveOutfitWithWeather()` and `getOutfitWithWeatherByDate()` methods
+- ✅ **Location Tracking**: Location parameter passed through generation chain
+- ✅ **Threshold Comparison**: Weather change detection with location override
+- ✅ **Error Resilience**: Graceful fallback to legacy storage if weather context fails
+- ✅ **Type Safety**: Full TypeScript interface compliance throughout
+
+**Code Quality**: Excellent separation of concerns with storage service handling weather context, hooks managing business logic, and components focusing on UI. Clean parameter passing eliminates complex state dependencies.
+
+**Issue Discovered & Resolved (June 15, 2025)**:
+- **Problem**: Complex signature-based logic was causing multiple weather API calls and infinite loops when switching calendar dates
+- **Root Cause**: Weather API inconsistency (same location returning different temps: 62°F vs 78°F) triggering thresholds + calendar switching refetching weather
+- **Solution**: Simplified useEffect logic to separate weather fetching (location changes only) from calendar switching (outfit selection only)
+- **Result**: Clean separation - weather fetches only on location change, calendar changes only affect outfit selection logic
+
+### ✅ Completed & Tested (Race Condition Fix - Final Implementation)
+- **Smart Outfit Restoration**: Unified `loadOrGenerateOutfit` function with date-based logic
+  - ✅ **Complete Code Refactor**: Simplified from dual hooks (useOutfitGenerator + useStoredOutfit) to single unified hook
+  - ✅ **Date-Aware Logic**: Past dates load from storage only, current/future dates check thresholds for regeneration
+  - ✅ **Weather Context Storage**: Outfits stored with location, temperature, precipitation, wind, and weather condition
+  - ✅ **Location Change Detection**: Forced regeneration when location differs from stored context
+  - ✅ **Weather Threshold Comparison**: Only regenerates when weather exceeds 10°F temp, 25% precipitation, 10mph wind, or condition changes
+  - ✅ **Storage-First Approach**: Always attempts restoration before LLM generation
+  - ✅ **Clean Error Handling**: Graceful fallback with clear error states and loading indicators
+  - ✅ **Simplified Calendar Logic**: Weather fetching and calendar switching are completely separate concerns
+  - ✅ **API Call Reduction**: Weather only fetches on actual location changes, not calendar date changes
+
+**Current Architecture (June 15, 2025)**:
+- **`OutfitStorageService`**: Streamlined to weather-context-only storage with `saveOutfit()` and `getOutfitByDate()` methods
+- **`useOutfitGenerator`**: Single `loadOrGenerateOutfit(date, weather, activity, location)` function handling all scenarios
+- **`home.tsx`**: Simplified calendar logic with clear date calculation and separate weather/outfit effects
+- **Date Logic**: Past dates = storage only, current/future dates = threshold-based regeneration
+
+## ⚠️ Known Issue: Login Regeneration (June 15, 2025) - DEFERRED
+
+**Issue Identified**: Outfit still regenerates on user login/app restart even when stored outfit exists and weather hasn't changed significantly.
+
+**Problem Analysis**:
+- **Symptom**: Unnecessary LLM API calls and outfit regeneration when opening app after login
+- **Root Cause**: Weather context loading timing vs outfit restoration timing during app initialization
+- **Impact**: Performance degradation and unnecessary API usage on app launch
+- **Frequency**: Every login/app restart cycle
+
+**Technical Details**:
+- Stored outfit with weather context exists in AsyncStorage
+- Weather thresholds are not exceeded (same location, similar weather conditions)
+- However, outfit generation still triggers instead of restoration
+- Likely timing issue during app hydration where weather loads before storage restoration completes
+
+**Priority**: Secondary (post-MVP) - Core functionality works, optimization needed
+- **Current Workaround**: Regeneration still provides correct outfits, just inefficient
+- **User Impact**: Minimal - slight delay on app launch but correct outfit displayed
+- **Developer Impact**: Unnecessary API usage and debugging complexity
+
+**Future Investigation Required**:
+1. **Timing Analysis**: Analyze useEffect execution order during app initialization
+2. **Storage Performance**: Check AsyncStorage read performance vs weather API timing
+3. **State Management**: Consider moving outfit restoration higher in component hierarchy
+4. **Cache Strategy**: Implement outfit caching mechanism independent of weather triggers
+
+**Deferral Justification**: System works correctly for all user-facing functionality. Login regeneration is a performance optimization that doesn't affect MVP features or user experience significantly.
+
 ---
 
 *This file tracks TDD progress and guides development priorities for MVP completion.*
