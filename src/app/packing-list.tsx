@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mainScrollView: {
-    // Remove flex: 1 to let ScrollView size to content
+    flex: 1,
   },
   mainScrollContent: {
     flexGrow: 1,
@@ -265,7 +265,6 @@ const styles = StyleSheet.create({
   },
   packingListContainer: {
     flex: 1,
-    maxHeight: 400, // Limit height to ensure scrolling
   },
   packingListContent: {
     paddingVertical: theme.spacing.md,

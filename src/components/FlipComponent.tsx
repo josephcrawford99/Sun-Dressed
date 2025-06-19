@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
-    minHeight: 400,
   },
   card: {
     flex: 1,

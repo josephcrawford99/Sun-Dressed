@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
   },
   forecastScrollView: {
     flex: 1,
-    maxHeight: 400, // Limit height to ensure scrolling
   },
   forecastContainer: {
     paddingBottom: theme.spacing.md,
