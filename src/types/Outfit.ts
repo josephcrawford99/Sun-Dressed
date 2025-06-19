@@ -1,8 +1,15 @@
+import { ClothingItemKey } from '@/constants/clothingItems';
+
+export interface OutfitItem {
+  iconKey: ClothingItemKey;
+  description: string;
+}
+
 export interface Outfit {
-  top: string;
-  bottom?: string;
-  outerwear?: string[];
-  accessories?: string[];
-  shoes: string;
+  top: OutfitItem;
+  bottom?: OutfitItem;
+  outerwear?: OutfitItem[];
+  accessories?: OutfitItem[];
+  shoes: OutfitItem;
   explanation: string;
 }

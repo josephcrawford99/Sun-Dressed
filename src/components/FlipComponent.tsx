@@ -3,7 +3,8 @@ import { StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withTiming
+  withTiming,
+  runOnJS
 } from 'react-native-reanimated';
 
 interface FlipComponentProps {
@@ -22,39 +23,43 @@ const FlipComponent: React.FC<FlipComponentProps> = ({
   duration = 800,
 }) => {
   const rotation = useSharedValue(0);
+  const [showBack, setShowBack] = React.useState(false);
 
-  // Update rotation when isFlipped changes
+  // Update rotation and switch content at midpoint
   React.useEffect(() => {
-    rotation.value = withTiming(isFlipped ? 180 : 0, { duration });
+    rotation.value = withTiming(isFlipped ? 180 : 0, { duration }, (finished) => {
+      if (finished) {
+        runOnJS(setShowBack)(isFlipped);
+      }
+    });
+    
+    // Switch content at 90 degrees (midpoint)
+    const halfDuration = duration / 2;
+    const timer = setTimeout(() => {
+      setShowBack(isFlipped);
+    }, halfDuration);
+    
+    return () => clearTimeout(timer);
   }, [isFlipped, duration, rotation]);
 
-  const frontStyle = useAnimatedStyle(() => ({
+  const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { perspective: 1000 },
       { rotateY: `${rotation.value}deg` }
     ],
-    backfaceVisibility: 'hidden',
-  }));
-
-  const backStyle = useAnimatedStyle(() => ({
-    transform: [
-      { perspective: 1000 },
-      { rotateY: `${rotation.value + 180}deg` }
-    ],
-    backfaceVisibility: 'hidden',
   }));
 
   return (
     <View style={[styles.container, style]}>
-      {!isFlipped ? (
-        <Animated.View style={[styles.card, frontStyle]}>
-          {frontComponent}
-        </Animated.View>
-      ) : (
-        <Animated.View style={[styles.card, backStyle]}>
-          {backComponent}
-        </Animated.View>
-      )}
+      <Animated.View style={[styles.card, animatedStyle]}>
+        {showBack ? (
+          <View style={styles.backContent}>
+            {backComponent}
+          </View>
+        ) : (
+          frontComponent
+        )}
+      </Animated.View>
     </View>
   );
 };
@@ -66,7 +71,11 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
+  },
+  backContent: {
+    flex: 1,
+    transform: [{ scaleX: -1 }],
   },
 });
 

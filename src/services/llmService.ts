@@ -4,6 +4,8 @@ import { Weather } from '../types/weather';
 import { StylePreference } from '../types/settings';
 import { geminiRateLimiter } from './rateLimiter';
 import { APIOptimizer } from './utils/APIOptimizer';
+import { ALL_CLOTHING_ITEMS } from '@/constants/clothingItems';
+import { ClothingValidationService } from './clothingValidationService';
 
 // Initialize API optimizer
 const apiOptimizer = new APIOptimizer();
@@ -25,6 +27,25 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
   
   // Use API optimizer to coalesce concurrent identical requests
   return apiOptimizer.coalesceRequest(cacheKey, async () => {
+    return await generateOutfitWithRetry(weather, activity, stylePreference);
+  });
+};
+
+const generateOutfitWithRetry = async (weather?: Weather, activity?: string, stylePreference?: StylePreference, retryCount = 0, previousError?: string): Promise<Outfit> => {
+  const maxRetries = 2;
+  
+  try {
+    return await generateOutfitAttempt(weather, activity, stylePreference, previousError);
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('RETRY_NEEDED:') && retryCount < maxRetries) {
+      const validationError = error.message.replace('RETRY_NEEDED: ', '');
+      return await generateOutfitWithRetry(weather, activity, stylePreference, retryCount + 1, validationError);
+    }
+    throw error;
+  }
+};
+
+const generateOutfitAttempt = async (weather?: Weather, activity?: string, stylePreference?: StylePreference, previousError?: string): Promise<Outfit> => {
     await geminiRateLimiter.checkRateLimit();
   
   const weatherDescription = weather 
@@ -34,8 +55,31 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
   const styleInstruction = stylePreference && stylePreference !== 'neutral'
     ? ` Focus on ${stylePreference} style clothing options.`
     : '';
+
+  const clothingItemsList = ALL_CLOTHING_ITEMS.join(', ');
   
-  const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}.${styleInstruction} Return only a JSON object with: top, bottom, outerwear (array), accessories (array), shoes, explanation (brief 1-2 sentence reason for this outfit choice based on weather/activity).`;
+  const errorInstruction = previousError 
+    ? `\n\nIMPORTANT: Your previous response had validation errors: ${previousError}\nPlease fix these errors and try again.\n`
+    : '';
+  
+  const prompt = `Generate a clothing outfit recommendation for ${weatherDescription} and ${activity || 'daily activities'}.${styleInstruction}${errorInstruction}
+
+IMPORTANT: For clothing items, you must choose ONLY from this list: ${clothingItemsList}
+
+Return only a JSON object with this exact format:
+{
+  "top": {"iconKey": "t-shirt", "description": "fitted black cotton t-shirt"},
+  "bottom": {"iconKey": "jeans", "description": "dark blue denim jeans"},
+  "outerwear": [{"iconKey": "jacket", "description": "light windbreaker jacket"}],
+  "accessories": [{"iconKey": "sunglasses", "description": "black aviator sunglasses"}],
+  "shoes": {"iconKey": "sneakers", "description": "white leather sneakers"},
+  "explanation": "brief 1-2 sentence reason for this outfit choice"
+}
+
+- iconKey must be exactly from the provided list
+- description should be a detailed description of the specific item
+- outerwear and accessories are arrays (can be empty [])
+- top and shoes are required`;
   
   const requestPayload = {
     contents: [{ parts: [{ text: prompt }] }]
@@ -63,7 +107,16 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
     try {
       const parsedOutfit = JSON.parse(cleanedText);
       
-      // Cache the result
+      // Validate the outfit response
+      const validationResult = ClothingValidationService.validateOutfit(parsedOutfit);
+      
+      if (!validationResult.isValid) {
+        // Retry with validation error message
+        throw new Error(`VALIDATION_ERROR: ${validationResult.errorMessage}`);
+      }
+      
+      // Cache the result - generate cache key since this is inside the attempt function
+      const cacheKey = generateCacheKey(weather, activity, stylePreference);
       promptCache.set(cacheKey, { outfit: parsedOutfit, timestamp: Date.now() });
       
       // Clean old cache entries
@@ -71,8 +124,13 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
       
       return parsedOutfit;
     } catch (parseError) {
+      // Check if this is a validation error that should trigger retry
+      if (parseError instanceof Error && parseError.message.startsWith('VALIDATION_ERROR:')) {
+        const errorMessage = parseError.message.replace('VALIDATION_ERROR: ', '');
+        throw new Error(`RETRY_NEEDED: ${errorMessage}`);
+      }
+      
       // JSON parsing failed
-      // Failed to parse text
       throw new Error(`Failed to parse outfit JSON: ${parseError}`);
     }
   } catch (error) {
@@ -83,7 +141,6 @@ export const generateOutfitLLM = async (weather?: Weather, activity?: string, st
     }
     throw error;
   }
-  });
 };
 
 /**

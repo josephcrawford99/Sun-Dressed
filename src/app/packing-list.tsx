@@ -52,18 +52,15 @@ export default function PackingListModal() {
 
 
   const renderPackingList = () => (
-    <ScrollView 
-      style={styles.packingListContainer}
-      contentContainerStyle={styles.packingListContent}
-      showsVerticalScrollIndicator={false}
-      bounces={true}
-    >
-      {packingList.map((item, index) => (
-        <View key={`${index}-${item}`} style={styles.packingItem}>
-          <Text style={styles.packingItemText}>{item}</Text>
-        </View>
-      ))}
-    </ScrollView>
+    <View style={styles.packingListContainer}>
+      <View style={styles.packingListContent}>
+        {packingList.map((item, index) => (
+          <View key={`${index}-${item}`} style={styles.packingItem}>
+            <Text style={styles.packingItemText}>{item}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
   );
 
   const renderEmptyState = () => {

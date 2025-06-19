@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { theme } from '../styles';
-import { Outfit } from '../types/Outfit';
+import { Outfit, OutfitItem } from '../types/Outfit';
+import { getClothingIcon } from '@/assets/ClothingIcons';
 
 interface BentoBoxProps {
   outfit?: Outfit | null;
@@ -32,7 +33,7 @@ const BentoBox: React.FC<BentoBoxProps> = ({
     );
   }
 
-  const renderOutfitItem = (item: string | undefined, label: string) => {
+  const renderOutfitItem = (item: OutfitItem | undefined, label: string) => {
     if (loading) {
       return (
         <View style={[styles.box, styles.loadingBox]}>
@@ -51,9 +52,23 @@ const BentoBox: React.FC<BentoBoxProps> = ({
       );
     }
 
+    if (!item) {
+      return (
+        <View style={[styles.box, styles.emptyBox]}>
+          <Text style={styles.emptyText}>None</Text>
+          <Text style={styles.labelText}>{label}</Text>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.box}>
-        <Text style={styles.itemText}>{item || 'None'}</Text>
+        <View style={styles.iconContainer}>
+          {getClothingIcon(item.iconKey, { size: 32, color: theme.colors.black })}
+        </View>
+        <Text style={styles.descriptionText} numberOfLines={2}>
+          {item.description}
+        </Text>
         <Text style={styles.labelText}>{label}</Text>
       </View>
     );
@@ -118,7 +133,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 60,
+    minHeight: 80,
   },
   loadingBox: {
     backgroundColor: theme.colors.surfaceVariant,
@@ -126,12 +141,25 @@ const styles = StyleSheet.create({
   errorBox: {
     backgroundColor: theme.colors.errorSurface,
   },
-  itemText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: '600',
+  iconContainer: {
+    marginBottom: theme.spacing.xs,
+  },
+  descriptionText: {
+    fontSize: theme.fontSize.xs,
     color: theme.colors.black,
     textAlign: 'center',
     marginBottom: theme.spacing.xs,
+    lineHeight: 14,
+  },
+  emptyBox: {
+    backgroundColor: theme.colors.lightGray,
+  },
+  emptyText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.gray,
+    textAlign: 'center',
+    marginBottom: theme.spacing.xs,
+    fontStyle: 'italic',
   },
   labelText: {
     fontSize: theme.fontSize.xxs,
