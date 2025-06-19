@@ -4,7 +4,13 @@ import { geocodeService } from '@services/geocodeService';
 import { theme, typography } from '@styles';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { 
+  GooglePlacesAutocomplete,
+  GooglePlacesAutocompleteRef,
+  GooglePlaceData,
+  GooglePlaceDetail,
+  DescriptionRow
+} from 'react-native-google-places-autocomplete';
 
 interface LocationAutocompleteProps {
   initialValue?: string;
@@ -22,7 +28,7 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
   showLocationPin = true
 }: LocationAutocompleteProps) {
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
-  const ref = useRef<any>(null);
+  const ref = useRef<GooglePlacesAutocompleteRef>(null);
   const { location: deviceLocation, requestLocation, hasPermission } = useDeviceLocation();
   const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
 
@@ -94,22 +100,16 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
     <GooglePlacesAutocomplete
       ref={ref}
       placeholder={placeholder}
-      onPress={(data, details) => {
-        // Use the same formatting logic as renderDescription for consistency
+      onPress={(data: GooglePlaceData, details: GooglePlaceDetail | null) => {
+        // GooglePlaceData doesn't have 'terms' property, so parse the description string
         let locationString = '';
         
-        if (data.terms && data.terms.length >= 2) {
-          const city = data.terms[0].value;
-          const stateOrCountry = data.terms[1].value;
-          locationString = `${city}, ${stateOrCountry}`;
+        // Parse the description string to extract city and state/country
+        const parts = data.description.split(', ');
+        if (parts.length >= 2) {
+          locationString = `${parts[0]}, ${parts[1]}`;
         } else {
-          // Fallback: parse the description string
-          const parts = data.description.split(', ');
-          if (parts.length >= 2) {
-            locationString = `${parts[0]}, ${parts[1]}`;
-          } else {
-            locationString = data.description;
-          }
+          locationString = data.description;
         }
         
         // Extract coordinates from Google Places response
@@ -150,7 +150,7 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       debounce={500}
       minLength={2}
       listViewDisplayed="auto"
-      renderDescription={(row) => {
+      renderDescription={(row: DescriptionRow) => {
         // Extract only city and state/country from the description
         // e.g. "Washington, D.C., USA" becomes "Washington, DC"
         if (row.terms && row.terms.length >= 2) {

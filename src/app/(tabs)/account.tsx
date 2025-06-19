@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
 import { useSettings } from '@/contexts/SettingsContext';
 import { theme, typography } from '@styles';
+import { UserSettings } from '@/types/settings';
 import React, { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
@@ -66,7 +67,7 @@ export default function AccountScreen() {
     }
   };
 
-  const handleSettingChange = async (key: string, value: any) => {
+  const handleSettingChange = async (key: keyof UserSettings, value: any) => {
     setIsUpdatingSetting(true);
     try {
       await updateSetting(key, value);

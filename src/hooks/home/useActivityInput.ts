@@ -19,7 +19,7 @@ export const useActivityInput = ({
   debounceMs = 800
 }: UseActivityInputOptions): UseActivityInputReturn => {
   const [activityInput, setActivityInput] = useState('');
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounce activity input and update parent
   useEffect(() => {

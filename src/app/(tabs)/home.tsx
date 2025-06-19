@@ -18,11 +18,12 @@ import {
 export default function HomeScreen() {
   const { settings } = useSettings();
   const { location, isLoading: locationLoading, saveLocation } = useLocation();
-  const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, refetch: refetchWeather } = useLocationWeather(location || '', currentDateOffset);
   
-  // Outfit state management
+  // Outfit state management - declare before using in hooks
   const [currentDateOffset, setCurrentDateOffset] = useState<DateOffset>(0);
   const [currentActivity, setCurrentActivity] = useState('daily activities');
+  
+  const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, refetch: refetchWeather } = useLocationWeather(location || '', currentDateOffset);
   
   // Initialize home screen state
   const { isFlipped, toggleFlipped } = useHomeScreenState({

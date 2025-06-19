@@ -3,7 +3,7 @@
  */
 export class APIOptimizer {
   private pendingRequests: Map<string, Promise<any>> = new Map();
-  private debounceTimers: Map<string, NodeJS.Timeout> = new Map();
+  private debounceTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
   
   /**
    * Debounce a request - delays execution until no new calls for specified duration

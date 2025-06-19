@@ -1,6 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Weather } from '@/types/weather';
 
+// Type definitions
+type PackingListData = {
+  packingList: string[];
+} | null;
+
+type WeatherForecastData = {
+  weatherForecast: Weather[];
+  location: string;
+} | null;
+
 // Query key factories for consistent cache management
 export const packingListKeys = {
   all: ['packingList'] as const,
@@ -25,9 +35,9 @@ export function usePackingListQuery(tripId: string | null, startDate?: Date, end
   const startDateStr = startDate?.toISOString().split('T')[0];
   const endDateStr = endDate?.toISOString().split('T')[0];
   
-  return useQuery({
+  return useQuery<PackingListData>({
     queryKey: packingListKeys.list(tripId || '', startDateStr, endDateStr),
-    queryFn: () => {
+    queryFn: (): Promise<PackingListData> => {
       // Return null for new queries - they will be populated via mutations
       return Promise.resolve(null);
     },
@@ -48,9 +58,9 @@ export function useWeatherForecastQuery(tripId: string | null, startDate?: Date,
   const startDateStr = startDate?.toISOString().split('T')[0];
   const endDateStr = endDate?.toISOString().split('T')[0];
   
-  return useQuery({
+  return useQuery<WeatherForecastData>({
     queryKey: packingListKeys.weather(tripId || '', startDateStr, endDateStr),
-    queryFn: () => {
+    queryFn: (): Promise<WeatherForecastData> => {
       // Return null for new queries - they will be populated via mutations
       return Promise.resolve(null);
     },
