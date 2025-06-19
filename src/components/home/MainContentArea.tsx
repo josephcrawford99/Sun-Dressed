@@ -20,7 +20,7 @@ interface MainContentAreaProps {
   onRefresh?: () => Promise<void>;
 }
 
-export const MainContentArea: React.FC<MainContentAreaProps> = ({
+export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   isFlipped,
   outfit,
   outfitLoading,
@@ -74,7 +74,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = ({
       />
     </ScrollView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   mainScrollView: {

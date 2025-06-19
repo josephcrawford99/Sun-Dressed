@@ -52,10 +52,22 @@ const FlipComponent: React.FC<FlipComponentProps> = ({
   return (
     <View style={[styles.container, style]}>
       <Animated.View style={[styles.card, animatedStyle]}>
-        <View style={[styles.frontContent, { display: showBack ? 'none' : 'flex' }]}>
+        <View style={[
+          styles.frontContent, 
+          { 
+            opacity: showBack ? 0 : 1,
+            pointerEvents: showBack ? 'none' : 'auto'
+          }
+        ]}>
           {frontComponent}
         </View>
-        <View style={[styles.backContent, { display: showBack ? 'flex' : 'none' }]}>
+        <View style={[
+          styles.backContent, 
+          { 
+            opacity: showBack ? 1 : 0,
+            pointerEvents: showBack ? 'auto' : 'none'
+          }
+        ]}>
           {backComponent}
         </View>
       </Animated.View>
@@ -87,4 +99,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FlipComponent;
+export default React.memo(FlipComponent);

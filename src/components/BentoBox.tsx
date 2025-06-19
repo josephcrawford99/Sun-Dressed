@@ -1,7 +1,7 @@
-import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { getClothingIcon } from '@/assets/ClothingIcons';
 import { theme } from '@/styles';
 import { Outfit, OutfitItem } from '@/types/Outfit';
-import { getClothingIcon } from '@/assets/ClothingIcons';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 interface BentoBoxProps {
   outfit?: Outfit | null;

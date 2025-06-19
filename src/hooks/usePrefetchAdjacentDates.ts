@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { geocodeService } from '@services/geocodeService';
 import { weatherService } from '@services/weatherService';
@@ -13,11 +13,27 @@ export function usePrefetchAdjacentDates(
   currentActivity: string
 ) {
   const queryClient = useQueryClient();
+  const coordinatesCache = useRef<{ [location: string]: { lat: number; lon: number } }>({});
+  const lastPrefetchLocation = useRef<string>('');
 
   useEffect(() => {
     if (!location?.trim()) return;
+    
+    // Skip if we already prefetched for this location
+    if (lastPrefetchLocation.current === location) return;
+    lastPrefetchLocation.current = location;
 
     const dateOffsets: DateOffset[] = [-1, 0, 1];
+
+    // Get coordinates once for all prefetches
+    const getCoordinates = async () => {
+      if (coordinatesCache.current[location]) {
+        return coordinatesCache.current[location];
+      }
+      const coords = await geocodeService.geocode(location);
+      coordinatesCache.current[location] = coords;
+      return coords;
+    };
 
     // Prefetch weather data for all three dates
     dateOffsets.forEach(async (offset) => {
@@ -29,7 +45,7 @@ export function usePrefetchAdjacentDates(
         queryClient.prefetchQuery({
           queryKey,
           queryFn: async () => {
-            const coordinates = await geocodeService.geocode(location);
+            const coordinates = await getCoordinates();
             
             if (offset === 0) {
               // Today - current weather
@@ -59,21 +75,5 @@ export function usePrefetchAdjacentDates(
       }
     });
 
-    // Also prefetch outfit query keys to warm the cache
-    // This ensures TanStack Query knows about these queries even if they return null initially
-    dateOffsets.forEach((offset) => {
-      const date = new Date();
-      date.setDate(date.getDate() + offset);
-      const queryKey = getOutfitQueryKey(date, location, currentActivity);
-      
-      // Register the query key in cache without fetching
-      // The outfit will be generated when actually needed with weather data
-      if (!queryClient.getQueryData(queryKey)) {
-        queryClient.setQueryDefaults(queryKey, {
-          staleTime: offset === -1 ? Infinity : 24 * 60 * 60 * 1000, // Until end of day
-          gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
-        });
-      }
-    });
-  }, [location, currentActivity, queryClient]);
+  }, [location, queryClient]); // Remove currentActivity dependency to prevent re-runs
 }

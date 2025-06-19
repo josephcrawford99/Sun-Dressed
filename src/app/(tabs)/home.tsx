@@ -10,7 +10,7 @@ import { useLocation } from '@hooks/useLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
 import { usePrefetchAdjacentDates } from '@hooks/usePrefetchAdjacentDates';
 import { theme } from '@styles';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -27,7 +27,7 @@ export default function HomeScreen() {
   const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, refetch: refetchWeather } = useLocationWeather(location || '', currentDateOffset);
   
   // Prefetch adjacent dates for smooth navigation
-  usePrefetchAdjacentDates(location, currentActivity);
+  usePrefetchAdjacentDates(location, 'daily activities'); // Use default activity for prefetch
   
   // Initialize home screen state
   const { isFlipped, toggleFlipped } = useHomeScreenState({
@@ -62,10 +62,16 @@ export default function HomeScreen() {
   // Mutation for logging worn outfits
   const dailyOutfitLogger = useDailyOutfitLogger();
 
-  // Log current outfit as "worn" when navigating away from today
+  // Track previous date offset to detect when leaving today
+  const prevDateOffsetRef = React.useRef<DateOffset>(0);
+  
+  // Log current outfit as "worn" only when navigating away from today
   useEffect(() => {
-    // Only log if we're navigating away from today and have an outfit
-    if (currentDateOffset !== 0 && outfit && location) {
+    const prevOffset = prevDateOffsetRef.current;
+    prevDateOffsetRef.current = currentDateOffset;
+    
+    // Only log when moving FROM today (0) to another date
+    if (prevOffset === 0 && currentDateOffset !== 0 && outfit && location) {
       const today = new Date();
       dailyOutfitLogger.mutate({
         date: today,
@@ -73,7 +79,7 @@ export default function HomeScreen() {
         location
       });
     }
-  }, [currentDateOffset, outfit, location, dailyOutfitLogger]); // Include all dependencies
+  }, [currentDateOffset]); // Only depend on date changes, not outfit changes
 
   // Handle outfit refresh with date validation
   const handleOutfitRefresh = useCallback(async () => {
