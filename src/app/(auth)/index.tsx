@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
+import { AppleSignInButton } from '@/components/AppleSignInButton';
 import { theme, typography } from '@styles';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -74,9 +75,8 @@ export default function AuthScreen() {
     router.replace('/(tabs)/home');
   };
 
-  const handleAppleLogin = () => {
-    // TODO: Implement Apple OAuth
-    Alert.alert('Coming Soon', 'Apple Sign In will be available in a future update');
+  const handleAppleSuccess = () => {
+    router.replace('/(tabs)/home');
   };
 
   const handleGoogleLogin = () => {
@@ -147,10 +147,7 @@ export default function AuthScreen() {
         </View>
 
         <View style={styles.oauthContainer}>
-          <TouchableOpacity style={styles.appleButton} onPress={handleAppleLogin}>
-            <Ionicons name="logo-apple" size={20} color={theme.colors.white} />
-            <Text style={styles.appleButtonText}>Continue with Apple</Text>
-          </TouchableOpacity>
+          <AppleSignInButton onSuccess={handleAppleSuccess} />
 
           <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
             <Ionicons name="logo-google" size={20} color={theme.colors.black} />
@@ -244,21 +241,6 @@ const styles = StyleSheet.create({
   },
   oauthContainer: {
     gap: theme.spacing.sm,
-  },
-  appleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.black,
-    borderRadius: theme.borderRadius.medium,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.sm,
-  },
-  appleButtonText: {
-    ...typography.button,
-    fontWeight: '600',
-    color: theme.colors.white,
   },
   googleButton: {
     flexDirection: 'row',

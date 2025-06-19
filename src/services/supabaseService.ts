@@ -161,6 +161,26 @@ export class SupabaseAuthService {
   }
 
   /**
+   * Sign in with Apple using ID token
+   */
+  static async signInWithApple(idToken: string, nonce?: string): Promise<AuthResult> {
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'apple',
+      token: idToken,
+      nonce,
+    });
+
+    if (error) {
+      throw new AuthError(error.message);
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  /**
    * Listen to auth state changes
    * Returns unsubscribe function
    */

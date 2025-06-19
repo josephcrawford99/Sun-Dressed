@@ -150,6 +150,29 @@ export function useUpdateProfileMutation() {
 }
 
 /**
+ * Mutation hook to sign in with Apple
+ */
+export function useAppleSignInMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ idToken, nonce }: { idToken: string; nonce?: string }) => 
+      SupabaseAuthService.signInWithApple(idToken, nonce),
+    onSuccess: (authResult) => {
+      // Update the auth cache with the new session
+      queryClient.setQueryData(authKeys.session(), authResult);
+    },
+    onError: () => {
+      // Clear any stale auth data on sign-in failure
+      queryClient.setQueryData(authKeys.session(), {
+        user: null,
+        session: null,
+      });
+    },
+  });
+}
+
+/**
  * Helper hook to get current user from the query
  */
 export function useCurrentUser(): User | null {
