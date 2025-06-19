@@ -9,7 +9,8 @@ interface UseHomeScreenStateReturn {
 }
 
 interface UseHomeScreenStateOptions {
-  location?: string;
+  location?: string | null;
+  locationLoading?: boolean;
   onLocationReady?: (location: string) => void;
 }
 
@@ -19,18 +20,19 @@ interface UseHomeScreenStateOptions {
  */
 export const useHomeScreenState = ({
   location,
+  locationLoading,
   onLocationReady
 }: UseHomeScreenStateOptions): UseHomeScreenStateReturn => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize when location is available
+  // Initialize when location is available and not loading
   useEffect(() => {
-    if (location && !isInitialized && onLocationReady) {
+    if (!locationLoading && location && !isInitialized && onLocationReady) {
       onLocationReady(location);
       setIsInitialized(true);
     }
-  }, [location, isInitialized, onLocationReady]);
+  }, [location, locationLoading, isInitialized, onLocationReady]);
 
   const toggleFlipped = useCallback(() => {
     setIsFlipped(prev => !prev);

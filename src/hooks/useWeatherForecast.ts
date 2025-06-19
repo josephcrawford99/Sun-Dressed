@@ -36,32 +36,22 @@ export const useWeatherForecast = (): UseWeatherForecastReturn => {
     setError(null);
 
     try {
-
-      // Calculate trip duration in days
-      const tripDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Limit to API maximum of 8 days
-      const forecastDays = Math.min(tripDays, 8);
-      
-
       // Step 1: Convert location string to coordinates using geocodeService
       const coordinates = await geocodeService.geocode(location);
 
-      // Step 2: Fetch weather forecast using weatherService
-      
-      const forecast = await weatherService.fetchForecastByCoordinates(
+      // Step 2: Fetch weather forecast for actual trip dates using the new smart method
+      const forecast = await weatherService.fetchForecastForTripDates(
         coordinates.lat,
         coordinates.lon,
-        forecastDays
+        startDate,
+        endDate
       );
-
 
       setWeatherForecast(forecast);
       return forecast;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch weather forecast';
-      // Weather forecast error, will be thrown
       setError(errorMessage);
       throw err;
     } finally {

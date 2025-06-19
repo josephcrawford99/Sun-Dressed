@@ -7,7 +7,8 @@ import { theme, typography } from '@styles';
 import { WeatherDisplay } from '@/types/weather';
 
 interface LocationWeatherBarProps {
-  location: string;
+  location: string | null;
+  isLocationLoading?: boolean;
   weatherDisplay: WeatherDisplay | null;
   isWeatherLoading: boolean;
   onLocationSelect: (locationString: string, coordinates?: { lat: number; lon: number }) => Promise<void>;
@@ -16,6 +17,7 @@ interface LocationWeatherBarProps {
 
 export const LocationWeatherBar: React.FC<LocationWeatherBarProps> = ({
   location,
+  isLocationLoading = false,
   weatherDisplay,
   isWeatherLoading,
   onLocationSelect,
@@ -26,10 +28,10 @@ export const LocationWeatherBar: React.FC<LocationWeatherBarProps> = ({
 
   // Memoize LocationAutocomplete props to prevent unnecessary re-renders
   const locationAutocompleteProps = useMemo(() => ({
-    initialValue: location,
+    initialValue: location || undefined,
     onLocationSelect,
-    placeholder: "Enter location"
-  }), [location, onLocationSelect]);
+    placeholder: isLocationLoading ? "Loading location..." : "Enter location"
+  }), [location, isLocationLoading, onLocationSelect]);
 
   return (
     <View style={styles.locationRow}>
@@ -37,7 +39,7 @@ export const LocationWeatherBar: React.FC<LocationWeatherBarProps> = ({
         {...locationAutocompleteProps}
       />
       <TouchableOpacity style={styles.weatherButton} onPress={onWeatherButtonPress}>
-        {isWeatherLoading ? (
+        {isLocationLoading || isWeatherLoading ? (
           <ActivityIndicator size="small" color={theme.colors.white} />
         ) : (
           <View style={styles.weatherButtonContent}>

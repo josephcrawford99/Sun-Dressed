@@ -17,7 +17,7 @@ import {
 
 export default function HomeScreen() {
   const { settings } = useSettings();
-  const { location, saveLocation } = useLocation();
+  const { location, isLoading: locationLoading, saveLocation } = useLocation();
   const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, fetchWeatherByLocationString } = useLocationWeather();
   
   // Outfit state management
@@ -27,6 +27,7 @@ export default function HomeScreen() {
   // Initialize home screen state and handle initialization
   const { isFlipped, toggleFlipped } = useHomeScreenState({
     location,
+    locationLoading,
     onLocationReady: fetchWeatherByLocationString
   });
 
@@ -43,11 +44,12 @@ export default function HomeScreen() {
   }, [currentDateOffset]);
 
   // Main outfit query - handles all caching automatically!
+  // Only fetch outfit when location is loaded
   const { 
     data: outfit, 
     isLoading: outfitLoading, 
     error: outfitError
-  } = useOutfitQuery(targetDate, location, currentActivity, weather);
+  } = useOutfitQuery(targetDate, location || '', currentActivity, weather);
 
   // Mutation for force regenerating outfits
   const outfitRegeneration = useOutfitRegeneration();
@@ -102,7 +104,7 @@ export default function HomeScreen() {
   }, [saveLocation, fetchWeatherByLocationString]);
 
   // Combine loading states
-  const isLoading = weatherLoading || outfitLoading || outfitRegeneration.isPending;
+  const isLoading = locationLoading || weatherLoading || outfitLoading || outfitRegeneration.isPending;
   
   // Combine errors - convert to string for component compatibility
   const error = (outfitError?.message || outfitError) || 
@@ -115,6 +117,7 @@ export default function HomeScreen() {
       
       <LocationWeatherBar
         location={location}
+        isLocationLoading={locationLoading}
         weatherDisplay={weatherDisplay}
         isWeatherLoading={weatherLoading}
         onLocationSelect={handleLocationSelect}

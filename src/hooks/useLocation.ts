@@ -9,12 +9,14 @@ import { LocationStorageService } from '@/services/locationStorageService';
  */
 
 interface UseLocationReturn {
-  location: string;
+  location: string | null;
+  isLoading: boolean;
   saveLocation: (locationString: string) => Promise<void>;
 }
 
 export const useLocation = (): UseLocationReturn => {
-  const [location, setLocation] = useState<string>("New York, NY, USA");
+  const [location, setLocation] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load the current location when hook initializes
   useEffect(() => {
@@ -23,7 +25,10 @@ export const useLocation = (): UseLocationReturn => {
         const stored = await LocationStorageService.getLastLocation();
         setLocation(stored);
       } catch (error) {
-        // Error loading location, keep default
+        // Error loading location, use default
+        setLocation("New York, NY, USA");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -43,6 +48,7 @@ export const useLocation = (): UseLocationReturn => {
 
   return {
     location,
+    isLoading,
     saveLocation,
   };
 };

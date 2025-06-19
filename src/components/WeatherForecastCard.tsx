@@ -10,13 +10,15 @@ interface WeatherForecastCardProps {
   loading?: boolean;
   error?: string | null;
   location?: string;
+  startDate?: Date | string;
 }
 
 const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({ 
   weatherDisplayArray, 
   loading, 
   error,
-  location 
+  location,
+  startDate 
 }) => {
 
   if (loading) {
@@ -41,10 +43,20 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
   }
 
   const formatDate = (index: number) => {
-    const date = new Date();
+    const baseDate = startDate ? new Date(startDate) : new Date();
+    const date = new Date(baseDate);
     date.setDate(date.getDate() + index);
     const options: Intl.DateTimeFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
+  };
+
+  const isToday = (index: number) => {
+    if (!startDate) return index === 0;
+    const baseDate = new Date(startDate);
+    const forecastDate = new Date(baseDate);
+    forecastDate.setDate(forecastDate.getDate() + index);
+    const today = new Date();
+    return forecastDate.toDateString() === today.toDateString();
   };
 
   return (
@@ -73,7 +85,7 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
           <View key={index} style={styles.dayCard}>
             <View style={styles.dateSection}>
               <Text style={styles.dateText}>{formatDate(index)}</Text>
-              {index === 0 && <Text style={styles.todayBadge}>Today</Text>}
+              {isToday(index) && <Text style={styles.todayBadge}>Today</Text>}
             </View>
             
             <View style={styles.weatherSection}>

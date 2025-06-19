@@ -138,6 +138,7 @@ export default function PackingListModal() {
             loading={loading}
             error={error}
             location={trip?.location}
+            startDate={trip?.startDate}
           />
         }
         style={styles.flipContainer}

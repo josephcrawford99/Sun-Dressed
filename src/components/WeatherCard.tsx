@@ -47,6 +47,9 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, erro
         <View style={styles.headerText}>
           <Text style={styles.location}>{weatherDisplay.location}</Text>
           <Text style={styles.condition}>{weatherDisplay.condition.replace('-', ' ')}</Text>
+          <Text style={styles.debugInfo}>
+            {weatherDisplay.coordinates && `(${weatherDisplay.coordinates.lat.toFixed(3)}, ${weatherDisplay.coordinates.lon.toFixed(3)})`}
+          </Text>
         </View>
       </View>
 
@@ -215,6 +218,12 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontSize: theme.fontSize.xxs,
     textAlign: 'center',
+  },
+  debugInfo: {
+    ...typography.caption,
+    fontSize: theme.fontSize.xxs,
+    color: theme.colors.gray,
+    marginTop: 2,
   },
 });
 

@@ -24,6 +24,10 @@ export interface WeatherDisplay extends Weather {
     unit: string;
   };
   temperatureUnit: string;
+  coordinates?: {
+    lat: number;
+    lon: number;
+  };
 }
 
 export const mockWeather: Weather = {

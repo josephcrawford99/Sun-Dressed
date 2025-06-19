@@ -17,11 +17,12 @@ interface UseLocationWeatherReturn {
 export function useLocationWeather(): UseLocationWeatherReturn {
   const { settings } = useSettings();
   const [weather, setWeather] = useState<Weather | null>(null);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Create display-ready weather object with user's preferred units
-  const createWeatherDisplay = useCallback((weatherData: Weather): WeatherDisplay => {
+  const createWeatherDisplay = useCallback((weatherData: Weather, coordinates?: { lat: number; lon: number }): WeatherDisplay => {
     const tempSymbol = getTemperatureSymbol(settings.temperatureUnit);
     const speedSymbol = getSpeedSymbol(settings.speedUnit);
 
@@ -37,7 +38,8 @@ export function useLocationWeather(): UseLocationWeatherReturn {
         speed: `${convertSpeed(weatherData.windiness, settings.speedUnit)}`,
         unit: speedSymbol
       },
-      temperatureUnit: tempSymbol
+      temperatureUnit: tempSymbol,
+      coordinates
     };
   }, [settings.temperatureUnit, settings.speedUnit]);
 
@@ -72,6 +74,7 @@ export function useLocationWeather(): UseLocationWeatherReturn {
       );
       
       setWeather(weatherData);
+      setCoordinates(finalCoordinates);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -84,11 +87,12 @@ export function useLocationWeather(): UseLocationWeatherReturn {
 
   const clearWeather = useCallback(() => {
     setWeather(null);
+    setCoordinates(null);
     setError(null);
   }, []);
 
   // Create weatherDisplay whenever weather changes
-  const weatherDisplay = weather ? createWeatherDisplay(weather) : null;
+  const weatherDisplay = weather ? createWeatherDisplay(weather, coordinates || undefined) : null;
 
   return {
     weather,
