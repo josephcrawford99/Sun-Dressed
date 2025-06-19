@@ -7,7 +7,7 @@ import { theme, typography } from '@styles';
 import { WeatherDisplay } from '@/types/weather';
 
 interface LocationWeatherBarProps {
-  lastLocation: string;
+  location: string;
   weatherDisplay: WeatherDisplay | null;
   isWeatherLoading: boolean;
   onLocationSelect: (locationString: string, coordinates?: { lat: number; lon: number }) => Promise<void>;
@@ -15,7 +15,7 @@ interface LocationWeatherBarProps {
 }
 
 export const LocationWeatherBar: React.FC<LocationWeatherBarProps> = ({
-  lastLocation,
+  location,
   weatherDisplay,
   isWeatherLoading,
   onLocationSelect,
@@ -26,10 +26,10 @@ export const LocationWeatherBar: React.FC<LocationWeatherBarProps> = ({
 
   // Memoize LocationAutocomplete props to prevent unnecessary re-renders
   const locationAutocompleteProps = useMemo(() => ({
-    initialValue: lastLocation,
+    initialValue: location,
     onLocationSelect,
     placeholder: "Enter location"
-  }), [lastLocation, onLocationSelect]);
+  }), [location, onLocationSelect]);
 
   return (
     <View style={styles.locationRow}>

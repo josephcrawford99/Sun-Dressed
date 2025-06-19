@@ -9,7 +9,7 @@ interface UseHomeScreenStateReturn {
 }
 
 interface UseHomeScreenStateOptions {
-  lastLocation?: string;
+  location?: string;
   onLocationReady?: (location: string) => void;
 }
 
@@ -18,7 +18,7 @@ interface UseHomeScreenStateOptions {
  * Handles initialization state and flip state for weather/outfit display
  */
 export const useHomeScreenState = ({
-  lastLocation,
+  location,
   onLocationReady
 }: UseHomeScreenStateOptions): UseHomeScreenStateReturn => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -26,11 +26,11 @@ export const useHomeScreenState = ({
 
   // Initialize when location is available
   useEffect(() => {
-    if (lastLocation && !isInitialized && onLocationReady) {
-      onLocationReady(lastLocation);
+    if (location && !isInitialized && onLocationReady) {
+      onLocationReady(location);
       setIsInitialized(true);
     }
-  }, [lastLocation, isInitialized, onLocationReady]);
+  }, [location, isInitialized, onLocationReady]);
 
   const toggleFlipped = useCallback(() => {
     setIsFlipped(prev => !prev);
