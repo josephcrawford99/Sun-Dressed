@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { getIoniconForWeather } from '../services/weatherIconService';
-import { theme, typography } from '../styles';
-import { WeatherDisplay } from '../types/weather';
+import { getIoniconForWeather } from '@/services/weatherIconService';
+import { theme, typography } from '@/styles';
+import { WeatherDisplay } from '@/types/weather';
 
 interface WeatherForecastCardProps {
   weatherDisplayArray?: WeatherDisplay[];

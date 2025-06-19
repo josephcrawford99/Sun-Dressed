@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, StyleSheet, Pressable } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { theme } from '@/styles/theme';
 
 interface Props {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Error boundary caught an error - could integrate with error reporting service
   }
 
   handleTryAgain = () => {
@@ -83,19 +84,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 24,
     padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
     fontFamily: 'monospace',
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: theme.borderRadius.medium,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 16,
+    color: theme.colors.white,
+    fontSize: theme.fontSize.md,
     fontWeight: '600',
   },
 });

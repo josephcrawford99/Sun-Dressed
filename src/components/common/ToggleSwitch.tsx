@@ -1,6 +1,5 @@
-import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { typography, theme } from '../../styles';
+import { typography, theme } from '@/styles';
 
 interface ToggleSwitchProps {
   label: string;

@@ -1,7 +1,6 @@
-import React from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
-import { theme } from '../styles';
-import { Outfit, OutfitItem } from '../types/Outfit';
+import { theme } from '@/styles';
+import { Outfit, OutfitItem } from '@/types/Outfit';
 import { getClothingIcon } from '@/assets/ClothingIcons';
 
 interface BentoBoxProps {

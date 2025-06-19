@@ -12,9 +12,9 @@ export const ClothingIcons = {
   // Tops
   't-shirt': (props: IconProps) => <MaterialCommunityIcons name="tshirt-crew" {...props} />,
   'button-shirt': (props: IconProps) => <MaterialCommunityIcons name="tshirt-v" {...props} />,
-  'sweater': (props: IconProps) => <MaterialCommunityIcons name="sweater" {...props} />,
+  'sweater': (props: IconProps) => <MaterialCommunityIcons name="sweater-outline" {...props} />,
   'hoodie': (props: IconProps) => <MaterialCommunityIcons name="hoodie" {...props} />,
-  'tank-top': (props: IconProps) => <MaterialCommunityIcons name="tank-top" {...props} />,
+  'tank-top': (props: IconProps) => <MaterialCommunityIcons name="tshirt-crew-outline" {...props} />,
   'blouse': (props: IconProps) => <MaterialCommunityIcons name="tshirt-v" {...props} />,
   'polo-shirt': (props: IconProps) => <MaterialCommunityIcons name="polo" {...props} />,
   
@@ -36,7 +36,7 @@ export const ClothingIcons = {
   // Footwear
   'sneakers': (props: IconProps) => <MaterialCommunityIcons name="shoe-sneaker" {...props} />,
   'boots': (props: IconProps) => <MaterialCommunityIcons name="shoe-boot" {...props} />,
-  'sandals': (props: IconProps) => <MaterialCommunityIcons name="shoe-casual" {...props} />,
+  'sandals': (props: IconProps) => <MaterialCommunityIcons name="shoe-print" {...props} />,
   'dress-shoes': (props: IconProps) => <MaterialCommunityIcons name="shoe-formal" {...props} />,
   'flats': (props: IconProps) => <MaterialCommunityIcons name="shoe-heel" {...props} />,
   

@@ -100,7 +100,7 @@ export const useDailyOutfitLogger = () => {
       return { date, outfit, location };
     },
     onError: (error) => {
-      console.error('Error logging worn outfit:', error);
+      // Error logging worn outfit - handled by TanStack Query
     }
   });
 };
@@ -145,7 +145,7 @@ export const useOutfitRegeneration = () => {
       });
     },
     onError: (error) => {
-      console.error('Error regenerating outfit:', error);
+      // Error regenerating outfit - handled by TanStack Query
     }
   });
 };

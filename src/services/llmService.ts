@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { Outfit } from '../types/Outfit';
-import { Weather } from '../types/weather';
-import { StylePreference } from '../types/settings';
+import { Outfit } from '@/types/Outfit';
+import { Weather } from '@/types/weather';
+import { StylePreference } from '@/types/settings';
 import { geminiRateLimiter } from './rateLimiter';
 import { APIOptimizer } from './utils/APIOptimizer';
 import { ALL_CLOTHING_ITEMS } from '@/constants/clothingItems';

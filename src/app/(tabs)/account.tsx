@@ -14,7 +14,7 @@ import {
   Alert
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCurrentUser, useSignOutMutation, useUpdateProfileMutation } from '@/hooks/queries/useAuthQuery';
+import { useCurrentUser, useSignOutMutation, useUpdateProfileMutation, useUpdatePasswordMutation } from '@/hooks/queries/useAuthQuery';
 
 
 export default function AccountScreen() {
@@ -23,10 +23,17 @@ export default function AccountScreen() {
   const currentUser = useCurrentUser();
   const signOutMutation = useSignOutMutation();
   const updateProfileMutation = useUpdateProfileMutation();
+  const updatePasswordMutation = useUpdatePasswordMutation();
   
   const [name, setName] = useState(currentUser?.user_metadata?.name || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [isUpdatingSetting, setIsUpdatingSetting] = useState(false);
+  
+  // Password change state
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Update local state when user data changes
   useEffect(() => {
@@ -79,6 +86,54 @@ export default function AccountScreen() {
     }
   };
 
+  const validatePasswordChange = () => {
+    if (!currentPassword.trim()) {
+      Alert.alert('Validation Error', 'Please enter your current password');
+      return false;
+    }
+    
+    if (!newPassword.trim()) {
+      Alert.alert('Validation Error', 'Please enter a new password');
+      return false;
+    }
+    
+    if (newPassword.length < 8) {
+      Alert.alert('Validation Error', 'New password must be at least 8 characters long');
+      return false;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Validation Error', 'New password and confirmation do not match');
+      return false;
+    }
+    
+    if (currentPassword === newPassword) {
+      Alert.alert('Validation Error', 'New password must be different from current password');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handlePasswordChange = async () => {
+    if (!validatePasswordChange()) {
+      return;
+    }
+
+    try {
+      await updatePasswordMutation.mutateAsync(newPassword);
+      Alert.alert('Success', 'Password updated successfully');
+      
+      // Reset form and hide section
+      setShowPasswordSection(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to update password');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
@@ -123,6 +178,84 @@ export default function AccountScreen() {
                 color={theme.colors.black} 
                 style={styles.inputLoadingSpinner} 
               />
+            )}
+          </View>
+
+          {/* Password Change Section */}
+          <View style={styles.passwordContainer}>
+            <Text style={styles.sectionLabel}>Password</Text>
+            {!showPasswordSection ? (
+              <Button
+                title="Change Password"
+                onPress={() => setShowPasswordSection(true)}
+                variant="secondary"
+                size="medium"
+              />
+            ) : (
+              <View style={styles.passwordFieldsContainer}>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    label="Current Password"
+                    placeholder="Enter current password"
+                    size="medium"
+                    value={currentPassword}
+                    onChangeText={setCurrentPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    autoComplete="current-password"
+                    textContentType="password"
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    label="New Password"
+                    placeholder="Enter new password"
+                    size="medium"
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    autoComplete="new-password"
+                    textContentType="newPassword"
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    label="Confirm New Password"
+                    placeholder="Confirm new password"
+                    size="medium"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    autoComplete="new-password"
+                    textContentType="newPassword"
+                  />
+                </View>
+
+                <View style={styles.passwordButtonContainer}>
+                  <Button
+                    title="Cancel"
+                    onPress={() => {
+                      setShowPasswordSection(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                    }}
+                    variant="secondary"
+                    size="medium"
+                  />
+                  <Button
+                    title={updatePasswordMutation.isPending ? "Updating..." : "Update Password"}
+                    onPress={handlePasswordChange}
+                    variant="primary"
+                    size="medium"
+                    disabled={updatePasswordMutation.isPending}
+                  />
+                </View>
+              </View>
             )}
           </View>
 
@@ -237,5 +370,24 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: theme.colors.gray,
     fontSize: theme.fontSize.sm,
+  },
+  passwordContainer: {
+    marginBottom: theme.spacing.lg,
+    borderRadius: theme.borderRadius.medium,
+    backgroundColor: theme.colors.lightGray,
+    padding: theme.spacing.md,
+  },
+  sectionLabel: {
+    ...typography.label,
+    marginBottom: theme.spacing.sm,
+  },
+  passwordFieldsContainer: {
+    gap: theme.spacing.sm,
+  },
+  passwordButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.sm,
   },
 });
