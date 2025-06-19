@@ -8,16 +8,18 @@ export default {
     experiments: {
       typedRoutes: true,
     },
-    // icon: "./src/assets/icon.png",
+    icon: "./src/assets/icon.png",
     userInterfaceStyle: "light",
     plugins: [
-      "expo-font"
+      "expo-font",
+      "expo-apple-authentication",
+      "expo-web-browser"
     ],
-    // splash: {
-    //   image: "./src/assets/splash.png",
-    //   resizeMode: "contain",
-    //   backgroundColor: "#ffffff"
-    // },
+    splash: {
+      image: "./src/assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff"
+    },
     assetBundlePatterns: [
       "**/*"
     ],
@@ -26,15 +28,15 @@ export default {
       bundleIdentifier: "com.sundressed.app"
     },
     android: {
-      // adaptiveIcon: {
-      //   foregroundImage: "./src/assets/adaptive-icon.png",
-      //   backgroundColor: "#ffffff"
-      // },
+      adaptiveIcon: {
+        foregroundImage: "./src/assets/adaptive-icon.png",
+        backgroundColor: "#ffffff"
+      },
       package: "com.sundressed.app"
     },
     web: {
       bundler: "metro",
-      // favicon: "./src/assets/icon.png"
+      favicon: "./src/assets/icon.png"
     },
     extra: {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
