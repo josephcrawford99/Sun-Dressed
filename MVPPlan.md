@@ -23,6 +23,7 @@ The Sun Dressed app is functionally complete but requires critical fixes and App
 ## Phase 1: Critical Bug Fixes (1-2 days)
 
 ### 1.1 Fix Login Regeneration Bug
+## NOTE: Joey thinks this bug is gone. If so, read it over and remove this task
 **File**: `src/app/(tabs)/index.tsx` (lines 48-56)
 **Issue**: Race condition between weather loading and outfit restoration
 **Solution**:

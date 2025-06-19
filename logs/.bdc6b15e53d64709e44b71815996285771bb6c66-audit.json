@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/joey/Desktop/Climate-Closet/sun-dressed/logs/.bdc6b15e53d64709e44b71815996285771bb6c66-audit.json",
+    "files": [
+        {
+            "date": 1750329213421,
+            "name": "/Users/joey/Desktop/Climate-Closet/sun-dressed/logs/mcp-puppeteer-2025-06-19.log",
+            "hash": "636e46bcba562ff1bc136d6b9cf0d49fdcaaa9c685ecc2a688f4329698136ebf"
+        }
+    ],
+    "hashType": "sha256"
+}

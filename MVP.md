@@ -20,7 +20,7 @@ App to use ai to generate an outfit of the day based on the weather and a packin
 -trips wearther forecast doesnt work (shows next fe days, not days of the trip)
 
 ## Features to remove for now
-- Previous and next day outfit
+- Previous and next day outfit (unless we can get working)
 - Placeholder closet and social screen
 
 ## Claude notes below

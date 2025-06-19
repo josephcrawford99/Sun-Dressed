@@ -1,16 +1,15 @@
 import { useOutfit } from '@/contexts/OutfitContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import CalendarBar, { DateOffset } from '@components/CalendarBar';
-import { useLastLocation } from '@hooks/useLastLocation';
-import { useLocationWeather } from '@hooks/useLocationWeather';
-import { useActivityInput } from '@hooks/home/useActivityInput';
-import { useHomeScreenState } from '@hooks/home/useHomeScreenState';
 import { HomeHeader } from '@components/home/HomeHeader';
 import { LocationWeatherBar } from '@components/home/LocationWeatherBar';
-import { ActivityInputSection } from '@components/home/ActivityInputSection';
 import { MainContentArea } from '@components/home/MainContentArea';
+import { useActivityInput } from '@hooks/home/useActivityInput';
+import { useHomeScreenState } from '@hooks/home/useHomeScreenState';
+import { useLastLocation } from '@hooks/useLastLocation';
+import { useLocationWeather } from '@hooks/useLocationWeather';
 import { theme } from '@styles';
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -98,10 +97,6 @@ export default function HomeScreen() {
         onDateSelect={handleDateSelect}
       />
       
-      <ActivityInputSection
-        value={activityInput}
-        onChangeText={setActivityInput}
-      />
 
       <MainContentArea
         isFlipped={isFlipped}
