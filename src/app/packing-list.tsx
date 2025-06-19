@@ -52,13 +52,18 @@ export default function PackingListModal() {
 
 
   const renderPackingList = () => (
-    <View style={styles.packingListContainer}>
+    <ScrollView 
+      style={styles.packingListContainer}
+      contentContainerStyle={styles.packingListContent}
+      showsVerticalScrollIndicator={false}
+      bounces={true}
+    >
       {packingList.map((item, index) => (
         <View key={`${index}-${item}`} style={styles.packingItem}>
           <Text style={styles.packingItemText}>{item}</Text>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 
   const renderEmptyState = () => {
@@ -259,6 +264,10 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
   },
   packingListContainer: {
+    flex: 1,
+    maxHeight: 400, // Limit height to ensure scrolling
+  },
+  packingListContent: {
     paddingVertical: theme.spacing.md,
   },
   packingItem: {

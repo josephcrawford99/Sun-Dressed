@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { getIoniconForWeather } from '../services/weatherIconService';
 import { theme, typography } from '../styles';
 import { WeatherDisplay } from '../types/weather';
@@ -77,7 +77,12 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
       </View>
 
       {/* Forecast list */}
-      <View style={styles.forecastContainer}>
+      <ScrollView 
+        style={styles.forecastScrollView}
+        contentContainerStyle={styles.forecastContainer}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
         {weatherDisplayArray.map((weather, index) => (
           <View key={index} style={styles.dayCard}>
             <View style={styles.dateSection}>
@@ -116,7 +121,7 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
             </View>
           </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -174,6 +179,10 @@ const styles = StyleSheet.create({
   subtitle: {
     ...typography.caption,
     color: theme.colors.gray,
+  },
+  forecastScrollView: {
+    flex: 1,
+    maxHeight: 400, // Limit height to ensure scrolling
   },
   forecastContainer: {
     paddingBottom: theme.spacing.md,

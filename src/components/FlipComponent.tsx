@@ -46,12 +46,15 @@ const FlipComponent: React.FC<FlipComponentProps> = ({
 
   return (
     <View style={[styles.container, style]}>
-      <Animated.View style={[styles.card, styles.frontCard, frontStyle]}>
-        {frontComponent}
-      </Animated.View>
-      <Animated.View style={[styles.card, styles.backCard, backStyle]}>
-        {backComponent}
-      </Animated.View>
+      {!isFlipped ? (
+        <Animated.View style={[styles.card, frontStyle]}>
+          {frontComponent}
+        </Animated.View>
+      ) : (
+        <Animated.View style={[styles.card, backStyle]}>
+          {backComponent}
+        </Animated.View>
+      )}
     </View>
   );
 };
@@ -60,34 +63,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
-    zIndex: 1000,
-    elevation: 10,
-    overflow: 'visible',
     minHeight: 400,
   },
   card: {
-    width: '100%',
     flex: 1,
-    backfaceVisibility: 'hidden',
     backgroundColor: 'transparent',
-    zIndex: 100,
-    elevation: 5,
-  },
-  frontCard: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 101,
-  },
-  backCard: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,  
-    zIndex: 100,
   },
 });
 
