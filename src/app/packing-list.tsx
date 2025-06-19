@@ -16,31 +16,28 @@ export default function PackingListModal() {
   const insets = useSafeAreaInsets();
   const { tripId } = useLocalSearchParams();
   const { getTrip } = useTrips();
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  // Get trip data first
+  const trip = tripId ? getTrip(tripId as string) : null;
+  
+  // Then initialize hooks with trip data
   const { 
     packingList, 
     weatherForecast,
     loading, 
     error, 
-    generatePackingList, 
-    refetch
+    generatePackingList
   } = usePackingList(tripId as string, trip?.startDate, trip?.endDate);
   const { convertToDisplayArray } = useWeatherDisplayArray();
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const trip = tripId ? getTrip(tripId as string) : null;
-  
-  // TanStack Query automatically handles loading stored data
   
   const handleGeneratePackingList = async () => {
-    if (!trip) {
-      // No trip found for ID
-      return;
-    }
+    if (!trip) return;
     
     try {
       await generatePackingList(trip.location, trip.startDate, trip.endDate, trip.id);
     } catch {
-      // Error generating packing list
+      // Error handled by usePackingList hook
     }
   };
 
@@ -48,8 +45,10 @@ export default function PackingListModal() {
     setIsFlipped(!isFlipped);
   };
 
-  // Get weather display data
-  const weatherDisplayArray = weatherForecast.length > 0 ? convertToDisplayArray(weatherForecast) : [];
+  // Get weather display data - simplified
+  const weatherDisplayArray = convertToDisplayArray(weatherForecast);
+  const hasWeatherData = weatherDisplayArray.length > 0;
+  const hasPackingList = packingList.length > 0;
 
   const renderPackingItem = ({ item }: { item: string }) => (
     <View style={styles.packingItem}>
@@ -67,12 +66,7 @@ export default function PackingListModal() {
       refreshControl={
         <RefreshControl
           refreshing={loading}
-          onRefresh={() => {
-            refetch();
-            if (trip) {
-              handleGeneratePackingList();
-            }
-          }}
+          onRefresh={handleGeneratePackingList}
           tintColor={theme.colors.black}
           title="Pull to regenerate"
           titleColor={theme.colors.black}
@@ -92,14 +86,14 @@ export default function PackingListModal() {
         >
           {loading ? (
             <ActivityIndicator size="small" color={theme.colors.white} />
-        ) : (
-          <Text style={styles.generateButtonText}>
-            {packingList.length === 0 ? 'Generate Packing List' : 'Regenerate Packing List'}
-          </Text>
-        )}
-      </TouchableOpacity>
+          ) : (
+            <Text style={styles.generateButtonText}>
+              {hasPackingList ? 'Regenerate Packing List' : 'Generate Packing List'}
+            </Text>
+          )}
+        </TouchableOpacity>
         {!trip && <Text style={styles.debugText}>No trip data available</Text>}
-        {trip && packingList.length === 0 && (
+        {trip && !hasPackingList && (
           <Text style={styles.debugText}>Pull down to refresh or tap generate to create packing list</Text>
         )}
       </View>
@@ -129,7 +123,7 @@ export default function PackingListModal() {
       );
     }
 
-    if (packingList.length === 0) {
+    if (!hasPackingList) {
       return renderEmptyState();
     }
 
@@ -142,8 +136,8 @@ export default function PackingListModal() {
             weatherDisplayArray={weatherDisplayArray}
             loading={loading}
             error={error}
-            location={trip?.location}
-            startDate={trip?.startDate}
+            location={trip.location}
+            startDate={trip.startDate}
           />
         }
         style={styles.flipContainer}
@@ -159,7 +153,7 @@ export default function PackingListModal() {
             <Ionicons name="arrow-back" size={24} color={theme.colors.black} />
           </TouchableOpacity>
           <Text style={styles.title}>Packing List</Text>
-          {trip && packingList.length > 0 && weatherDisplayArray.length > 0 ? (
+          {trip && hasPackingList && hasWeatherData ? (
             <TouchableOpacity style={styles.weatherButton} onPress={handleWeatherButtonPress}>
               <Text style={styles.weatherButtonText}>
                 {isFlipped ? 'List' : 'Weather'}
