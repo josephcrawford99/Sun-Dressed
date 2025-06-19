@@ -8,6 +8,7 @@ import { useHomeScreenState } from '@hooks/home/useHomeScreenState';
 import { useDailyOutfitLogger, useOutfitQuery, useOutfitRegeneration } from '@hooks/queries/useOutfitQuery';
 import { useLocation } from '@hooks/useLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
+import { usePrefetchAdjacentDates } from '@hooks/usePrefetchAdjacentDates';
 import { theme } from '@styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -24,6 +25,9 @@ export default function HomeScreen() {
   const [currentActivity, setCurrentActivity] = useState('daily activities');
   
   const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, refetch: refetchWeather } = useLocationWeather(location || '', currentDateOffset);
+  
+  // Prefetch adjacent dates for smooth navigation
+  usePrefetchAdjacentDates(location, currentActivity);
   
   // Initialize home screen state
   const { isFlipped, toggleFlipped } = useHomeScreenState({

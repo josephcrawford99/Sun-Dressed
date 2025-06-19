@@ -92,7 +92,7 @@ export function useLocationWeather(
       return weatherData;
     },
     enabled: !!location?.trim(),
-    staleTime: dateOffset === 0 ? 5 * 60 * 1000 : 30 * 60 * 1000, // Today: 5min, others: 30min
+    staleTime: dateOffset === 0 ? 5 * 60 * 1000 : 6 * 60 * 60 * 1000, // Today: 5min, others: 6 hours
     gcTime: 60 * 60 * 1000, // 1 hour
     retry: 2
   });
