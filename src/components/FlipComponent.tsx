@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
-  runOnJS
+  withTiming
 } from 'react-native-reanimated';
 
 interface FlipComponentProps {

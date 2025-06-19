@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { OutfitManager, OutfitContext, OutfitResult } from '@/services/outfit/OutfitManager';
 import { Weather } from '@/types/weather';
 import { Outfit } from '@/types/Outfit';
 import { 
@@ -8,64 +7,8 @@ import {
   isPastDate,
   OUTFIT_CACHE_CONFIG 
 } from '@/utils/cacheUtils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Global outfit manager instance
-let outfitManager: OutfitManager | null = null;
-
-const getOutfitManager = (): OutfitManager => {
-  if (!outfitManager) {
-    outfitManager = new OutfitManager();
-  }
-  return outfitManager;
-};
-
-/**
- * Generate outfit using OutfitManager
- */
-const generateOutfitForDate = async (
-  date: Date,
-  weather: Weather | null,
-  activity: string,
-  location: string
-): Promise<OutfitResult> => {
-  const manager = getOutfitManager();
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const targetDateOnly = new Date(date);
-  targetDateOnly.setHours(0, 0, 0, 0);
-  const daysDiff = Math.floor((targetDateOnly.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  
-  const context: OutfitContext = {
-    date,
-    weather,
-    activity,
-    location,
-    dateOffset: Math.max(-1, Math.min(1, daysDiff)) as -1 | 0 | 1
-  };
-  
-  return manager.getOutfit(context);
-};
-
-/**
- * Check for "worn outfit" for past dates
- */
-const getWornOutfitForDate = async (date: Date): Promise<Outfit | null> => {
-  try {
-    const dateString = date.toISOString().split('T')[0];
-    const wornOutfitData = await AsyncStorage.getItem(`worn-outfit-${dateString}`);
-    
-    if (wornOutfitData) {
-      const { outfit } = JSON.parse(wornOutfitData);
-      return outfit;
-    }
-  } catch (error) {
-    console.error('Error getting worn outfit:', error);
-  }
-  
-  return null;
-};
+import { generateOutfitLLM } from '@/services/llmService';
+import { SettingsService } from '@/services/settingsService';
 
 /**
  * Main outfit query hook with smart caching
@@ -78,26 +21,51 @@ export const useOutfitQuery = (
 ) => {
   const queryKey = getOutfitQueryKey(date, location, activity);
   const isDateInPast = isPastDate(date);
+  const queryClient = useQueryClient();
   
   return useQuery({
     queryKey,
     queryFn: async (): Promise<Outfit | null> => {
-      // For past dates, try to get worn outfit first
+      // For past dates, check if we have a worn outfit stored
       if (isDateInPast) {
-        const wornOutfit = await getWornOutfitForDate(date);
+        const dateString = date.toISOString().split('T')[0];
+        const wornOutfit = queryClient.getQueryData(['worn-outfit', dateString]) as Outfit | undefined;
         if (wornOutfit) {
           return wornOutfit;
         }
+        // No worn outfit for past date, return null
+        return null;
       }
       
-      // Generate using OutfitManager (handles all caching internally)
-      const result = await generateOutfitForDate(date, weather, activity, location);
-      return result.outfit;
+      // For current/future dates, check if we already have a cached outfit
+      // TanStack Query will automatically check its cache first, but we can also
+      // check if we have the data without triggering network requests
+      const existingOutfit = queryClient.getQueryData(queryKey) as Outfit | undefined;
+      if (existingOutfit) {
+        return existingOutfit;
+      }
+      
+      // No cached outfit exists, need to generate new one
+      // But we need weather data to generate
+      if (!weather) {
+        // Return null and query will re-run when weather becomes available
+        return null;
+      }
+      
+      // Generate new outfit using LLM
+      const settings = await SettingsService.loadSettings();
+      const outfit = await generateOutfitLLM(
+        weather,
+        activity,
+        settings.stylePreference
+      );
+      
+      return outfit;
     },
     staleTime: isDateInPast 
       ? Infinity // Past outfits never go stale
       : getTimeUntilEndOfDay(date), // Today's outfit fresh until midnight
-    enabled: !!(location && (weather || isDateInPast)), // Only run when we have required data
+    enabled: !!location, // Always enabled when we have location - check cache first, weather when needed
     ...OUTFIT_CACHE_CONFIG,
   });
 };
@@ -120,23 +88,16 @@ export const useDailyOutfitLogger = () => {
     }) => {
       const dateString = date.toISOString().split('T')[0];
       
-      // Store as "worn outfit" in AsyncStorage
-      const wornOutfitData = {
-        outfit,
-        location,
-        timestamp: Date.now()
-      };
-      
-      await AsyncStorage.setItem(
-        `worn-outfit-${dateString}`,
-        JSON.stringify(wornOutfitData)
-      );
+      // Store as worn outfit in TanStack Query cache
+      queryClient.setQueryData(['worn-outfit', dateString], outfit);
       
       // Invalidate outfit queries for this date to ensure fresh data shows worn outfit
       queryClient.invalidateQueries({
         queryKey: ['outfit', dateString],
         exact: false
       });
+      
+      return { date, outfit, location };
     },
     onError: (error) => {
       console.error('Error logging worn outfit:', error);
@@ -162,30 +123,26 @@ export const useOutfitRegeneration = () => {
       activity: string;
       weather: Weather;
     }) => {
-      const manager = getOutfitManager();
-      
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const targetDateOnly = new Date(date);
-      targetDateOnly.setHours(0, 0, 0, 0);
-      const daysDiff = Math.floor((targetDateOnly.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      
-      const context: OutfitContext = {
-        date,
+      // Generate new outfit using LLM directly
+      const settings = await SettingsService.loadSettings();
+      const outfit = await generateOutfitLLM(
         weather,
         activity,
-        location,
-        dateOffset: Math.max(-1, Math.min(1, daysDiff)) as -1 | 0 | 1
-      };
+        settings.stylePreference
+      );
       
-      // Force regeneration
-      const result = await manager.forceRegenerate(context);
-      return result.outfit;
+      return outfit;
     },
     onSuccess: (newOutfit, variables) => {
       // Update cache with new outfit
       const queryKey = getOutfitQueryKey(variables.date, variables.location, variables.activity);
       queryClient.setQueryData(queryKey, newOutfit);
+      
+      // Also invalidate the query to ensure UI updates
+      queryClient.invalidateQueries({
+        queryKey,
+        exact: true
+      });
     },
     onError: (error) => {
       console.error('Error regenerating outfit:', error);

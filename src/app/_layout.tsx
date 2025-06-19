@@ -9,7 +9,6 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SettingsProvider } from '@/contexts/SettingsContext';
-import { OutfitProvider } from '@/contexts/OutfitContext';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { queryClient, asyncStoragePersister } from '@/config/queryClient';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -70,13 +69,12 @@ export default function RootLayout() {
         }}
       >
         <SettingsProvider>
-          <OutfitProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <SafeAreaProvider>
-                <AuthGuard>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <SafeAreaProvider>
+              <AuthGuard>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                     <Stack.Screen 
                       name="edit-trip" 
                       options={{ 
@@ -97,7 +95,6 @@ export default function RootLayout() {
                 <StatusBar style="auto" />
               </SafeAreaProvider>
             </ThemeProvider>
-          </OutfitProvider>
         </SettingsProvider>
       </PersistQueryClientProvider>
     </ErrorBoundary>
