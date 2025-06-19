@@ -1,25 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { geocodeService } from '@services/geocodeService';
 import { weatherService } from '@services/weatherService';
 import { Weather, WeatherDisplay } from '@/types/weather';
 import { useSettings } from '@/contexts/SettingsContext';
 import { convertTemperature, convertSpeed, getTemperatureSymbol, getSpeedSymbol } from '@/utils/unitConversions';
+import { DateOffset } from '@components/CalendarBar';
 
 interface UseLocationWeatherReturn {
   weather: Weather | null;
   weatherDisplay: WeatherDisplay | null;
   isLoading: boolean;
   error: string | null;
-  fetchWeatherByLocationString: (locationString: string, coordinates?: { lat: number; lon: number }) => Promise<void>;
-  clearWeather: () => void;
+  refetch: () => void;
 }
 
-export function useLocationWeather(): UseLocationWeatherReturn {
+export function useLocationWeather(
+  location: string,
+  dateOffset: DateOffset = 0,
+  coordinates?: { lat: number; lon: number }
+): UseLocationWeatherReturn {
   const { settings } = useSettings();
-  const [weather, setWeather] = useState<Weather | null>(null);
-  const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Create display-ready weather object with user's preferred units
   const createWeatherDisplay = useCallback((weatherData: Weather, coordinates?: { lat: number; lon: number }): WeatherDisplay => {
@@ -43,63 +44,69 @@ export function useLocationWeather(): UseLocationWeatherReturn {
     };
   }, [settings.temperatureUnit, settings.speedUnit]);
 
-  const fetchWeatherByLocationString = useCallback(async (
-    locationString: string, 
-    coordinates?: { lat: number; lon: number }
-  ) => {
-    if (!locationString?.trim()) {
-      // Empty location string provided
-      return;
-    }
+  // TanStack Query for reactive weather fetching
+  const {
+    data: weather,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['weather', location, dateOffset],
+    queryFn: async (): Promise<Weather> => {
+      if (!location?.trim()) {
+        throw new Error('Location is required');
+      }
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      
       let finalCoordinates;
       
       if (coordinates) {
-        // Use coordinates from Google Places if available
         finalCoordinates = coordinates;
       } else {
-        // Fallback to geocoding service
-        finalCoordinates = await geocodeService.geocode(locationString);
+        finalCoordinates = await geocodeService.geocode(location);
       }
       
-      // Fetch weather data using coordinates
-      const weatherData = await weatherService.fetchWeatherByCoordinates(
-        finalCoordinates.lat, 
-        finalCoordinates.lon
-      );
+      let weatherData: Weather;
       
-      setWeather(weatherData);
-      setCoordinates(finalCoordinates);
+      if (dateOffset === 0) {
+        // Today - use current weather
+        weatherData = await weatherService.fetchWeatherByCoordinates(
+          finalCoordinates.lat, 
+          finalCoordinates.lon
+        );
+      } else if (dateOffset === 1) {
+        // Tomorrow - fetch 2-day forecast and take tomorrow's weather
+        const forecast = await weatherService.fetchForecastByCoordinates(
+          finalCoordinates.lat,
+          finalCoordinates.lon,
+          2
+        );
+        weatherData = forecast[1]; // Index 1 is tomorrow
+      } else {
+        // Yesterday (dateOffset === -1) - use current weather as fallback
+        weatherData = await weatherService.fetchWeatherByCoordinates(
+          finalCoordinates.lat, 
+          finalCoordinates.lon
+        );
+      }
       
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      // Weather fetch failed, error will be thrown
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const clearWeather = useCallback(() => {
-    setWeather(null);
-    setCoordinates(null);
-    setError(null);
-  }, []);
+      return weatherData;
+    },
+    enabled: !!location?.trim(),
+    staleTime: dateOffset === 0 ? 5 * 60 * 1000 : 30 * 60 * 1000, // Today: 5min, others: 30min
+    gcTime: 60 * 60 * 1000, // 1 hour
+    retry: 2
+  });
 
   // Create weatherDisplay whenever weather changes
-  const weatherDisplay = weather ? createWeatherDisplay(weather, coordinates || undefined) : null;
+  const weatherDisplay = useMemo(() => {
+    return weather && coordinates ? createWeatherDisplay(weather, coordinates) : weather ? createWeatherDisplay(weather) : null;
+  }, [weather, coordinates, createWeatherDisplay]);
 
   return {
-    weather,
+    weather: weather || null,
     weatherDisplay,
     isLoading,
-    error,
-    fetchWeatherByLocationString,
-    clearWeather
+    error: error?.message || null,
+    refetch
   };
 }

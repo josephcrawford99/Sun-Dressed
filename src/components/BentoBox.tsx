@@ -60,10 +60,16 @@ const BentoBox: React.FC<BentoBoxProps> = ({
       );
     }
 
+    const iconResult = getClothingIcon(item.iconKey, { size: 32, color: theme.colors.black });
+    
     return (
       <View style={styles.box}>
         <View style={styles.iconContainer}>
-          {getClothingIcon(item.iconKey, { size: 32, color: theme.colors.black })}
+          {typeof iconResult === 'string' ? (
+            <Text style={styles.iconText}>{iconResult}</Text>
+          ) : (
+            iconResult
+          )}
         </View>
         <Text style={styles.descriptionText} numberOfLines={2}>
           {item.description}
@@ -142,6 +148,12 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginBottom: theme.spacing.xs,
+  },
+  iconText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.black,
+    textAlign: 'center',
+    fontWeight: '500',
   },
   descriptionText: {
     fontSize: theme.fontSize.xs,

@@ -4,14 +4,24 @@ import { getIoniconForWeather } from '@/services/weatherIconService';
 import { theme, typography } from '@/styles';
 import { WeatherDisplay } from '@/types/weather';
 import { getWindDirection, formatTime, getPrecipitationMessage } from '@/utils/weatherUtils';
+import { DateOffset } from '@components/CalendarBar';
 
 interface WeatherCardProps {
   weatherDisplay?: WeatherDisplay;
   loading?: boolean;
   error?: string | null;
+  dateOffset?: DateOffset;
 }
 
-const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, error }) => {
+const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, error, dateOffset }) => {
+
+  // Helper function to get date label
+  const getDateLabel = (): string => {
+    if (dateOffset === undefined || dateOffset === 0) return 'Today';
+    if (dateOffset === 1) return 'Tomorrow';
+    if (dateOffset === -1) return 'Yesterday';
+    return 'Today'; // fallback
+  };
 
   if (loading) {
     return (
@@ -46,6 +56,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weatherDisplay, loading, erro
         />
         <View style={styles.headerText}>
           <Text style={styles.location}>{weatherDisplay.location}</Text>
+          <Text style={styles.dateLabel}>{getDateLabel()}</Text>
           <Text style={styles.condition}>{weatherDisplay.description || weatherDisplay.condition.replace('-', ' ')}</Text>
         </View>
       </View>
@@ -182,6 +193,12 @@ const styles = StyleSheet.create({
   },
   location: {
     ...typography.subheading,
+    marginBottom: theme.spacing.xs,
+  },
+  dateLabel: {
+    ...typography.caption,
+    color: theme.colors.gray,
+    fontSize: theme.fontSize.xs,
     marginBottom: theme.spacing.xs,
   },
   condition: {

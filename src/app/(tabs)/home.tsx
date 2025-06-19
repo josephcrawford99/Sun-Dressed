@@ -18,17 +18,17 @@ import {
 export default function HomeScreen() {
   const { settings } = useSettings();
   const { location, isLoading: locationLoading, saveLocation } = useLocation();
-  const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, fetchWeatherByLocationString } = useLocationWeather();
+  const { weather, weatherDisplay, isLoading: weatherLoading, error: weatherError, refetch: refetchWeather } = useLocationWeather(location || '', currentDateOffset);
   
   // Outfit state management
   const [currentDateOffset, setCurrentDateOffset] = useState<DateOffset>(0);
   const [currentActivity, setCurrentActivity] = useState('daily activities');
   
-  // Initialize home screen state and handle initialization
+  // Initialize home screen state
   const { isFlipped, toggleFlipped } = useHomeScreenState({
     location,
     locationLoading,
-    onLocationReady: fetchWeatherByLocationString
+    onLocationReady: () => {} // No longer needed - useQuery handles this reactively
   });
 
   // Handle activity input with debouncing
@@ -98,10 +98,9 @@ export default function HomeScreen() {
   // Handle location selection - now much simpler!
   const handleLocationSelect = useCallback(async (locationString: string, coordinates?: { lat: number; lon: number }) => {
     await saveLocation(locationString);
-    fetchWeatherByLocationString(locationString, coordinates);
-    // No need to manually handle outfit loading - useOutfitQuery will automatically
-    // refetch when location changes thanks to its query key dependency!
-  }, [saveLocation, fetchWeatherByLocationString]);
+    // No need to manually handle weather/outfit loading - useQuery hooks will automatically
+    // refetch when location changes thanks to their query key dependencies!
+  }, [saveLocation]);
 
   // Combine loading states
   const isLoading = locationLoading || weatherLoading || outfitLoading || outfitRegeneration.isPending;

@@ -67,6 +67,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = ({
             weatherDisplay={weatherDisplay || undefined}
             loading={isWeatherLoading}
             error={weatherError}
+            dateOffset={currentDateOffset}
           />
         }
         style={styles.flipContainer}
