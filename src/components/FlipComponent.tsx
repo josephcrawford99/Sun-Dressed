@@ -63,10 +63,11 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     elevation: 10,
     overflow: 'visible',
+    minHeight: 400,
   },
   card: {
     width: '100%',
-    height: '100%',
+    flex: 1,
     backfaceVisibility: 'hidden',
     backgroundColor: 'transparent',
     zIndex: 100,

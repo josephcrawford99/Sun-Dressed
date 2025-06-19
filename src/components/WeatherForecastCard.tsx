@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { getIoniconForWeather } from '../services/weatherIconService';
 import { theme, typography } from '../styles';
 import { WeatherDisplay } from '../types/weather';
@@ -59,6 +59,7 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
     return forecastDate.toDateString() === today.toDateString();
   };
 
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -76,11 +77,7 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
       </View>
 
       {/* Forecast list */}
-      <ScrollView 
-        style={styles.forecastScroll}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.forecastContent}
-      >
+      <View style={styles.forecastContainer}>
         {weatherDisplayArray.map((weather, index) => (
           <View key={index} style={styles.dayCard}>
             <View style={styles.dateSection}>
@@ -119,7 +116,7 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
             </View>
           </View>
         ))}
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -178,10 +175,7 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: theme.colors.gray,
   },
-  forecastScroll: {
-    flex: 1,
-  },
-  forecastContent: {
+  forecastContainer: {
     paddingBottom: theme.spacing.md,
   },
   dayCard: {

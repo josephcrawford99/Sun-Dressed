@@ -57,6 +57,7 @@ export default function TripsScreen() {
       
       <TripsList
         trips={trips}
+        loading={loading}
         onDelete={deleteTrip}
         onEdit={handleEditTrip}
         onViewPackingList={handleViewPackingList}

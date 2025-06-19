@@ -344,11 +344,28 @@ class WeatherService {
     
     let forecasts: Weather[];
     
-    // Check if we can use the standard One Call API (within 8 days)
-    if (daysFromToday <= 7 && daysFromToday >= 0) {
+    // Determine the date that is 8 days from today (OneCall API limit)
+    const oneCallCutoffDate = new Date(today);
+    oneCallCutoffDate.setDate(today.getDate() + 7); // Day 7 is the last day available in OneCall
+    
+    // Check if trip spans across the 8-day boundary
+    if (daysFromToday >= 0 && tripStart <= oneCallCutoffDate && tripEnd > oneCallCutoffDate) {
+      // Trip spans both OneCall range and Day Summary range
+      const oneCallForecasts = await this.fetchForecastUsingOneCall(lat, lon, daysFromToday, Math.min(tripDurationDays, 8 - daysFromToday), tripStart, oneCallCutoffDate);
+      
+      // Calculate the portion that needs Day Summary API
+      const daySummaryStartDate = new Date(oneCallCutoffDate);
+      daySummaryStartDate.setDate(oneCallCutoffDate.getDate() + 1);
+      
+      const daySummaryForecasts = await this.fetchForecastUsingDaySummary(lat, lon, daySummaryStartDate, tripEnd);
+      
+      // Combine both results
+      forecasts = [...oneCallForecasts, ...daySummaryForecasts];
+    } else if (daysFromToday <= 7 && daysFromToday >= 0) {
+      // Trip is entirely within OneCall API range
       forecasts = await this.fetchForecastUsingOneCall(lat, lon, daysFromToday, tripDurationDays, tripStart, tripEnd);
     } else {
-      // Use Day Summary API for future dates
+      // Trip is entirely in the future, use Day Summary API
       forecasts = await this.fetchForecastUsingDaySummary(lat, lon, startDate, endDate);
     }
     
@@ -401,7 +418,7 @@ class WeatherService {
       const endIndex = Math.min(allForecasts.length, startIndex + tripDurationDays);
       const tripForecasts = allForecasts.slice(startIndex, endIndex);
 
-      // Cache the result
+      // Cache the full forecast result for reuse
       this.cache.set(cacheKey, {
         weather: allForecasts,
         timestamp: Date.now()

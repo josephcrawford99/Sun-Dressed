@@ -42,6 +42,7 @@ JOEY NOTE: Completed on 6/19.
 - Add "Try Again" functionality
 
 ### 1.4 Add Loading States
+JOEY NOTE: I think this is all good, looks good to me at least
 **Files**: All screens with async operations
 - Create consistent loading skeleton components
 - Add loading states to all API calls

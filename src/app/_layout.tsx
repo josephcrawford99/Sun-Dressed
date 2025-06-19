@@ -13,6 +13,7 @@ import { OutfitProvider } from '@/contexts/OutfitContext';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { queryClient, asyncStoragePersister } from '@/config/queryClient';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AuthGuard } from '@/components/AuthGuard';
 
 import {
   LibreBaskerville_400Regular,
@@ -72,25 +73,27 @@ export default function RootLayout() {
           <OutfitProvider>
             <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
               <SafeAreaProvider>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen 
-                    name="edit-trip" 
-                    options={{ 
-                      presentation: 'modal',
-                      headerShown: false
-                    }} 
-                  />
-                  <Stack.Screen 
-                    name="packing-list" 
-                    options={{ 
-                      presentation: 'modal',
-                      headerShown: false
-                    }} 
-                  />
-                  <Stack.Screen name="+not-found" />
-                </Stack>
+                <AuthGuard>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen 
+                      name="edit-trip" 
+                      options={{ 
+                        presentation: 'modal',
+                        headerShown: false
+                      }} 
+                    />
+                    <Stack.Screen 
+                      name="packing-list" 
+                      options={{ 
+                        presentation: 'modal',
+                        headerShown: false
+                      }} 
+                    />
+                    <Stack.Screen name="+not-found" />
+                  </Stack>
+                </AuthGuard>
                 <StatusBar style="auto" />
               </SafeAreaProvider>
             </ThemeProvider>

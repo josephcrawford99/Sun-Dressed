@@ -2,21 +2,86 @@ import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
 import { theme, typography } from '@styles';
 import { router } from 'expo-router';
-import React from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSignInMutation, useSignUpMutation, authKeys } from '@/hooks/queries/useAuthQuery';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AuthScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  
+  const queryClient = useQueryClient();
+  const signInMutation = useSignInMutation();
+  const signUpMutation = useSignUpMutation();
+  
+  const currentMutation = isSignUp ? signUpMutation : signInMutation;
+
+  const handleSubmit = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    try {
+      const result = await currentMutation.mutateAsync({
+        email: email.trim(),
+        password,
+      });
+
+      if (result.user) {
+        router.replace('/(tabs)/home');
+      }
+    } catch (error: any) {
+      Alert.alert(
+        'Authentication Error',
+        error.message || 'An error occurred during authentication'
+      );
+    }
+  };
+
   const handleDevLogin = () => {
+    // Create a mock user session for development
+    const mockAuthData = {
+      user: {
+        id: 'dev-user-123',
+        email: 'dev@sundressed.app',
+        user_metadata: {
+          name: 'Developer',
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      session: {
+        access_token: 'dev-token',
+        refresh_token: 'dev-refresh-token',
+        user: {
+          id: 'dev-user-123',
+          email: 'dev@sundressed.app',
+          user_metadata: {
+            name: 'Developer',
+          },
+        },
+      },
+    };
+
+    // Set the mock auth data in TanStack Query cache
+    queryClient.setQueryData(authKeys.session(), mockAuthData);
+    
+    // Navigate to home - AuthGuard will recognize the user as authenticated
     router.replace('/(tabs)/home');
   };
 
   const handleAppleLogin = () => {
     // TODO: Implement Apple OAuth
+    Alert.alert('Coming Soon', 'Apple Sign In will be available in a future update');
   };
 
   const handleGoogleLogin = () => {
     // TODO: Implement Google OAuth
+    Alert.alert('Coming Soon', 'Google Sign In will be available in a future update');
   };
 
   return (
@@ -25,20 +90,48 @@ export default function AuthScreen() {
         <Text style={typography.logo}>Sun Dressed</Text>
       </View>
       <View style={styles.formContainer}>
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity 
+            style={[styles.toggleButton, !isSignUp && styles.activeToggle]}
+            onPress={() => setIsSignUp(false)}
+          >
+            <Text style={[styles.toggleText, !isSignUp && styles.activeToggleText]}>
+              Sign In
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.toggleButton, isSignUp && styles.activeToggle]}
+            onPress={() => setIsSignUp(true)}
+          >
+            <Text style={[styles.toggleText, isSignUp && styles.activeToggleText]}>
+              Sign Up
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <TextInput 
           placeholder="Email"
           size="medium"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
         />
         <TextInput 
           placeholder="Password"
           secureTextEntry
           size="medium"
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
         />
         <Button
-          title="Log In"
-          onPress={() => {}}
+          title={currentMutation.isPending ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
+          onPress={handleSubmit}
           variant="primary"
           size="medium"
+          disabled={currentMutation.isPending}
         />
 
         <View style={styles.dividerContainer}>
@@ -90,6 +183,37 @@ const styles = StyleSheet.create({
   },
   devButtonContainer: {
     marginTop: theme.spacing.lg,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.lightGray,
+    borderRadius: theme.borderRadius.medium,
+    padding: 4,
+    marginBottom: theme.spacing.lg,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.small,
+    alignItems: 'center',
+  },
+  activeToggle: {
+    backgroundColor: theme.colors.white,
+    shadowColor: theme.colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  toggleText: {
+    ...typography.body,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.gray,
+    fontWeight: '500',
+  },
+  activeToggleText: {
+    color: theme.colors.black,
+    fontWeight: '600',
   },
   dividerContainer: {
     flexDirection: 'row',

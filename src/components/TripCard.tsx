@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
 import { Trip } from '@/types/trip';
 import { theme, typography } from '@/styles';
@@ -29,6 +29,7 @@ const formatDateRange = (startDate: Date | string, endDate: Date | string): stri
 
 export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit, onViewPackingList }) => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
 
   const openMenu = () => setMenuVisible(true);
@@ -47,36 +48,48 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit, onVi
 
   const handleDelete = async () => {
     closeMenu();
-    await onDelete(trip.id);
+    setIsDeleting(true);
+    try {
+      await onDelete(trip.id);
+    } catch (error) {
+      // Error is handled by parent component
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
-    <View style={[styles.container, menuVisible && styles.containerWithMenu]}>
+    <View style={[styles.container, menuVisible && styles.containerWithMenu, isDeleting && styles.containerDeleting]}>
       <TouchableOpacity 
         style={styles.content} 
         onPress={handleCardPress}
         activeOpacity={0.7}
+        disabled={isDeleting}
       >
-        <Text style={styles.location}>{trip.location}</Text>
-        <Text style={styles.dates}>
+        <Text style={[styles.location, isDeleting && styles.textDeleting]}>{trip.location}</Text>
+        <Text style={[styles.dates, isDeleting && styles.textDeleting]}>
           {formatDateRange(trip.startDate, trip.endDate)}
         </Text>
+        {isDeleting && <Text style={styles.deletingText}>Deleting...</Text>}
       </TouchableOpacity>
       
-      <Menu
-        visible={menuVisible}
-        onDismiss={closeMenu}
-        contentStyle={styles.menuContent}
-        anchor={
-          <IconButton
-            icon="dots-vertical"
-            size={20}
-            onPress={openMenu}
-            style={styles.menuButton}
-            iconColor={theme.colors.gray}
-          />
-        }
-      >
+      {isDeleting ? (
+        <ActivityIndicator size="small" color={theme.colors.black} style={styles.loadingSpinner} />
+      ) : (
+        <Menu
+          visible={menuVisible}
+          onDismiss={closeMenu}
+          contentStyle={styles.menuContent}
+          anchor={
+            <IconButton
+              icon="dots-vertical"
+              size={20}
+              onPress={openMenu}
+              style={styles.menuButton}
+              iconColor={theme.colors.gray}
+            />
+          }
+        >
         <Menu.Item 
           onPress={handleEdit} 
           title="Edit"
@@ -98,7 +111,8 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit, onVi
           leadingIcon="delete"
           titleStyle={styles.menuItemText}
         />
-      </Menu>
+        </Menu>
+      )}
     </View>
   );
 };
@@ -145,5 +159,21 @@ const styles = StyleSheet.create({
   menuItemText: {
     color: theme.colors.black,
     fontSize: theme.fontSize.md,
+  },
+  containerDeleting: {
+    opacity: 0.6,
+  },
+  textDeleting: {
+    opacity: 0.7,
+  },
+  deletingText: {
+    ...typography.body,
+    color: theme.colors.gray,
+    fontSize: theme.fontSize.sm,
+    fontStyle: 'italic',
+    marginTop: theme.spacing.xs,
+  },
+  loadingSpinner: {
+    padding: theme.spacing.sm,
   },
 });

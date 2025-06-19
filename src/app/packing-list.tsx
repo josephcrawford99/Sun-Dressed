@@ -9,7 +9,7 @@ import { typography } from '@styles/typography';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Platform, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PackingListModal() {
@@ -50,29 +50,15 @@ export default function PackingListModal() {
   const hasWeatherData = weatherDisplayArray.length > 0;
   const hasPackingList = packingList.length > 0;
 
-  const renderPackingItem = ({ item }: { item: string }) => (
-    <View style={styles.packingItem}>
-      <Text style={styles.packingItemText}>{item}</Text>
-    </View>
-  );
 
   const renderPackingList = () => (
-    <FlatList
-      data={packingList}
-      renderItem={renderPackingItem}
-      keyExtractor={(item, index) => `${index}-${item}`}
-      contentContainerStyle={styles.listContentContainer}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={loading}
-          onRefresh={handleGeneratePackingList}
-          tintColor={theme.colors.black}
-          title="Pull to regenerate"
-          titleColor={theme.colors.black}
-        />
-      }
-    />
+    <View style={styles.packingListContainer}>
+      {packingList.map((item, index) => (
+        <View key={`${index}-${item}`} style={styles.packingItem}>
+          <Text style={styles.packingItemText}>{item}</Text>
+        </View>
+      ))}
+    </View>
   );
 
   const renderEmptyState = () => {
@@ -128,20 +114,35 @@ export default function PackingListModal() {
     }
 
     return (
-      <FlipComponent
-        isFlipped={isFlipped}
-        frontComponent={renderPackingList()}
-        backComponent={
-          <WeatherForecastCard
-            weatherDisplayArray={weatherDisplayArray}
-            loading={loading}
-            error={error}
-            location={trip.location}
-            startDate={trip.startDate}
+      <ScrollView
+        style={styles.mainScrollView}
+        contentContainerStyle={styles.mainScrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={handleGeneratePackingList}
+            tintColor={theme.colors.black}
+            title="Pull to regenerate"
+            titleColor={theme.colors.black}
           />
         }
-        style={styles.flipContainer}
-      />
+      >
+        <FlipComponent
+          isFlipped={isFlipped}
+          frontComponent={renderPackingList()}
+          backComponent={
+            <WeatherForecastCard
+              weatherDisplayArray={weatherDisplayArray}
+              loading={loading}
+              error={error}
+              location={trip.location}
+              startDate={trip.startDate}
+            />
+          }
+          style={styles.flipContainer}
+        />
+      </ScrollView>
     );
   };
 
@@ -218,11 +219,14 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    backgroundColor: 'transparent',
+  },
+  mainScrollView: {
+    // Remove flex: 1 to let ScrollView size to content
+  },
+  mainScrollContent: {
+    flexGrow: 1,
   },
   flipContainer: {
-    flex: 1,
-    minHeight: 400,
     backgroundColor: 'transparent',
     borderRadius: theme.borderRadius.large,
   },
@@ -254,7 +258,7 @@ const styles = StyleSheet.create({
     color: theme.colors.gray,
     marginTop: theme.spacing.sm,
   },
-  listContentContainer: {
+  packingListContainer: {
     paddingVertical: theme.spacing.md,
   },
   packingItem: {

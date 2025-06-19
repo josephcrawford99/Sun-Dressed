@@ -3,50 +3,80 @@ import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
 import { useSettings } from '@/contexts/SettingsContext';
 import { theme, typography } from '@styles';
-import { router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import {
+  ActivityIndicator,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  Alert
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCurrentUser, useSignOutMutation, useUpdateProfileMutation } from '@/hooks/queries/useAuthQuery';
 
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
   const { settings, updateSetting } = useSettings();
-  const [name, setName] = useState(settings.name);
-  const [email, setEmail] = useState(settings.email);
+  const currentUser = useCurrentUser();
+  const signOutMutation = useSignOutMutation();
+  const updateProfileMutation = useUpdateProfileMutation();
+  
+  const [name, setName] = useState(currentUser?.user_metadata?.name || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [isUpdatingSetting, setIsUpdatingSetting] = useState(false);
 
-  // Update local state when settings change
+  // Update local state when user data changes
   useEffect(() => {
-    setName(settings.name);
-    setEmail(settings.email);
-  }, [settings]);
+    if (currentUser) {
+      setName(currentUser.user_metadata?.name || '');
+      setEmail(currentUser.email || '');
+    }
+  }, [currentUser]);
 
   const handleNameChange = async (value: string) => {
     setName(value);
     try {
-      await updateSetting('name', value);
-    } catch {
-      // Failed to update name
+      await updateProfileMutation.mutateAsync({ name: value });
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to update name');
+      // Revert local state on error
+      setName(currentUser?.user_metadata?.name || '');
     }
   };
 
   const handleEmailChange = async (value: string) => {
     setEmail(value);
     try {
-      await updateSetting('email', value);
-    } catch {
-      // Failed to update email
+      await updateProfileMutation.mutateAsync({ email: value });
+      Alert.alert('Success', 'Email updated successfully. Please check your email to confirm the change.');
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to update email');
+      // Revert local state on error
+      setEmail(currentUser?.email || '');
     }
   };
 
-  const handleLogout = () => {
-    router.replace('/(auth)');
+  const handleSettingChange = async (key: string, value: any) => {
+    setIsUpdatingSetting(true);
+    try {
+      await updateSetting(key, value);
+    } catch {
+      // Failed to update setting
+    } finally {
+      setIsUpdatingSetting(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOutMutation.mutateAsync();
+      // AuthGuard will handle redirecting to auth screen
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to sign out');
+    }
   };
 
   return (
@@ -60,21 +90,41 @@ export default function AccountScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.formContainer}>
-          <TextInput
-            label="Name"
-            placeholder="Enter your name"
-            size="medium"
-            value={name}
-            onChangeText={handleNameChange}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              label="Name"
+              placeholder="Enter your name"
+              size="medium"
+              value={name}
+              onChangeText={handleNameChange}
+            />
+            {updateProfileMutation.isPending && (
+              <ActivityIndicator 
+                size="small" 
+                color={theme.colors.black} 
+                style={styles.inputLoadingSpinner} 
+              />
+            )}
+          </View>
 
-          <TextInput
-            label="Email"
-            placeholder="Enter your email"
-            size="medium"
-            value={email}
-            onChangeText={handleEmailChange}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              label="Email"
+              placeholder="Enter your email"
+              size="medium"
+              value={email}
+              onChangeText={handleEmailChange}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            {updateProfileMutation.isPending && (
+              <ActivityIndicator 
+                size="small" 
+                color={theme.colors.black} 
+                style={styles.inputLoadingSpinner} 
+              />
+            )}
+          </View>
 
           <View style={styles.unitContainer}>
             <ToggleSwitch
@@ -84,7 +134,7 @@ export default function AccountScreen() {
                 { value: 'Celsius', label: '°C' },
                 { value: 'Fahrenheit', label: '°F' }
               ]}
-              onValueChange={(value) => updateSetting('temperatureUnit', value as 'Celsius' | 'Fahrenheit')}
+              onValueChange={(value) => handleSettingChange('temperatureUnit', value as 'Celsius' | 'Fahrenheit')}
             />
 
             <ToggleSwitch
@@ -94,7 +144,7 @@ export default function AccountScreen() {
                 { value: 'kph', label: 'km/h' },
                 { value: 'mph', label: 'mph' }
               ]}
-              onValueChange={(value) => updateSetting('speedUnit', value as 'mph' | 'kph')}
+              onValueChange={(value) => handleSettingChange('speedUnit', value as 'mph' | 'kph')}
             />
           </View>
 
@@ -106,15 +156,26 @@ export default function AccountScreen() {
               { value: 'feminine', label: 'Feminine' },
               { value: 'neutral', label: 'Neutral' }
             ]}
-            onValueChange={(value) => updateSetting('stylePreference', value as 'masculine' | 'feminine' | 'neutral')}
+            onValueChange={(value) => handleSettingChange('stylePreference', value as 'masculine' | 'feminine' | 'neutral')}
           />
+
+          {isUpdatingSetting && (
+            <View style={styles.globalLoadingContainer}>
+              <ActivityIndicator 
+                size="small" 
+                color={theme.colors.black} 
+              />
+              <Text style={styles.loadingText}>Updating setting...</Text>
+            </View>
+          )}
         </View>
 
         <Button
-          title="Log Out"
+          title={signOutMutation.isPending ? "Signing out..." : "Log Out"}
           onPress={handleLogout}
           variant="danger"
           size="medium"
+          disabled={signOutMutation.isPending}
         />
       </ScrollView>
     </View>
@@ -154,5 +215,27 @@ const styles = StyleSheet.create({
   unitContainer: {
     gap: theme.spacing.md,
     marginBottom: theme.spacing.lg,
+  },
+  inputContainer: {
+    position: 'relative',
+    marginBottom: theme.spacing.md,
+  },
+  inputLoadingSpinner: {
+    position: 'absolute',
+    right: theme.spacing.sm,
+    top: '50%',
+    transform: [{ translateY: -10 }],
+  },
+  globalLoadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  loadingText: {
+    ...typography.body,
+    color: theme.colors.gray,
+    fontSize: theme.fontSize.sm,
   },
 });
