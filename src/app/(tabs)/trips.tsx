@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,7 +12,7 @@ import { Trip } from '@/types/trip';
 
 export default function TripsScreen() {
   const insets = useSafeAreaInsets();
-  const { trips, refreshTrips, deleteTrip } = useTrips();
+  const { trips, loading, refreshTrips, deleteTrip } = useTrips();
 
   // Refresh trips when screen comes into focus (e.g., after returning from create-trip modal)
   useFocusEffect(

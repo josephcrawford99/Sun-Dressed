@@ -17,7 +17,7 @@ import {
  */
 export const useTrips = () => {
   // Use TanStack Query hooks
-  const { data: trips = [], isLoading: loading, error: queryError, refetch } = useTripsQuery();
+  const { data: trips = [], isLoading: loading, isFetching: refreshing, error: queryError, refetch } = useTripsQuery();
   const addTripMutation = useAddTripMutation();
   const updateTripMutation = useUpdateTripMutation();
   const deleteTripMutation = useDeleteTripMutation();

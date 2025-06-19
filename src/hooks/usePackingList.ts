@@ -25,8 +25,13 @@ export const usePackingList = (
   endDate?: Date
 ): UsePackingListReturn => {
   const { settings } = useSettings();
-  // Use TanStack Query for data management
-  const packingDataQuery = usePackingDataQuery(tripId || null, startDate, endDate);
+  
+  // Use dependent query pattern - only query if we have valid trip data
+  const packingDataQuery = usePackingDataQuery(
+    tripId || null, 
+    startDate, 
+    endDate
+  );
   const packingListMutation = usePackingListMutation();
   const weatherForecastMutation = useWeatherForecastMutation();
   
@@ -70,6 +75,8 @@ export const usePackingList = (
         await packingListMutation.mutateAsync({
           tripId: targetTripId,
           packingList: newPackingList,
+          startDate,
+          endDate,
         });
         
         if (weatherArray.length > 0) {
@@ -77,6 +84,8 @@ export const usePackingList = (
             tripId: targetTripId,
             weatherForecast: weatherArray,
             location,
+            startDate,
+            endDate,
           });
         }
         

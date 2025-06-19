@@ -29,11 +29,12 @@ JOEY NOTE: Fixed on 6/19
 ### 1.2 Fix Trip Weather Forecast Display
 JOEY NOTE: Fixed 6/19
 
-New bug, when trip dates are updated then the "generate packing list" needs to come back and the weather should be updated to the new date range uniformly. Also need to handle trips spanning the 8 day range, currently only goes up to 8, or will ddo trips fully after 8 days but not both. Also forecast needs to be a scrollview as 6 cards go below the screen on my phone. Overall trips caching is flawed
+Need to handle trips spanning the 8 day range, currently only goes up to 8, or will ddo trips fully after 8 days but not both. If trip goes past 8 days it cuts off at the 8 day mark. Ex: 26th is 8 days away . A trip goes 25th to 27th. Weather will only show 25th and 26th. Shoudl show the output of onecall standard for 25 and 26 and the output from the extended forecast mode for the 27th. Also forecast needs to be a scrollview as 6 cards go below the screen on my phone.
 
 
 
 ### 1.3 Add Error Boundaries
+JOEY NOTE: Completed on 6/19. 
 **Create**: `src/components/ErrorBoundary.tsx`
 - Catch JavaScript errors in component tree
 - Display fallback UI instead of white screen

@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PackingListQueryService } from '@/services/packingListQueryService';
 import { Weather } from '@/types/weather';
 
 // Query key factories for consistent cache management
@@ -29,12 +28,11 @@ export function usePackingListQuery(tripId: string | null, startDate?: Date, end
   return useQuery({
     queryKey: packingListKeys.list(tripId || '', startDateStr, endDateStr),
     queryFn: () => {
-      if (!tripId) {
-        return Promise.resolve(null);
-      }
-      return PackingListQueryService.getPackingList(tripId);
+      // Return null for new queries - they will be populated via mutations
+      return Promise.resolve(null);
     },
-    enabled: !!tripId, // Only run query if tripId exists
+    // Enable query when we have tripId AND both dates (dependent query pattern)
+    enabled: !!tripId && !!startDate && !!endDate,
     staleTime: Infinity, // Prevent automatic refetching to minimize API costs
     gcTime: 1000 * 60 * 60 * 24 * 7, // Keep in memory for 1 week
     refetchOnMount: false, // Don't refetch when component mounts
@@ -53,12 +51,11 @@ export function useWeatherForecastQuery(tripId: string | null, startDate?: Date,
   return useQuery({
     queryKey: packingListKeys.weather(tripId || '', startDateStr, endDateStr),
     queryFn: () => {
-      if (!tripId) {
-        return Promise.resolve(null);
-      }
-      return PackingListQueryService.getWeatherForecast(tripId);
+      // Return null for new queries - they will be populated via mutations
+      return Promise.resolve(null);
     },
-    enabled: !!tripId, // Only run query if tripId exists
+    // Enable query when we have tripId AND both dates (dependent query pattern)
+    enabled: !!tripId && !!startDate && !!endDate,
     staleTime: Infinity, // Prevent automatic refetching to minimize API costs
     gcTime: 1000 * 60 * 60 * 24 * 7, // Keep in memory for 1 week
     refetchOnMount: false, // Don't refetch when component mounts
@@ -74,29 +71,32 @@ export function usePackingListMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ tripId, packingList }: { tripId: string; packingList: string[] }) => {
-      // Check if packing list already exists to determine save vs update
-      const existing = await PackingListQueryService.getPackingList(tripId);
-      
-      if (existing) {
-        return PackingListQueryService.updatePackingList(tripId, packingList);
-      } else {
-        return PackingListQueryService.savePackingList(tripId, packingList);
-      }
+    mutationFn: async ({ 
+      tripId, 
+      packingList, 
+      startDate, 
+      endDate 
+    }: { 
+      tripId: string; 
+      packingList: string[]; 
+      startDate: Date; 
+      endDate: Date; 
+    }) => {
+      // Return the packing list data directly
+      return { packingList };
     },
     onSuccess: (data, variables) => {
-      // Update the cache with the new data (invalidate all variations for this trip)
-      queryClient.invalidateQueries({
-        queryKey: ['packingList', variables.tripId],
-        exact: false, // Invalidate all date variations
-      });
+      const startDateStr = variables.startDate.toISOString().split('T')[0];
+      const endDateStr = variables.endDate.toISOString().split('T')[0];
       
-      // Set the new data for future queries
-      queryClient.setQueryData(packingListKeys.list(variables.tripId), data);
+      // Set the data directly in TanStack Query cache
+      queryClient.setQueryData(
+        packingListKeys.list(variables.tripId, startDateStr, endDateStr), 
+        data
+      );
     },
-    onError: (error, variables) => {
+    onError: () => {
       // Error is handled by TanStack Query's error state
-      // UI components can access error through mutation.error
     },
   });
 }
@@ -111,32 +111,30 @@ export function useWeatherForecastMutation() {
     mutationFn: async ({ 
       tripId, 
       weatherForecast, 
-      location 
+      location,
+      startDate,
+      endDate
     }: { 
       tripId: string; 
       weatherForecast: Weather[]; 
-      location: string; 
+      location: string;
+      startDate: Date;
+      endDate: Date;
     }) => {
-      // Check if weather forecast already exists to determine save vs update
-      const existing = await PackingListQueryService.getWeatherForecast(tripId);
-      
-      if (existing) {
-        return PackingListQueryService.updateWeatherForecast(tripId, weatherForecast, location);
-      } else {
-        return PackingListQueryService.saveWeatherForecast(tripId, weatherForecast, location);
-      }
+      // Return the weather forecast data directly
+      return { weatherForecast, location };
     },
     onSuccess: (data, variables) => {
-      // Update the cache with the new data (invalidate all variations for this trip)
-      queryClient.invalidateQueries({
-        queryKey: ['weatherForecast', variables.tripId],
-        exact: false, // Invalidate all date variations
-      });
+      const startDateStr = variables.startDate.toISOString().split('T')[0];
+      const endDateStr = variables.endDate.toISOString().split('T')[0];
       
-      // Set the new data for future queries
-      queryClient.setQueryData(packingListKeys.weather(variables.tripId), data);
+      // Set the data directly in TanStack Query cache
+      queryClient.setQueryData(
+        packingListKeys.weather(variables.tripId, startDateStr, endDateStr), 
+        data
+      );
     },
-    onError: (error, variables) => {
+    onError: () => {
       // Error is handled by TanStack Query's error state
     },
   });
@@ -150,7 +148,8 @@ export function useDeletePackingListMutation() {
 
   return useMutation({
     mutationFn: (tripId: string) => {
-      return PackingListQueryService.deletePackingList(tripId);
+      // No async operation needed - just return success
+      return Promise.resolve();
     },
     onSuccess: (_, tripId) => {
       // Remove all variations of the data from cache
@@ -158,7 +157,7 @@ export function useDeletePackingListMutation() {
         queryKey: ['packingList', tripId],
       });
     },
-    onError: (error) => {
+    onError: () => {
       // Error is handled by TanStack Query's error state
     },
   });
@@ -172,7 +171,8 @@ export function useDeleteWeatherForecastMutation() {
 
   return useMutation({
     mutationFn: (tripId: string) => {
-      return PackingListQueryService.deleteWeatherForecast(tripId);
+      // No async operation needed - just return success
+      return Promise.resolve();
     },
     onSuccess: (_, tripId) => {
       // Remove all variations of the data from cache
@@ -180,7 +180,7 @@ export function useDeleteWeatherForecastMutation() {
         queryKey: ['weatherForecast', tripId],
       });
     },
-    onError: (error) => {
+    onError: () => {
       // Error is handled by TanStack Query's error state
     },
   });
