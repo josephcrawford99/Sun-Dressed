@@ -1,7 +1,8 @@
 export interface Weather {
   dailyHighTemp: number; // Fahrenheit
   dailyLowTemp: number; // Fahrenheit
-  highestChanceOfRain: number; // Percentage (0-100)
+  highestChanceOfRain: number; // Percentage (0-100) or precipitation volume (mm)
+  precipitationUnit: 'percentage' | 'mm'; // Unit for highestChanceOfRain
   windiness: number; // mph
   sunniness: number; // Percentage (0-100)
   feelsLikeTemp: number; // Fahrenheit
@@ -34,6 +35,7 @@ export const mockWeather: Weather = {
   dailyHighTemp: 55,
   dailyLowTemp: 42,
   highestChanceOfRain: 75,
+  precipitationUnit: 'percentage',
   windiness: 12,
   sunniness: 25,
   feelsLikeTemp: 48,

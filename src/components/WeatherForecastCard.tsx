@@ -104,7 +104,12 @@ const WeatherForecastCard: React.FC<WeatherForecastCardProps> = ({
               <View style={styles.detailsSection}>
                 <View style={styles.detailItem}>
                   <Ionicons name="rainy-outline" size={16} color={theme.colors.accent} />
-                  <Text style={styles.detailText}>{weather.highestChanceOfRain}%</Text>
+                  <Text style={styles.detailText}>
+                    {weather.precipitationUnit === 'percentage' 
+                      ? `${weather.highestChanceOfRain}%` 
+                      : `${weather.highestChanceOfRain}mm`
+                    }
+                  </Text>
                 </View>
                 <View style={styles.detailItem}>
                   <Ionicons name="flag-outline" size={16} color={theme.colors.accent} />

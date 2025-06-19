@@ -174,6 +174,7 @@ class WeatherService {
       dailyHighTemp: Math.round(today.temp.max),
       dailyLowTemp: Math.round(today.temp.min),
       highestChanceOfRain: Math.round(today.pop * 100),
+      precipitationUnit: 'percentage',
       windiness: Math.round(current.wind_speed),
       sunniness,
       feelsLikeTemp: Math.round(current.feels_like),
@@ -288,6 +289,7 @@ class WeatherService {
         dailyHighTemp: Math.round(dailyData.temp.max),
         dailyLowTemp: Math.round(dailyData.temp.min),
         highestChanceOfRain: Math.round(dailyData.pop * 100),
+        precipitationUnit: 'percentage',
         windiness: Math.round(dailyData.wind_speed || current?.wind_speed || 0),
         sunniness,
         feelsLikeTemp: Math.round(dailyData.feels_like.day || current?.feels_like || dailyData.temp.day),
@@ -461,7 +463,8 @@ class WeatherService {
     return {
       dailyHighTemp: Math.round(data.temperature.max),
       dailyLowTemp: Math.round(data.temperature.min),
-      highestChanceOfRain: Math.round((data.precipitation.total / 10) * 100), // Rough estimate
+      highestChanceOfRain: Math.round(data.precipitation.total * 10) / 10, // Precipitation in mm
+      precipitationUnit: 'mm',
       windiness: Math.round(data.wind.max.speed),
       sunniness,
       feelsLikeTemp: Math.round(data.temperature.afternoon),
@@ -477,6 +480,7 @@ class WeatherService {
       dailyHighTemp: 0,
       dailyLowTemp: 0,
       highestChanceOfRain: 0,
+      precipitationUnit: 'percentage',
       windiness: 0,
       sunniness: 0,
       feelsLikeTemp: 0,
@@ -499,6 +503,7 @@ class WeatherService {
       default: return '02d';
     }
   }
+
 
   getCacheSize(): number {
     return this.cache.size;
