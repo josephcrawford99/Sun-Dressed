@@ -32,7 +32,7 @@ export function useLocationWeather(): UseLocationWeatherReturn {
         feelsLike: `${convertTemperature(weatherData.feelsLikeTemp, settings.temperatureUnit)}${tempSymbol}`,
         high: `${convertTemperature(weatherData.dailyHighTemp, settings.temperatureUnit)}${tempSymbol}`,
         low: `${convertTemperature(weatherData.dailyLowTemp, settings.temperatureUnit)}${tempSymbol}`,
-        current: `${convertTemperature(weatherData.feelsLikeTemp, settings.temperatureUnit)}${tempSymbol}`
+        current: `${convertTemperature(weatherData.currentTemp, settings.temperatureUnit)}${tempSymbol}`
       },
       displayWind: {
         speed: `${convertSpeed(weatherData.windiness, settings.speedUnit)}`,

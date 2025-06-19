@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, StyleSheet, Pressable } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { theme } from '@/styles/theme';
+import { theme, typography } from '@/styles';
 
 interface Props {
   children: React.ReactNode;
@@ -62,36 +62,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: theme.spacing.lg,
   },
   content: {
     alignItems: 'center',
     maxWidth: 300,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    ...typography.heading,
+    marginBottom: theme.spacing.md,
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
+    ...typography.body,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: theme.spacing.lg,
     lineHeight: 22,
   },
   errorDetails: {
-    fontSize: 12,
-    marginBottom: 24,
-    padding: 12,
+    fontSize: theme.fontSize.xs,
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.sm,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.medium,
     fontFamily: 'monospace',
   },
   button: {
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.medium,
   },
   buttonText: {

@@ -8,6 +8,10 @@ interface OpenWeatherOneCallResponse {
     humidity: number;
     uvi: number;
     wind_speed: number;
+    wind_deg: number;
+    pressure: number;
+    sunrise: number;
+    sunset: number;
     weather: {
       main: string;
       description: string;
@@ -172,16 +176,22 @@ class WeatherService {
     const sunniness = Math.max(0, 100 - today.clouds);
 
     return {
+      currentTemp: Math.round(current.temp),
       dailyHighTemp: Math.round(today.temp.max),
       dailyLowTemp: Math.round(today.temp.min),
       highestChanceOfRain: Math.round(today.pop * 100),
       precipitationUnit: 'percentage',
       windiness: Math.round(current.wind_speed),
+      windDirection: current.wind_deg || 0,
       sunniness,
       feelsLikeTemp: Math.round(current.feels_like),
       humidity: current.humidity,
       uvIndex: Math.round(current.uvi),
+      pressure: Math.round(current.pressure),
+      sunrise: current.sunrise,
+      sunset: current.sunset,
       condition,
+      description: current.weather[0]?.description,
       icon: current.weather[0]?.icon
     };
   }
@@ -287,16 +297,22 @@ class WeatherService {
       const sunniness = Math.max(0, 100 - (dailyData.clouds || 0));
 
       forecasts.push({
+        currentTemp: Math.round(current?.temp || dailyData.temp.day),
         dailyHighTemp: Math.round(dailyData.temp.max),
         dailyLowTemp: Math.round(dailyData.temp.min),
         highestChanceOfRain: Math.round(dailyData.pop * 100),
         precipitationUnit: 'percentage',
         windiness: Math.round(dailyData.wind_speed || current?.wind_speed || 0),
+        windDirection: current?.wind_deg || 0,
         sunniness,
         feelsLikeTemp: Math.round(dailyData.feels_like.day || current?.feels_like || dailyData.temp.day),
         humidity: dailyData.humidity || current?.humidity || 0,
         uvIndex: Math.round(dailyData.uvi || current?.uvi || 0),
+        pressure: Math.round(current?.pressure || 1013),
+        sunrise: current?.sunrise || 0,
+        sunset: current?.sunset || 0,
         condition,
+        description: weatherCondition?.description,
         icon: weatherCondition?.icon
       });
     });
@@ -500,32 +516,44 @@ class WeatherService {
     const sunniness = Math.max(0, 100 - data.cloud_cover.afternoon);
 
     return {
+      currentTemp: Math.round(data.temperature.afternoon), // Use afternoon temp as current for day summary
       dailyHighTemp: Math.round(data.temperature.max),
       dailyLowTemp: Math.round(data.temperature.min),
       highestChanceOfRain: Math.round(data.precipitation.total * 10) / 10, // Precipitation in mm
       precipitationUnit: 'mm',
       windiness: Math.round(data.wind.max.speed),
+      windDirection: data.wind.max.direction || 0,
       sunniness,
       feelsLikeTemp: Math.round(data.temperature.afternoon),
       humidity: data.humidity.afternoon,
       uvIndex: 0, // Not available in day summary - show as unavailable
+      pressure: data.pressure?.afternoon || 1013, // Default pressure if not available
+      sunrise: 0, // Not available in day summary
+      sunset: 0, // Not available in day summary
       condition,
+      description: condition.replace('-', ' '), // Convert condition to description
       icon: this.getIconForCondition(condition)
     };
   }
 
   private createPlaceholderWeather(): Weather {
     return {
+      currentTemp: 0,
       dailyHighTemp: 0,
       dailyLowTemp: 0,
       highestChanceOfRain: 0,
       precipitationUnit: 'percentage',
       windiness: 0,
+      windDirection: 0,
       sunniness: 0,
       feelsLikeTemp: 0,
       humidity: 0,
       uvIndex: 0,
+      pressure: 1013,
+      sunrise: 0,
+      sunset: 0,
       condition: 'partly-cloudy',
+      description: 'partly cloudy',
       icon: '02d'
     };
   }
