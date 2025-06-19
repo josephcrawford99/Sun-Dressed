@@ -1,21 +1,5 @@
 import { geocodingRateLimiter } from './rateLimiter';
 
-// US State name to abbreviation mapping
-const STATE_ABBREVIATIONS: Record<string, string> = {
-  'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-  'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
-  'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
-  'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
-  'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
-  'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-  'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
-  'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
-  'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
-  'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
-  'District of Columbia': 'DC', 'Puerto Rico': 'PR', 'American Samoa': 'AS', 'Guam': 'GU',
-  'Northern Mariana Islands': 'MP', 'U.S. Virgin Islands': 'VI'
-};
-
 interface GeocodeResult {
   lat: number;
   lon: number;
@@ -23,20 +7,25 @@ interface GeocodeResult {
   state?: string;
 }
 
-interface OpenWeatherGeocodeResponse {
-  name: string;
-  lat: number;
-  lon: number;
-  country: string;
-  state?: string;
+interface GoogleGeocodeResponse {
+  results: GoogleGeocodeResult[];
+  status: string;
+  error_message?: string;
 }
 
-interface OpenWeatherReverseGeocodeResponse {
-  name: string;
-  lat: number;
-  lon: number;
-  country: string;
-  state?: string;
+interface GoogleGeocodeResult {
+  formatted_address: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  address_components: {
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }[];
 }
 
 class GeocodeService {
@@ -47,9 +36,9 @@ class GeocodeService {
   private reverseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
-    this.baseUrl = process.env.EXPO_PUBLIC_OPENWEATHER_GEOCODING_URL || 'https://api.openweathermap.org/geo/1.0/direct';
-    this.reverseUrl = 'https://api.openweathermap.org/geo/1.0/reverse';
+    this.apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY || '';
+    this.baseUrl = process.env.EXPO_PUBLIC_GOOGLE_GEOCODING_URL || 'https://maps.googleapis.com/maps/api/geocode/json';
+    this.reverseUrl = process.env.EXPO_PUBLIC_GOOGLE_REVERSE_GEOCODING_URL || 'https://maps.googleapis.com/maps/api/geocode/json';
     
     if (!this.apiKey) {
       // API key will be checked when methods are called
@@ -69,7 +58,7 @@ class GeocodeService {
     }
 
     if (!this.apiKey) {
-      throw new Error('OpenWeather API key not configured');
+      throw new Error('Google Places API key not configured');
     }
 
     // Apply rate limiting
@@ -77,7 +66,7 @@ class GeocodeService {
 
     try {
       
-      const url = `${this.baseUrl}?q=${encodeURIComponent(locationString)}&limit=1&appid=${this.apiKey}`;
+      const url = `${this.baseUrl}?address=${encodeURIComponent(locationString)}&key=${this.apiKey}`;
       
       const response = await fetch(url);
       
@@ -85,17 +74,22 @@ class GeocodeService {
         throw new Error(`Geocoding API error: ${response.status} ${response.statusText}`);
       }
 
-      const data: OpenWeatherGeocodeResponse[] = await response.json();
+      const data: GoogleGeocodeResponse = await response.json();
       
-      if (!data || data.length === 0) {
+      if (data.status !== 'OK') {
+        throw new Error(data.error_message || `Geocoding failed with status: ${data.status}`);
+      }
+      
+      if (!data.results || data.results.length === 0) {
         throw new Error(`No coordinates found for location: ${locationString}`);
       }
 
+      const firstResult = data.results[0];
       const result: GeocodeResult = {
-        lat: data[0].lat,
-        lon: data[0].lon,
-        country: data[0].country,
-        state: data[0].state,
+        lat: firstResult.geometry.location.lat,
+        lon: firstResult.geometry.location.lng,
+        country: this.extractAddressComponent(firstResult, 'country'),
+        state: this.extractAddressComponent(firstResult, 'administrative_area_level_1'),
       };
 
       // Cache the result
@@ -121,7 +115,7 @@ class GeocodeService {
     }
 
     if (!this.apiKey) {
-      throw new Error('OpenWeather API key not configured');
+      throw new Error('Google Places API key not configured');
     }
 
     // Apply rate limiting
@@ -129,7 +123,7 @@ class GeocodeService {
 
     try {
       
-      const url = `${this.reverseUrl}?lat=${latitude}&lon=${longitude}&limit=1&appid=${this.apiKey}`;
+      const url = `${this.reverseUrl}?latlng=${latitude},${longitude}&key=${this.apiKey}`;
       
       const response = await fetch(url);
       
@@ -137,23 +131,18 @@ class GeocodeService {
         throw new Error(`Reverse geocoding API error: ${response.status} ${response.statusText}`);
       }
 
-      const data: OpenWeatherReverseGeocodeResponse[] = await response.json();
+      const data: GoogleGeocodeResponse = await response.json();
       
-      if (!data || data.length === 0) {
+      if (data.status !== 'OK') {
+        throw new Error(data.error_message || `Reverse geocoding failed with status: ${data.status}`);
+      }
+      
+      if (!data.results || data.results.length === 0) {
         throw new Error(`No address found for coordinates: ${latitude}, ${longitude}`);
       }
 
-      // Format the address similar to what user might expect
-      const location = data[0];
-      let formattedAddress = location.name;
-      if (location.state) {
-        // Use state abbreviation if available, otherwise use full name
-        const stateAbbr = STATE_ABBREVIATIONS[location.state] || location.state;
-        formattedAddress += `, ${stateAbbr}`;
-      }
-      if (location.country) {
-        formattedAddress += `, ${location.country}`;
-      }
+      // Use formatted_address from Google which matches Places API format
+      const formattedAddress = data.results[0].formatted_address;
 
       // Cache the result
       this.reverseCache.set(cacheKey, formattedAddress);
@@ -172,6 +161,11 @@ class GeocodeService {
 
   getCacheSize(): number {
     return this.cache.size + this.reverseCache.size;
+  }
+
+  private extractAddressComponent(result: GoogleGeocodeResult, type: string): string | undefined {
+    const component = result.address_components.find(comp => comp.types.includes(type));
+    return component?.short_name;
   }
 }
 
