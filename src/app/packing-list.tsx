@@ -23,7 +23,7 @@ export default function PackingListModal() {
     error, 
     generatePackingList, 
     refetch
-  } = usePackingList(tripId as string);
+  } = usePackingList(tripId as string, trip?.startDate, trip?.endDate);
   const { convertToDisplayArray } = useWeatherDisplayArray();
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -93,11 +93,16 @@ export default function PackingListModal() {
           {loading ? (
             <ActivityIndicator size="small" color={theme.colors.white} />
         ) : (
-          <Text style={styles.generateButtonText}>Generate Packing List</Text>
+          <Text style={styles.generateButtonText}>
+            {packingList.length === 0 ? 'Generate Packing List' : 'Regenerate Packing List'}
+          </Text>
         )}
       </TouchableOpacity>
-      {!trip && <Text style={styles.debugText}>No trip data available</Text>}
-    </View>
+        {!trip && <Text style={styles.debugText}>No trip data available</Text>}
+        {trip && packingList.length === 0 && (
+          <Text style={styles.debugText}>Pull down to refresh or tap generate to create packing list</Text>
+        )}
+      </View>
     );
   };
 
@@ -154,7 +159,7 @@ export default function PackingListModal() {
             <Ionicons name="arrow-back" size={24} color={theme.colors.black} />
           </TouchableOpacity>
           <Text style={styles.title}>Packing List</Text>
-          {trip && packingList.length > 0 ? (
+          {trip && packingList.length > 0 && weatherDisplayArray.length > 0 ? (
             <TouchableOpacity style={styles.weatherButton} onPress={handleWeatherButtonPress}>
               <Text style={styles.weatherButtonText}>
                 {isFlipped ? 'List' : 'Weather'}

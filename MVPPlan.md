@@ -27,12 +27,11 @@ JOEY NOTE: Fixed on 6/19
 ```
 
 ### 1.2 Fix Trip Weather Forecast Display
-**File**: `src/services/weatherService.ts`
-**Issue**: Shows next 8 days from today, not trip dates
-**Solution**:
-- Add date validation for trip start date
-- If trip > 8 days away: "Weather forecast available 7 days before trip"
-- Cache weather when trip comes into forecast range
+JOEY NOTE: Fixed 6/19
+
+New bug, when trip dates are updated then the "generate packing list" needs to come back and the weather should be updated to the new date range uniformly. Also need to handle trips spanning the 8 day range, currently only goes up to 8, or will ddo trips fully after 8 days but not both. Also forecast needs to be a scrollview as 6 cards go below the screen on my phone. Overall trips caching is flawed
+
+
 
 ### 1.3 Add Error Boundaries
 **Create**: `src/components/ErrorBoundary.tsx`

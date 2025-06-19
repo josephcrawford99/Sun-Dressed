@@ -20,11 +20,13 @@ interface UsePackingListReturn {
 }
 
 export const usePackingList = (
-  tripId?: string
+  tripId?: string,
+  startDate?: Date,
+  endDate?: Date
 ): UsePackingListReturn => {
   const { settings } = useSettings();
   // Use TanStack Query for data management
-  const packingDataQuery = usePackingDataQuery(tripId || null);
+  const packingDataQuery = usePackingDataQuery(tripId || null, startDate, endDate);
   const packingListMutation = usePackingListMutation();
   const weatherForecastMutation = useWeatherForecastMutation();
   

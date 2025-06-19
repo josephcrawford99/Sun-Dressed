@@ -5,16 +5,29 @@ import { Weather } from '@/types/weather';
 // Query key factories for consistent cache management
 export const packingListKeys = {
   all: ['packingList'] as const,
-  list: (tripId: string) => ['packingList', tripId] as const,
-  weather: (tripId: string) => ['weatherForecast', tripId] as const,
+  list: (tripId: string, startDate?: string, endDate?: string) => {
+    if (startDate && endDate) {
+      return ['packingList', tripId, startDate, endDate] as const;
+    }
+    return ['packingList', tripId] as const;
+  },
+  weather: (tripId: string, startDate?: string, endDate?: string) => {
+    if (startDate && endDate) {
+      return ['weatherForecast', tripId, startDate, endDate] as const;
+    }
+    return ['weatherForecast', tripId] as const;
+  },
 };
 
 /**
  * Hook to fetch packing list data for a specific trip
  */
-export function usePackingListQuery(tripId: string | null) {
+export function usePackingListQuery(tripId: string | null, startDate?: Date, endDate?: Date) {
+  const startDateStr = startDate?.toISOString().split('T')[0];
+  const endDateStr = endDate?.toISOString().split('T')[0];
+  
   return useQuery({
-    queryKey: packingListKeys.list(tripId || ''),
+    queryKey: packingListKeys.list(tripId || '', startDateStr, endDateStr),
     queryFn: () => {
       if (!tripId) {
         return Promise.resolve(null);
@@ -22,17 +35,23 @@ export function usePackingListQuery(tripId: string | null) {
       return PackingListQueryService.getPackingList(tripId);
     },
     enabled: !!tripId, // Only run query if tripId exists
-    staleTime: Infinity, // Local storage data doesn't go stale automatically
-    gcTime: 1000 * 60 * 60 * 24, // Keep in memory for 24 hours
+    staleTime: Infinity, // Prevent automatic refetching to minimize API costs
+    gcTime: 1000 * 60 * 60 * 24 * 7, // Keep in memory for 1 week
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
   });
 }
 
 /**
  * Hook to fetch weather forecast data for a specific trip
  */
-export function useWeatherForecastQuery(tripId: string | null) {
+export function useWeatherForecastQuery(tripId: string | null, startDate?: Date, endDate?: Date) {
+  const startDateStr = startDate?.toISOString().split('T')[0];
+  const endDateStr = endDate?.toISOString().split('T')[0];
+  
   return useQuery({
-    queryKey: packingListKeys.weather(tripId || ''),
+    queryKey: packingListKeys.weather(tripId || '', startDateStr, endDateStr),
     queryFn: () => {
       if (!tripId) {
         return Promise.resolve(null);
@@ -40,8 +59,11 @@ export function useWeatherForecastQuery(tripId: string | null) {
       return PackingListQueryService.getWeatherForecast(tripId);
     },
     enabled: !!tripId, // Only run query if tripId exists
-    staleTime: 1000 * 60 * 5, // Weather data can be stale after 5 minutes
-    gcTime: 1000 * 60 * 60 * 24, // Keep in memory for 24 hours
+    staleTime: Infinity, // Prevent automatic refetching to minimize API costs
+    gcTime: 1000 * 60 * 60 * 24 * 7, // Keep in memory for 1 week
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
   });
 }
 
@@ -63,14 +85,14 @@ export function usePackingListMutation() {
       }
     },
     onSuccess: (data, variables) => {
-      // Update the cache with the new data
-      queryClient.setQueryData(packingListKeys.list(variables.tripId), data);
-      
-      // Optionally invalidate related queries to refetch
+      // Update the cache with the new data (invalidate all variations for this trip)
       queryClient.invalidateQueries({
-        queryKey: packingListKeys.all,
+        queryKey: ['packingList', variables.tripId],
+        exact: false, // Invalidate all date variations
       });
       
+      // Set the new data for future queries
+      queryClient.setQueryData(packingListKeys.list(variables.tripId), data);
     },
     onError: (error, variables) => {
       // Error is handled by TanStack Query's error state
@@ -105,14 +127,14 @@ export function useWeatherForecastMutation() {
       }
     },
     onSuccess: (data, variables) => {
-      // Update the cache with the new data
-      queryClient.setQueryData(packingListKeys.weather(variables.tripId), data);
-      
-      // Optionally invalidate related queries
+      // Update the cache with the new data (invalidate all variations for this trip)
       queryClient.invalidateQueries({
-        queryKey: ['weatherForecast'],
+        queryKey: ['weatherForecast', variables.tripId],
+        exact: false, // Invalidate all date variations
       });
       
+      // Set the new data for future queries
+      queryClient.setQueryData(packingListKeys.weather(variables.tripId), data);
     },
     onError: (error, variables) => {
       // Error is handled by TanStack Query's error state
@@ -131,11 +153,10 @@ export function useDeletePackingListMutation() {
       return PackingListQueryService.deletePackingList(tripId);
     },
     onSuccess: (_, tripId) => {
-      // Remove the data from cache
+      // Remove all variations of the data from cache
       queryClient.removeQueries({
-        queryKey: packingListKeys.list(tripId),
+        queryKey: ['packingList', tripId],
       });
-      
     },
     onError: (error) => {
       // Error is handled by TanStack Query's error state
@@ -154,11 +175,10 @@ export function useDeleteWeatherForecastMutation() {
       return PackingListQueryService.deleteWeatherForecast(tripId);
     },
     onSuccess: (_, tripId) => {
-      // Remove the data from cache
+      // Remove all variations of the data from cache
       queryClient.removeQueries({
-        queryKey: packingListKeys.weather(tripId),
+        queryKey: ['weatherForecast', tripId],
       });
-      
     },
     onError: (error) => {
       // Error is handled by TanStack Query's error state
@@ -170,9 +190,9 @@ export function useDeleteWeatherForecastMutation() {
  * Hook to get combined packing list and weather data
  * Useful for components that need both datasets
  */
-export function usePackingDataQuery(tripId: string | null) {
-  const packingListQuery = usePackingListQuery(tripId);
-  const weatherForecastQuery = useWeatherForecastQuery(tripId);
+export function usePackingDataQuery(tripId: string | null, startDate?: Date, endDate?: Date) {
+  const packingListQuery = usePackingListQuery(tripId, startDate, endDate);
+  const weatherForecastQuery = useWeatherForecastQuery(tripId, startDate, endDate);
 
   return {
     packingList: packingListQuery.data?.packingList || [],

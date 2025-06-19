@@ -3,6 +3,18 @@ import { TripsQueryService } from '@/services/tripsQueryService';
 import { Trip } from '@/types/trip';
 import { Weather } from '@/types/weather';
 
+// Helper function to check if trip dates have changed
+const hasDateChanged = (oldTrip: Trip | undefined, newTrip: Trip): boolean => {
+  if (!oldTrip) return false;
+  
+  const oldStart = new Date(oldTrip.startDate).getTime();
+  const oldEnd = new Date(oldTrip.endDate).getTime();
+  const newStart = new Date(newTrip.startDate).getTime();
+  const newEnd = new Date(newTrip.endDate).getTime();
+  
+  return oldStart !== newStart || oldEnd !== newEnd;
+};
+
 // Query key factories for consistent cache management
 export const tripsKeys = {
   all: ['trips'] as const,
@@ -58,6 +70,13 @@ export function useUpdateTripMutation() {
   return useMutation({
     mutationFn: (trip: Trip) => TripsQueryService.updateTrip(trip),
     onSuccess: (updatedTrip) => {
+      // Get the old trip data to compare dates
+      const oldTrips = queryClient.getQueryData<Trip[]>(tripsKeys.list()) || [];
+      const oldTrip = oldTrips.find(t => t.id === updatedTrip.id);
+      
+      // Check if dates have changed
+      const datesChanged = hasDateChanged(oldTrip, updatedTrip);
+      
       // Update the cache by replacing the updated trip in the list
       queryClient.setQueryData(tripsKeys.list(), (oldTrips: Trip[] = []) => {
         return oldTrips.map(trip => 
@@ -65,7 +84,22 @@ export function useUpdateTripMutation() {
         );
       });
       
-      // Invalidate related queries
+      // Only clear packing/weather cache if dates changed
+      if (datesChanged) {
+        // Completely remove all packing list data for this trip (all date variations)
+        queryClient.removeQueries({
+          queryKey: ['packingList', updatedTrip.id],
+          exact: false,
+        });
+        
+        // Completely remove all weather forecast data for this trip (all date variations)
+        queryClient.removeQueries({
+          queryKey: ['weatherForecast', updatedTrip.id],
+          exact: false,
+        });
+      }
+      
+      // Always invalidate trip queries for UI updates
       queryClient.invalidateQueries({
         queryKey: tripsKeys.all,
       });

@@ -72,7 +72,8 @@ interface OpenWeatherDaySummaryResponse {
 
 class WeatherService {
   private cache = new Map<string, { weather: Weather | Weather[]; timestamp: number }>();
-  private readonly CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+  private readonly CACHE_DURATION = 60 * 60 * 1000; // 1 hour for cost optimization
+  private readonly FORECAST_CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours for forecast data
   private apiKey: string;
   private baseUrl: string;
 
@@ -200,9 +201,9 @@ class WeatherService {
 
     const cacheKey = `forecast-${lat.toFixed(2)},${lon.toFixed(2)}-${days}d`;
     
-    // Check cache first
+    // Check cache first with longer duration for forecast data
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+    if (cached && Date.now() - cached.timestamp < this.FORECAST_CACHE_DURATION) {
       return Array.isArray(cached.weather) ? cached.weather : [cached.weather];
     }
 
@@ -316,6 +317,17 @@ class WeatherService {
       throw new Error('Start date must be before end date');
     }
 
+    // Create date-range-aware cache key for cost optimization
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    const cacheKey = `trip-forecast-${lat.toFixed(2)},${lon.toFixed(2)}-${startDateStr}-${endDateStr}`;
+    
+    // Check cache first with longer duration for forecast data
+    const cached = this.cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.FORECAST_CACHE_DURATION) {
+      return Array.isArray(cached.weather) ? cached.weather : [cached.weather];
+    }
+
     // Use date-only comparison to avoid timezone and time-of-day issues
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -330,21 +342,31 @@ class WeatherService {
     const daysFromToday = Math.floor((tripStart.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     const tripDurationDays = Math.floor((tripEnd.getTime() - tripStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     
+    let forecasts: Weather[];
+    
     // Check if we can use the standard One Call API (within 8 days)
     if (daysFromToday <= 7 && daysFromToday >= 0) {
-      return this.fetchForecastUsingOneCall(lat, lon, daysFromToday, tripDurationDays, tripStart, tripEnd);
+      forecasts = await this.fetchForecastUsingOneCall(lat, lon, daysFromToday, tripDurationDays, tripStart, tripEnd);
     } else {
       // Use Day Summary API for future dates
-      return this.fetchForecastUsingDaySummary(lat, lon, startDate, endDate);
+      forecasts = await this.fetchForecastUsingDaySummary(lat, lon, startDate, endDate);
     }
+    
+    // Cache the result with date-range-specific key
+    this.cache.set(cacheKey, {
+      weather: forecasts,
+      timestamp: Date.now()
+    });
+    
+    return forecasts;
   }
 
   private async fetchForecastUsingOneCall(lat: number, lon: number, daysFromToday: number, tripDurationDays: number, tripStart: Date, tripEnd: Date): Promise<Weather[]> {
     const cacheKey = `onecall-${lat.toFixed(2)},${lon.toFixed(2)}-${daysFromToday}`;
     
-    // Check cache first
+    // Check cache first with longer duration for forecast data
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+    if (cached && Date.now() - cached.timestamp < this.FORECAST_CACHE_DURATION) {
       const cachedArray = Array.isArray(cached.weather) ? cached.weather : [cached.weather];
       // Extract the exact days for the trip - OpenWeatherMap index 0 = today
       const startIndex = Math.max(0, daysFromToday);
@@ -400,9 +422,9 @@ class WeatherService {
       const dateString = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
       const cacheKey = `daysummary-${lat.toFixed(2)},${lon.toFixed(2)}-${dateString}`;
       
-      // Check cache first
+      // Check cache first with longer duration for day summary data
       const cached = this.cache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      if (cached && Date.now() - cached.timestamp < this.FORECAST_CACHE_DURATION) {
         forecasts.push(Array.isArray(cached.weather) ? cached.weather[0] : cached.weather);
       } else {
         if (!this.apiKey) {

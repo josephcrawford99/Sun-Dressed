@@ -120,6 +120,7 @@ hooks/
 - Ask Joey to test functionality after implementing atomic features
 - Test on both iOS and Android platforms
 - Pause and request testing when features are visible in the app
+- **Playwright Integration**: When the Expo app is running at `http://192.168.130.62:8081`, use Playwright MCP tools to interact with and test the web version of the app directly
 
 ### Git Workflow
 - Feature branches: `feature/description`
