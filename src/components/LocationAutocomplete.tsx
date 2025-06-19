@@ -1,7 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useDeviceLocation } from '@hooks/useDeviceLocation';
 import { geocodeService } from '@services/geocodeService';
 import { theme, typography } from '@styles';
-import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -67,7 +67,7 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
         lon: deviceLocation.longitude
       });
       
-    } catch (error) {
+    } catch {
       // Device location error
       
       // Fallback: use device coordinates with generic name if reverse geocoding fails
@@ -95,7 +95,22 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       ref={ref}
       placeholder={placeholder}
       onPress={(data, details) => {
-        const locationString = details?.formatted_address || data?.description || '';
+        // Use the same formatting logic as renderDescription for consistency
+        let locationString = '';
+        
+        if (data.terms && data.terms.length >= 2) {
+          const city = data.terms[0].value;
+          const stateOrCountry = data.terms[1].value;
+          locationString = `${city}, ${stateOrCountry}`;
+        } else {
+          // Fallback: parse the description string
+          const parts = data.description.split(', ');
+          if (parts.length >= 2) {
+            locationString = `${parts[0]}, ${parts[1]}`;
+          } else {
+            locationString = data.description;
+          }
+        }
         
         // Extract coordinates from Google Places response
         const coordinates = details?.geometry?.location ? {
@@ -115,7 +130,7 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       query={{
         key: apiKey,
         language: 'en',
-        types: 'locality|sublocality',
+        types: '(cities)',
         // Location biasing - prioritize results near device location or US center
         location: deviceLocation ? 
           `${deviceLocation.latitude},${deviceLocation.longitude}` : 
@@ -135,7 +150,23 @@ const LocationAutocomplete = React.memo(function LocationAutocomplete({
       debounce={500}
       minLength={2}
       listViewDisplayed="auto"
-      renderDescription={(row) => row.description}
+      renderDescription={(row) => {
+        // Extract only city and state/country from the description
+        // e.g. "Washington, D.C., USA" becomes "Washington, DC"
+        if (row.terms && row.terms.length >= 2) {
+          const city = row.terms[0].value;
+          const stateOrCountry = row.terms[1].value;
+          return `${city}, ${stateOrCountry}`;
+        }
+        
+        // Fallback: parse the description string
+        const parts = row.description.split(', ');
+        if (parts.length >= 2) {
+          return `${parts[0]}, ${parts[1]}`;
+        }
+        
+        return row.description;
+      }}
       predefinedPlaces={[]}
       currentLocation={false}
       suppressDefaultStyles={true}

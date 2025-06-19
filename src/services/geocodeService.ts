@@ -1,4 +1,5 @@
 import { geocodingRateLimiter } from './rateLimiter';
+import { extractLocationParts, type AddressComponent } from '@utils/locationUtils';
 
 interface GeocodeResult {
   lat: number;
@@ -123,7 +124,7 @@ class GeocodeService {
 
     try {
       
-      const url = `${this.reverseUrl}?latlng=${latitude},${longitude}&key=${this.apiKey}`;
+      const url = `${this.reverseUrl}?latlng=${latitude},${longitude}&result_type=locality&key=${this.apiKey}`;
       
       const response = await fetch(url);
       
@@ -141,13 +142,17 @@ class GeocodeService {
         throw new Error(`No address found for coordinates: ${latitude}, ${longitude}`);
       }
 
-      // Use formatted_address from Google which matches Places API format
-      const formattedAddress = data.results[0].formatted_address;
+      // Extract standardized location format from address components
+      const addressComponents = data.results[0].address_components as AddressComponent[];
+      const formattedLocation = extractLocationParts(addressComponents);
+      
+      // Fallback to formatted_address if extraction fails
+      const finalAddress = formattedLocation || data.results[0].formatted_address;
 
       // Cache the result
-      this.reverseCache.set(cacheKey, formattedAddress);
+      this.reverseCache.set(cacheKey, finalAddress);
       
-      return formattedAddress;
+      return finalAddress;
 
     } catch (error) {
       throw error;

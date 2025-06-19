@@ -36,17 +36,16 @@ This file tracks development priorities for MVP completion and serves as a high-
 - **TanStack Query Migration**: Successfully migrated trips and packing list storage from custom AsyncStorage hooks to TanStack Query for better caching and state management.
 - **Trip Card Interactions**: Fixed 3-dot menu functionality that broke during TanStack Query migration. Issue was caused by useCallback re-render loops - resolved by memoizing all functions in useTrips hook.
 - **Legacy Code Cleanup**: Removed all backward compatibility layers, no-op functions, and unused parameters from the TanStack Query migration. Reduced codebase by ~50-70 lines and eliminated console.log statements for production readiness.
+- **Location Standardization**: Unified location formatting to consistent "City, State/Country" format across both Google Places autocomplete and reverse geocoding. Fixed autocomplete dropdown/selection mismatch where suggestions showed "Oslo, Norway" but selection filled "Oslo, Oslo". Solution uses identical formatting logic for both dropdown display and selection via data.terms array, eliminating variance and providing international compatibility.
 
 ### ⚠️ Known Issues (Deferred Post-MVP)
 - **TextInput in BentoBox**: Touch events are blocked inside the `FlipComponent`. A workaround is currently in place.
-- **API Inconsistencies**: Using both Google and OpenWeather for geocoding results in minor formatting differences.
 
 ### ❌ Post-MVP Features
 - Full authentication system.
 - Advanced error handling and input validation.
 - Interactive BentoBox component state machine.
 - Weather estimation for trips longer than 8 days.
-- A unified geocoding service to replace Google Places autocomplete.
 
 ---
 
