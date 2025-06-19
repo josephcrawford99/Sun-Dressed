@@ -192,7 +192,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.none,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.gray,
+    paddingBottom: theme.spacing.md,
   },
   backButton: {
     padding: theme.spacing.sm,
@@ -230,6 +233,8 @@ const styles = StyleSheet.create({
   },
   mainScrollContent: {
     flexGrow: 1,
+    paddingBottom: theme.spacing.xl,
+    paddingTop: theme.spacing.md,
   },
   flipContainer: {
     backgroundColor: 'transparent',
@@ -267,7 +272,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   packingListContent: {
-    paddingVertical: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.md,
   },
   packingItem: {
     backgroundColor: theme.colors.surface,
