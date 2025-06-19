@@ -3,7 +3,7 @@ import { TextInput } from '@/components/ui/TextInput';
 import { theme, typography } from '@styles';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSignInMutation, useSignUpMutation, authKeys } from '@/hooks/queries/useAuthQuery';
 import { useQueryClient } from '@tanstack/react-query';
@@ -86,10 +86,12 @@ export default function AuthScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.logoRow}>
-        <Text style={typography.logo}>Sun Dressed</Text>
-      </View>
-      <View style={styles.formContainer}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.content}>
+          <View style={styles.logoRow}>
+            <Text style={typography.logo}>Sun Dressed</Text>
+          </View>
+          <View style={styles.formContainer}>
         <View style={styles.toggleContainer}>
           <TouchableOpacity 
             style={[styles.toggleButton, !isSignUp && styles.activeToggle]}
@@ -117,6 +119,8 @@ export default function AuthScreen() {
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
+          autoComplete="email"
+          textContentType="emailAddress"
         />
         <TextInput 
           placeholder="Password"
@@ -125,6 +129,8 @@ export default function AuthScreen() {
           value={password}
           onChangeText={setPassword}
           autoCapitalize="none"
+          autoComplete={isSignUp ? "new-password" : "current-password"}
+          textContentType={isSignUp ? "newPassword" : "password"}
         />
         <Button
           title={currentMutation.isPending ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
@@ -162,7 +168,9 @@ export default function AuthScreen() {
             />
           </View>
         )}
-      </View>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
@@ -171,6 +179,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.white
+  },
+  content: {
+    flex: 1,
   },
   logoRow: {
     paddingVertical: theme.spacing.lg,

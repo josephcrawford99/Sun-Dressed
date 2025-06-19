@@ -27,8 +27,7 @@ JOEY NOTE: Fixed on 6/19
 ```
 
 ### 1.2 Fix Packing List Scroll
-
-The scroll view in the packing list and weather in the flip container do not work. 
+JOEY NOTE: Complete 19Jun
 
 
 ### 1.3 Add Error Boundaries
