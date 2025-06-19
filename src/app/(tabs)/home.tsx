@@ -5,11 +5,11 @@ import { LocationWeatherBar } from '@components/home/LocationWeatherBar';
 import { MainContentArea } from '@components/home/MainContentArea';
 import { useActivityInput } from '@hooks/home/useActivityInput';
 import { useHomeScreenState } from '@hooks/home/useHomeScreenState';
+import { useDailyOutfitLogger, useOutfitQuery, useOutfitRegeneration } from '@hooks/queries/useOutfitQuery';
 import { useLocation } from '@hooks/useLocation';
 import { useLocationWeather } from '@hooks/useLocationWeather';
-import { useOutfitQuery, useOutfitRegeneration, useDailyOutfitLogger } from '@hooks/queries/useOutfitQuery';
 import { theme } from '@styles';
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
