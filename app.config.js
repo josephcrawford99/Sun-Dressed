@@ -13,7 +13,8 @@ export default {
     plugins: [
       "expo-font",
       "expo-apple-authentication",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-location"
     ],
     splash: {
       image: "./src/assets/splash.png",
@@ -25,7 +26,11 @@ export default {
     ],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.sundressed.app"
+      bundleIdentifier: "com.sundressed.app",
+      deploymentTarget: "15.1",
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription: "Sun Dressed uses your location to provide accurate weather data and personalized outfit recommendations for your current area."
+      }
     },
     android: {
       adaptiveIcon: {

@@ -63,7 +63,12 @@ const BentoBox: React.FC<BentoBoxProps> = ({
     const iconResult = getClothingIcon(item.iconKey, { size: 32, color: theme.colors.black });
     
     return (
-      <View style={styles.box}>
+      <View 
+        style={styles.box}
+        accessible={true}
+        accessibilityLabel={`${label}: ${item.description}`}
+        accessibilityRole="text"
+      >
         <View style={styles.iconContainer}>
           {typeof iconResult === 'string' ? (
             <Text style={styles.iconText}>{iconResult}</Text>
@@ -93,9 +98,23 @@ const BentoBox: React.FC<BentoBoxProps> = ({
         </View>
       </View>
       
+      {/* AI Content Disclosure */}
+      {outfit && (
+        <View style={styles.aiDisclosureContainer}>
+          <Text style={styles.aiDisclosureText}>
+            ✨ AI-generated outfit recommendation
+          </Text>
+        </View>
+      )}
+      
       {/* Explanation Section */}
       {outfit?.explanation && (
-        <View style={styles.explanationContainer}>
+        <View 
+          style={styles.explanationContainer}
+          accessible={true}
+          accessibilityLabel={`Outfit explanation: ${outfit.explanation}`}
+          accessibilityRole="text"
+        >
           <Text style={styles.explanationText}>
             {outfit.explanation}
           </Text>
@@ -220,6 +239,21 @@ const styles = StyleSheet.create({
     color: theme.colors.gray,
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  aiDisclosureContainer: {
+    marginTop: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    backgroundColor: theme.colors.lightGray,
+    borderRadius: theme.borderRadius.small,
+    borderWidth: 1,
+    borderColor: theme.colors.gray,
+  },
+  aiDisclosureText: {
+    fontSize: theme.fontSize.xs,
+    color: theme.colors.gray,
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
 

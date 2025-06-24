@@ -38,7 +38,13 @@ export const LocationWeatherBar: React.FC<LocationWeatherBarProps> = ({
       <LocationAutocomplete
         {...locationAutocompleteProps}
       />
-      <TouchableOpacity style={styles.weatherButton} onPress={onWeatherButtonPress}>
+      <TouchableOpacity 
+        style={styles.weatherButton} 
+        onPress={onWeatherButtonPress}
+        accessible={true}
+        accessibilityLabel={isLocationLoading || isWeatherLoading ? "Loading weather" : `Weather: ${currentTemp}, tap to view details`}
+        accessibilityRole="button"
+      >
         {isLocationLoading || isWeatherLoading ? (
           <ActivityIndicator size="small" color={theme.colors.white} />
         ) : (

@@ -42,6 +42,10 @@ const CalendarBar: React.FC<CalendarBarProps> = ({ selectedDateOffset, onDateSel
                 isSelected && styles.dateOptionActive
               ]}
               onPress={() => onDateSelect(offset)}
+              accessible={true}
+              accessibilityLabel={`${offset === -1 ? 'Yesterday' : offset === 0 ? 'Today' : 'Tomorrow'}, ${day} ${date}${isSelected ? ', selected' : ''}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isSelected }}
             >
               <View style={styles.dateContent}>
                 <Text style={[
