@@ -1,14 +1,12 @@
 import { theme, typography } from '@styles';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 import ComingSoonPlaceholder from '@/components/ComingSoonPlaceholder';
+import SafeAreaWrapper from '@/components/SafeAreaWrapper';
 
 export default function ClosetScreen() {
-  const insets = useSafeAreaInsets();
-
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
+    <SafeAreaWrapper style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>My Closet</Text>
       </View>
       
@@ -16,7 +14,7 @@ export default function ClosetScreen() {
         title="My Closet"
         description="We're busy tailoring this space for you. Soon, you'll be able to add your own clothes, create custom outfits, and get even smarter recommendations."
       />
-    </View>
+    </SafeAreaWrapper>
   );
 }
 
@@ -27,6 +25,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.lightGray,

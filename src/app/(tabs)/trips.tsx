@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
+import SafeAreaWrapper from '@/components/SafeAreaWrapper';
 
 import { TripsList } from '@components/TripsList';
 import { useTrips } from '@hooks/useTrips';
@@ -11,7 +11,6 @@ import { theme, typography } from '@styles';
 import { Trip } from '@/types/trip';
 
 export default function TripsScreen() {
-  const insets = useSafeAreaInsets();
   const { trips, loading, refreshTrips, deleteTrip } = useTrips();
 
   // Refresh trips when screen comes into focus (e.g., after returning from create-trip modal)
@@ -47,8 +46,8 @@ export default function TripsScreen() {
 
   return (
     <PaperProvider>
-      <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
+      <SafeAreaWrapper style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>Trips</Text>
         <TouchableOpacity onPress={handleAddTrip} style={styles.addButton}>
           <Ionicons name="add-circle-outline" size={32} color={theme.colors.black} />
@@ -62,7 +61,7 @@ export default function TripsScreen() {
         onEdit={handleEditTrip}
         onViewPackingList={handleViewPackingList}
       />
-      </View>
+      </SafeAreaWrapper>
     </PaperProvider>
   );
 }
@@ -77,6 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.lightGray,

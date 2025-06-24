@@ -1,6 +1,7 @@
 import ToggleSwitch from '@/components/common/ToggleSwitch';
 import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/TextInput';
+import SafeAreaWrapper from '@/components/SafeAreaWrapper';
 import { useSettings } from '@/contexts/SettingsContext';
 import { theme, typography } from '@styles';
 import { UserSettings } from '@/types/settings';
@@ -12,14 +13,14 @@ import {
   StyleSheet,
   Text,
   View,
-  Alert
+  Alert,
+  Linking,
+  TouchableOpacity
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCurrentUser, useSignOutMutation, useUpdateProfileMutation, useUpdatePasswordMutation } from '@/hooks/queries/useAuthQuery';
 
 
 export default function AccountScreen() {
-  const insets = useSafeAreaInsets();
   const { settings, updateSetting } = useSettings();
   const currentUser = useCurrentUser();
   const signOutMutation = useSignOutMutation();
@@ -135,9 +136,16 @@ export default function AccountScreen() {
     }
   };
 
+  const handlePrivacyPolicyPress = () => {
+    const url = 'https://josephcrawford99.github.io/Sun-Dressed/';
+    Linking.openURL(url).catch(err => {
+      Alert.alert('Error', 'Unable to open privacy policy');
+    });
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? insets.top : 20 }]}>
+    <SafeAreaWrapper style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>Account</Text>
       </View>
       
@@ -304,6 +312,20 @@ export default function AccountScreen() {
           )}
         </View>
 
+        {/* Legal Section */}
+        <View style={styles.legalContainer}>
+          <Text style={styles.sectionLabel}>Legal</Text>
+          <TouchableOpacity 
+            style={styles.legalItem}
+            onPress={handlePrivacyPolicyPress}
+            accessibilityLabel="Privacy Policy"
+            accessibilityHint="Opens privacy policy in browser"
+          >
+            <Text style={styles.legalText}>Privacy Policy</Text>
+            <Text style={styles.legalChevron}>›</Text>
+          </TouchableOpacity>
+        </View>
+
         <Button
           title={signOutMutation.isPending ? "Signing out..." : "Log Out"}
           onPress={handleLogout}
@@ -312,7 +334,7 @@ export default function AccountScreen() {
           disabled={signOutMutation.isPending}
         />
       </ScrollView>
-    </View>
+    </SafeAreaWrapper>
   );
 }
 
@@ -323,6 +345,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.lightGray,
@@ -390,5 +413,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: theme.spacing.sm,
     marginTop: theme.spacing.sm,
+  },
+  legalContainer: {
+    marginBottom: theme.spacing.xl,
+    borderRadius: theme.borderRadius.medium,
+    backgroundColor: theme.colors.lightGray,
+    padding: theme.spacing.md,
+  },
+  legalItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.sm,
+  },
+  legalText: {
+    ...typography.body,
+    color: theme.colors.black,
+  },
+  legalChevron: {
+    ...typography.body,
+    color: theme.colors.gray,
+    fontSize: theme.fontSize.lg,
   },
 });

@@ -12,9 +12,9 @@ import { usePrefetchAdjacentDates } from '@hooks/usePrefetchAdjacentDates';
 import { theme } from '@styles';
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
 } from 'react-native';
+import SafeAreaWrapper from '@/components/SafeAreaWrapper';
 
 export default function HomeScreen() {
   const { settings } = useSettings();
@@ -122,7 +122,7 @@ export default function HomeScreen() {
                 (outfitRegeneration.error?.message || outfitRegeneration.error?.toString());
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaWrapper style={styles.container}>
       <HomeHeader userName={settings.name} />
       
       <LocationWeatherBar
@@ -150,7 +150,7 @@ export default function HomeScreen() {
         currentDateOffset={currentDateOffset}
         onRefresh={handleOutfitRefresh}
       />
-    </SafeAreaView>
+    </SafeAreaWrapper>
   );
 }
 
