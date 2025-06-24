@@ -25,19 +25,27 @@
 
 ### ❌ **CRITICAL MISSING (BLOCKING SUBMISSION)**
 - [ ] **Alternative Login**: Required alongside Apple Sign In (2025 guideline 4.8)
+  - Email/password authentication already implemented ✅
+  - Must ensure it's prominently displayed alongside Apple Sign In button
+  - Cannot hide alternative login or make it harder to find than Apple Sign In
 - [ ] **Privacy Nutrition Labels**: Must complete in App Store Connect
+- [ ] **Apple Sign In Backend Configuration**: Requires Apple Developer account ($99)
+  - Frontend implementation complete ✅
+  - Supabase OAuth provider configuration pending ❌
 
 ---
 
 ## ESSENTIAL REQUIREMENTS OVERVIEW
 
 ### Cost Summary
-- **Apple Developer Program**: $99/year (Required)
+- **Apple Developer Program**: $99/year (Required for App Store + Apple Sign In)
 - **API Costs**: Variable, estimated $0.40 per user (Currently free during trial)
+- **Apple Sign In**: No additional cost (included with Developer Program)
 
 ### Updated Timeline Expectations (Based on Current Status)
 - **Critical compliance fixes**: 1-2 weeks ⬇️ *Reduced after completing major blockers*
 - **Developer enrollment**: 1-5 days
+- **Apple Sign In configuration**: 2-4 hours (after Developer Program approval)
 - **Asset creation**: 1-2 weeks
 - **Initial review**: 12-24 hours (Apple's current average)
 - **Total MVP timeline**: 2-3 weeks from today ⬇️ *Updated*
@@ -115,11 +123,51 @@
 - [x] Use HTTPS for all network communications ✅ **COMPLETE**
 
 #### 2. APPLE DEVELOPER PROGRAM SETUP
-**PRIORITY: CRITICAL - Start once both parties agree to pay for the dev program ($50)**
+**PRIORITY: CRITICAL - Start once both parties agree to pay for the dev program ($99)**
 - [ ] Create Apple ID with two-factor authentication
 - [ ] Enroll in Apple Developer Program ($99/year)
 - [ ] Complete identity verification process
 - [ ] Accept Developer Program License Agreement
+
+#### 2.1. APPLE SIGN IN CONFIGURATION (REQUIRED FOR APPLE SIGN IN FEATURE)
+**PRIORITY: HIGH - Required after Developer Program enrollment**
+
+**Apple Developer Console Setup:**
+- [ ] Create App ID: `com.sundressed.app`
+- [ ] Enable "Sign In with Apple" capability on App ID
+- [ ] Create Services ID for OAuth (e.g., `com.sundressed.app.signin`)
+- [ ] Configure Services ID with proper redirect URLs from Supabase
+- [ ] Generate Private Key (.p8 file) for Apple Sign In:
+  - [ ] Create new key with "Sign In with Apple" capability
+  - [ ] Download .p8 file (SAVE SECURELY - only downloadable once)
+  - [ ] Note the Key ID for Supabase configuration
+- [ ] Record Team ID from Developer Account membership page
+
+**Supabase Dashboard Configuration:**
+- [ ] Go to Supabase Dashboard → Authentication → Providers → Apple
+- [ ] Enable Apple provider
+- [ ] Configure with Apple credentials:
+  - [ ] Services ID (Identifier)
+  - [ ] Team ID
+  - [ ] Key ID
+  - [ ] Upload Private Key (.p8 file)
+- [ ] Copy redirect URL from Supabase for Services ID configuration
+- [ ] Test Apple Sign In flow end-to-end
+
+**Documentation Notes:**
+- Private key (.p8) file is only downloadable once - store securely
+- Services ID must have different identifier than App ID
+- Redirect URLs must match exactly between Apple and Supabase
+- Test thoroughly on device (Apple Sign In doesn't work in simulator)
+
+**Testing Checklist for Apple Sign In:**
+- [ ] Test successful sign in flow with real Apple ID
+- [ ] Test sign in cancellation (user presses cancel)
+- [ ] Test error handling for network issues
+- [ ] Verify user data (name, email) is captured correctly
+- [ ] Test sign out functionality
+- [ ] Verify alternative login is equally accessible
+- [ ] Test on multiple iOS devices if available
 
 #### 3. TECHNICAL COMPLIANCE
 **PRIORITY: HIGH - Required for approval**
