@@ -153,10 +153,10 @@ export default function AuthScreen() {
         <View style={styles.oauthContainer}>
           <AppleSignInButton onSuccess={handleAppleSuccess} />
 
-          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+          {/* <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
             <Ionicons name="logo-google" size={20} color={theme.colors.black} />
             <Text style={styles.googleButtonText}>Continue with Google</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         
         {__DEV__ && (

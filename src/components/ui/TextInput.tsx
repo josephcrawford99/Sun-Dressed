@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   medium: {
-    height: 48,
+    minHeight: 48,
     fontSize: theme.fontSize.md,
     paddingVertical: theme.spacing.md,
   },
