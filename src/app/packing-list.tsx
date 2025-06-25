@@ -8,7 +8,7 @@ import { theme } from '@styles/theme';
 import { typography } from '@styles/typography';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -50,6 +50,13 @@ export default function PackingListModal() {
   const hasWeatherData = weatherDisplayArray.length > 0;
   const hasPackingList = packingList.length > 0;
 
+  // Auto-generate packing list on first render if none exists
+  useEffect(() => {
+    if (!hasPackingList && trip && !loading) {
+      generatePackingList(trip.location, trip.startDate, trip.endDate, trip.id);
+    }
+  }, [hasPackingList, trip, loading, generatePackingList]);
+
 
   const renderPackingList = () => (
     <View style={styles.packingListContainer}>
@@ -63,30 +70,6 @@ export default function PackingListModal() {
     </View>
   );
 
-  const renderEmptyState = () => {
-    return (
-      <View style={styles.emptyContainer}>
-        <TouchableOpacity
-          style={[styles.generateButton, (loading || !trip) && styles.disabledButton]}
-          onPress={handleGeneratePackingList}
-          disabled={loading || !trip}
-          activeOpacity={0.7}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color={theme.colors.white} />
-          ) : (
-            <Text style={styles.generateButtonText}>
-              {hasPackingList ? 'Regenerate Packing List' : 'Generate Packing List'}
-            </Text>
-          )}
-        </TouchableOpacity>
-        {!trip && <Text style={styles.debugText}>No trip data available</Text>}
-        {trip && !hasPackingList && (
-          <Text style={styles.debugText}>Pull down to refresh or tap generate to create packing list</Text>
-        )}
-      </View>
-    );
-  };
 
   const renderContent = () => {
     if (!trip) {
@@ -109,10 +92,6 @@ export default function PackingListModal() {
           </TouchableOpacity>
         </View>
       );
-    }
-
-    if (!hasPackingList) {
-      return renderEmptyState();
     }
 
     return (
@@ -201,8 +180,11 @@ const styles = StyleSheet.create({
     ...typography.heading,
     fontSize: theme.fontSize.xxxl,
     color: theme.colors.black,
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    right: 0,
     textAlign: 'center',
+    zIndex: 1,
   },
   spacer: {
     width: theme.spacing.xl + theme.spacing.sm, // Same width as back button for centering
@@ -236,34 +218,6 @@ const styles = StyleSheet.create({
   flipContainer: {
     backgroundColor: 'transparent',
     borderRadius: theme.borderRadius.large,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  generateButton: {
-    backgroundColor: theme.colors.black,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.medium,
-    alignItems: 'center',
-    minHeight: 48,
-    justifyContent: 'center',
-  },
-  generateButtonText: {
-    ...typography.body,
-    fontSize: theme.fontSize.md,
-    fontWeight: '600',
-    color: theme.colors.white,
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  debugText: {
-    ...typography.caption,
-    color: theme.colors.gray,
-    marginTop: theme.spacing.sm,
   },
   packingListContainer: {
     flex: 1,
