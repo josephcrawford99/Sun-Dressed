@@ -75,8 +75,12 @@ export default function AuthScreen() {
     router.replace('/(tabs)/home');
   };
 
-  const handleAppleSuccess = () => {
-    router.replace('/(tabs)/home');
+  const handleAppleSuccess = (user: any) => {
+    if (user) {
+      // Invalidate queries to refetch user session
+      queryClient.invalidateQueries({ queryKey: authKeys.session() });
+      router.replace('/(tabs)/home');
+    }
   };
 
   const handleGoogleLogin = () => {

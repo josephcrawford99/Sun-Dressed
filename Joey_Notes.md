@@ -11,3 +11,8 @@ at least we need an ability to say "dont use this outfit item as I dont have it"
 onboarding needed
 add name flow to sign up
 Add payment and subscription (one week, then 1 dollar a month)
+
+Team ID
+878G4DAZ9R
+
+Key ID UJB4QSCYT2

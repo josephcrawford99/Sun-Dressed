@@ -4,7 +4,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAppleSignInMutation } from '@/hooks/queries/useAuthQuery';
 
 interface AppleSignInButtonProps {
-  onSuccess?: () => void;
+  onSuccess?: (user: any) => void;
   onError?: (error: string) => void;
 }
 
@@ -31,8 +31,8 @@ export function AppleSignInButton({ onSuccess, onError }: AppleSignInButtonProps
             nonce,
           },
           {
-            onSuccess: () => {
-              onSuccess?.();
+            onSuccess: (data) => {
+              onSuccess?.(data.user);
             },
             onError: (error) => {
               const errorMessage = error.message || 'Apple Sign In failed';
