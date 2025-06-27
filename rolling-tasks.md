@@ -1,5 +1,7 @@
 # Rolling Tasks - Sun Dressed App (MVP Launch Document)
-*Updated: June 19, 2025*
+*Updated: June 27, 2025* by Joey
+
+Note from Joey: flip card button in @packing-list screen does not press normall, it is finicky Need to fix. Also pulling from async is weird, background weather pulling does not always occur, and sometimes current day gets empty outfit. Need to simplify tanstack implementation to pull old and new outfits and ensure caching of weather. Also read @code-review27jun.md for a code review from an outside dev. you should implement fixes if t=you find any of the soncerns to be valid but do not assume it is correct. Trust but verify!
 
 ## Executive Summary for Courtney
 This document defines what we need for MVP launch vs. future updates. The app is **85% ready** - we have a working product that generates AI outfits based on weather. The remaining 15% is critical bugs and monetization.
@@ -47,7 +49,7 @@ This document defines what we need for MVP launch vs. future updates. The app is
 - [ ] Test purchase flow end-to-end
 - [ ] Add restore purchases functionality
 
-### 3. **Authentication** (1-2 days)  
+### 3. **Authentication** (1-2 days)
 - [ ] Complete Apple Sign In integration
 - [ ] Add name collection during signup
 - [ ] Test full auth flow (signup → subscription → usage)
@@ -129,7 +131,7 @@ This document defines what we need for MVP launch vs. future updates. The app is
 - [ ] Subscription flow implemented
 - [ ] Critical bugs fixed
 
-### Business Requirements 
+### Business Requirements
 - [ ] Terms of Service written
 - [ ] Privacy Policy updated
 - [ ] App Store assets ready
@@ -164,7 +166,7 @@ This document defines what we need for MVP launch vs. future updates. The app is
 ## Why We Can Ship This MVP
 
 1. **Core Value Works**: Users can get AI outfit suggestions - that's the whole app
-2. **Revenue Ready**: With RevenueCat, we can start charging immediately  
+2. **Revenue Ready**: With RevenueCat, we can start charging immediately
 3. **Sustainable Costs**: API costs are manageable and predictable
 4. **Quick Iteration**: Post-launch updates can add polish
 5. **Market Validation**: Get real user feedback faster
@@ -181,9 +183,9 @@ The app delivers on its promise: "AI outfit suggestions based on weather." Every
 
 **Launch Strategy**: Ship MVP with core features, then iterate based on user feedback. This gets us to market faster and validates demand.
 
-**Risk Assessment**: 
+**Risk Assessment**:
 - Technical risk: LOW (core features working)
-- Financial risk: LOW (positive unit economics)  
+- Financial risk: LOW (positive unit economics)
 - Market risk: MEDIUM (needs validation)
 
 **Recommendation**: Complete the "Must Have" items and ship. Perfect is the enemy of good - we have a working product that solves a real problem.
