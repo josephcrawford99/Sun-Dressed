@@ -8,7 +8,9 @@ import {
   OUTFIT_CACHE_CONFIG 
 } from '@/utils/cacheUtils';
 import { generateOutfitLLM } from '@/services/llmService';
-import { SettingsService } from '@/services/settingsService';
+import { queryClient } from '@/config/queryClient';
+import { settingsKeys } from './useSettingsQuery';
+import { UserSettings, DEFAULT_SETTINGS } from '@/types/settings';
 
 /**
  * Main outfit query hook with smart caching
@@ -53,7 +55,8 @@ export const useOutfitQuery = (
       }
       
       // Generate new outfit using LLM
-      const settings = await SettingsService.loadSettings();
+      // Get settings from TanStack Query cache
+      const settings = queryClient.getQueryData<UserSettings>(settingsKeys.unified()) || DEFAULT_SETTINGS;
       const outfit = await generateOutfitLLM(
         weather,
         activity,
@@ -124,11 +127,12 @@ export const useOutfitRegeneration = () => {
       weather: Weather;
     }) => {
       // Generate new outfit using LLM directly
-      const settings = await SettingsService.loadSettings();
+      // Get settings from query cache instead of SettingsService
+      const currentSettings = queryClient.getQueryData<UserSettings>(settingsKeys.unified()) || DEFAULT_SETTINGS;
       const outfit = await generateOutfitLLM(
         weather,
         activity,
-        settings.stylePreference
+        currentSettings.stylePreference
       );
       
       return outfit;

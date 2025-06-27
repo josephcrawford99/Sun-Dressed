@@ -24,6 +24,10 @@ export function useAuthQuery() {
       // Don't retry auth failures, they're usually intentional
       return failureCount < 1 && !error.message.includes('Invalid');
     },
+    // Override defaults for auth queries to ensure fresh data
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+    refetchInterval: 1000 * 60 * 10, // Refresh session every 10 minutes
   });
 }
 
