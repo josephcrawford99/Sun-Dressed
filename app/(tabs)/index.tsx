@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    marginBottom: 20,
+    marginBottom: 30,
   },
   generateButton: {
     backgroundColor: '#0a7ea4',

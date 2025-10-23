@@ -17,7 +17,7 @@ export default function MeScreen() {
 
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'background');
-  const borderColor = useThemeColor({ light: '#ccc', dark: '#444' }, 'border');
+  const borderColor = useThemeColor({}, 'border');
 
   const radioButtons: RadioButtonProps[] = useMemo(
     () => [
