@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    marginBottom: 25,
+    marginBottom: 10,
   },
   sectionTitle: {
     marginBottom: 10,

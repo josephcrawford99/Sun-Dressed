@@ -13,6 +13,8 @@ export interface WeatherData {
     feels_like: number;
     pressure: number;
     humidity: number;
+    dew_point: number;
+    uvi: number;
     weather: Array<{
       id: number;
       main: string;
