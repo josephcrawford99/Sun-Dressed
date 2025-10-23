@@ -5,10 +5,12 @@ import { ThemedView } from '@/components/themed-view';
 
 export default function OutfitScreen() {
   return (
+
     <ThemedView style={styles.container}>
       <ThemedText type="title">Outfit</ThemedText>
       <ThemedText>Your daily outfit recommendations will appear here.</ThemedText>
     </ThemedView>
+
   );
 }
 

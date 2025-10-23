@@ -1,13 +1,31 @@
-import { StyleSheet } from 'react-native';
+import {  ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useWeather } from '@/hooks/use-weather';
 
 export default function WeatherScreen() {
+    const { weather, loading, error } = useWeather();
+
     return (
         <ThemedView style={styles.container}>
-            <ThemedText type="title">Weather</ThemedText>
-            <ThemedText>Weather data will appear here.</ThemedText>
+            <ThemedText type="title" style={styles.title}>Weather</ThemedText>
+
+            {loading && (
+                <ThemedText>Loading weather data...</ThemedText>
+            )}
+
+            {error && (
+                <ThemedText style={styles.error}>Error: {error}</ThemedText>
+            )}
+
+            {weather && (
+                <ScrollView style={styles.scrollView}>
+                    <ThemedText style={styles.jsonText}>
+                        {JSON.stringify(weather, null, 2)}
+                    </ThemedText>
+                </ScrollView>
+            )}
         </ThemedView>
     );
 }
@@ -15,8 +33,18 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
+    },
+    title: {
+        marginBottom: 20,
+    },
+    scrollView: {
+        flex: 1,
+    },
+    jsonText: {
+        fontFamily: 'monospace',
+        fontSize: 12,
+    },
+    error: {
+        color: '#ff6b6b',
     },
 });
