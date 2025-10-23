@@ -13,6 +13,7 @@ type IconSymbolName = keyof typeof MAPPING;
 const MAPPING = {
   'outfit': { library: 'FontAwesome6', name: 'person-half-dress' },
   'me': { library: 'MaterialCommunityIcons', name: 'hanger' },
+  'weather': { library: 'MaterialCommunityIcons', name: 'weather-partly-cloudy' },
 } as const;
 
 /**
