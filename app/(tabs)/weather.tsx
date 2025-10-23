@@ -2,10 +2,12 @@ import {  ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useWeather } from '@/hooks/use-weather';
+import { useStore } from '@/store/store';
 
 export default function WeatherScreen() {
-    const { weather, loading, error } = useWeather();
+    const weather = useStore((state) => state.weather);
+    const loading = useStore((state) => state.weatherLoading);
+    const error = useStore((state) => state.weatherError);
 
     return (
         <ThemedView style={styles.container}>

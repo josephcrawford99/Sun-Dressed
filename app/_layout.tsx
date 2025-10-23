@@ -4,12 +4,21 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useStore } from '@/store/store';
+import { useEffect } from 'react';
+
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const fetchWeather = useStore((state) => state.fetchWeather);
+
+  // Fetch weather data when app loads
+  useEffect(() => {
+    fetchWeather();
+  }, [fetchWeather]);
 
   return (
     <SafeAreaProvider>
