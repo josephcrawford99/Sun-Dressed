@@ -14,6 +14,7 @@ const MAPPING = {
   'outfit': { library: 'FontAwesome6', name: 'person-half-dress' },
   'me': { library: 'MaterialCommunityIcons', name: 'hanger' },
   'weather': { library: 'MaterialCommunityIcons', name: 'weather-partly-cloudy' },
+  'debug': { library: 'MaterialCommunityIcons', name: 'bug' },
 } as const;
 
 /**

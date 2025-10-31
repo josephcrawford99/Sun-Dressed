@@ -12,8 +12,10 @@ export type OutfitStyle = 'masculine' | 'feminine' | 'neutral';
 export const useStore = create(
   combine(
     {
-      style: 'neutral',
+      style: 'neutral' as OutfitStyle,
       activity: '',
+      prompt: null as string | null,
+      outfit: null as string | null,
     },
     (set) => {
       return {
@@ -22,6 +24,12 @@ export const useStore = create(
         },
         setActivity: (nextActivity: string) => {
           set({ activity: nextActivity });
+        },
+        setPrompt: (nextPrompt: string | null) => {
+          set({ prompt: nextPrompt });
+        },
+        setOutfit: (nextOutfit: string | null) => {
+          set({ outfit: nextOutfit });
         },
       };
     },
