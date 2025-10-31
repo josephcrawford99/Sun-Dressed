@@ -7,19 +7,20 @@ import axios from 'axios';
 
 /**
  * OpenWeatherMap OneCall 3.0 API response type
+ * Matches the actual API structure
  */
 export interface WeatherData {
   lat: number;
   lon: number;
   timezone: string;
-  current?: {
+  current: {
     dt: number;
     temp: number;
     feels_like: number;
-    pressure: number;
     humidity: number;
-    dew_point: number;
     uvi: number;
+    wind_speed: number;
+    wind_gust?: number;
     weather: Array<{
       id: number;
       main: string;
@@ -27,8 +28,11 @@ export interface WeatherData {
       icon: string;
     }>;
   };
-  daily?: Array<{
+  daily: Array<{
     dt: number;
+    sunrise: number;
+    sunset: number;
+    summary?: string;
     temp: {
       min: number;
       max: number;
@@ -43,23 +47,22 @@ export interface WeatherData {
       eve: number;
       morn: number;
     };
-    pressure: number;
     humidity: number;
-    dew_point: number;
     wind_speed: number;
-    wind_deg: number;
+    wind_gust?: number;
     weather: Array<{
       id: number;
       main: string;
       description: string;
       icon: string;
     }>;
-    clouds: number;
     pop: number;
     uvi: number;
+    rain?: number;
+    snow?: number;
   }>;
-  [key: string]: any;
 }
+
 
 /**
  * Result from fetching weather data
@@ -74,7 +77,7 @@ export interface WeatherFetchResult {
  *
  * @param latitude - Latitude coordinate
  * @param longitude - Longitude coordinate
- * @returns Promise with weather data and raw JSON string
+ * @returns Promise with raw weather data, processed data, and raw JSON string
  * @throws Error if API key is missing or fetch fails
  */
 export async function fetchWeatherData(

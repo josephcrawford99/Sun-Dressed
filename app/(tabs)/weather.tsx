@@ -1,4 +1,4 @@
-import {  ScrollView, StyleSheet } from 'react-native';
+import { Image, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,23 +9,62 @@ export default function WeatherScreen() {
 
     return (
         <ThemedView style={styles.container}>
-            <ThemedText type="title" style={styles.title}>Weather</ThemedText>
+            <ScrollView style={{ flex: 1, padding: 20 }}>
+                <ThemedText type="title" style={styles.title}>Weather</ThemedText>
 
-            {loading && (
-                <ThemedText>Loading weather data...</ThemedText>
-            )}
+                {loading && (
+                    <ThemedText>Loading weather data...</ThemedText>
+                )}
 
-            {error && (
-                <ThemedText style={styles.error}>Error: {error.message}</ThemedText>
-            )}
+                {error && (
+                    <ThemedText style={styles.error}>Error: {error.message}</ThemedText>
+                )}
 
-            {weather && (
-                <ScrollView style={styles.scrollView}>
-                    <ThemedText style={styles.jsonText}>
-                        {JSON.stringify(weather, null, 2)}
-                    </ThemedText>
-                </ScrollView>
-            )}
+                {weather && (
+                    <ThemedView style={styles.weatherContent}>
+                        {/* Temperature Display */}
+                        <ThemedView style={styles.section}>
+                            <ThemedText type="subtitle" style={styles.sectionTitle}>Temperature</ThemedText>
+                            <ThemedText style={styles.dataText}>
+                                High: {Math.round(weather.daily[0].temp.max)}°C
+                            </ThemedText>
+                            <ThemedText style={styles.dataText}>
+                                Low: {Math.round(weather.daily[0].temp.min)}°C
+                            </ThemedText>
+                        </ThemedView>
+
+                        {/* Chance of Rain */}
+                        <ThemedView style={styles.section}>
+                            <ThemedText type="subtitle" style={styles.sectionTitle}>Precipitation</ThemedText>
+                            <ThemedText style={styles.dataText}>
+                                Chance of Rain: {Math.round(weather.daily[0].pop * 100)}%
+                            </ThemedText>
+                        </ThemedView>
+
+                        {/* UV Index */}
+                        <ThemedView style={styles.section}>
+                            <ThemedText type="subtitle" style={styles.sectionTitle}>UV Index</ThemedText>
+                            <ThemedText style={styles.dataText}>
+                                UV Index: {Math.round(weather.daily[0].uvi)}
+                            </ThemedText>
+                        </ThemedView>
+
+                        {/* Weather Description */}
+                        <ThemedView style={styles.section}>
+                            <ThemedText type="subtitle" style={styles.sectionTitle}>Conditions</ThemedText>
+                            <ThemedView style={styles.conditionsRow}>
+                                <Image
+                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
+                                    style={styles.weatherIcon}
+                                />
+                                <ThemedText style={styles.dataText}>
+                                    {weather.daily[0].weather[0].description}
+                                </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
+                )}
+            </ScrollView>
         </ThemedView>
     );
 }
@@ -33,17 +72,31 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
     },
     title: {
-        marginBottom: 20,
+        marginBottom: 0,
     },
-    scrollView: {
+    weatherContent: {
         flex: 1,
     },
-    jsonText: {
-        fontFamily: 'monospace',
-        fontSize: 12,
+    section: {
+        marginBottom: 0,
+    },
+    sectionTitle: {
+        marginBottom: 0,
+    },
+    dataText: {
+        fontSize: 18,
+        marginVertical: 4,
+    },
+    conditionsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    weatherIcon: {
+        width: 50,
+        height: 50,
+        marginRight: 8,
     },
     error: {
         color: '#ff6b6b',
