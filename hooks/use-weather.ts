@@ -1,5 +1,5 @@
 import { fetchWeatherData, WeatherData } from '@/services/openweathermap-service';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 
 const WEATHER_STALE_TIME = 5 * 60 * 1000
@@ -31,8 +31,8 @@ async function fetchWeather(): Promise<WeatherData> {
  *
  * @returns TanStack Query result with weather data, loading state, and error
  */
-export function useWeather() {
-  return useQuery({
+export function useWeather(): UseQueryResult<WeatherData, Error> {
+  return useQuery<WeatherData, Error>({
     queryKey: ['weather'],
     queryFn: fetchWeather,
     staleTime: WEATHER_STALE_TIME,
