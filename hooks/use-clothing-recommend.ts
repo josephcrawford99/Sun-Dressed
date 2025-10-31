@@ -3,13 +3,14 @@ import { useStore } from '@/store/store';
 import { useWeather } from '@/hooks/use-weather';
 import { generateOutfitRecommendation } from '@/services/gemini-service';
 import { buildOutfitPrompt } from '@/services/prompt-generator';
+import { Outfit } from '@/types/outfit';
 
 /**
  * Return type for the useClothingRecommend hook
  */
 export interface UseClothingRecommendResult {
   generateOutfit: () => Promise<void>;
-  outfit: string | null;
+  outfit: Outfit | null;
   prompt: string | null;
   loading: boolean;
   error: string | null;
@@ -34,6 +35,7 @@ export function useClothingRecommend(): UseClothingRecommendResult {
   const outfit = useStore((state) => state.outfit);
   const prompt = useStore((state) => state.prompt);
   const setOutfit = useStore((state) => state.setOutfit);
+  const setOutfitRawText = useStore((state) => state.setOutfitRawText);
   const setPrompt = useStore((state) => state.setPrompt);
 
   // Get weather data from TanStack Query
@@ -47,6 +49,7 @@ export function useClothingRecommend(): UseClothingRecommendResult {
     // Reset state
     setError(null);
     setOutfit(null);
+    setOutfitRawText(null);
     setPrompt(null);
 
     // Validate weather data
@@ -76,9 +79,10 @@ export function useClothingRecommend(): UseClothingRecommendResult {
       );
       setPrompt(generatedPrompt);
 
-      // Generate outfit recommendation
-      const recommendation = await generateOutfitRecommendation(generatedPrompt);
-      setOutfit(recommendation);
+      // Generate outfit recommendation (returns both structured and raw data)
+      const result = await generateOutfitRecommendation(generatedPrompt);
+      setOutfit(result.recommendation);
+      setOutfitRawText(result.rawText);
     } catch (err) {
       // Handle errors
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate outfit recommendation';

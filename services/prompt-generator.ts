@@ -50,14 +50,21 @@ USER PREFERENCES:
 - Clothing Gender Preference (will be masculine, feminine, neutral): ${userPrefs.style || 'neutral'}
 - Activity: ${userPrefs.activity || 'general daily activities'}
 
-Please provide a detailed outfit recommendation including:
-1. Upper body clothing
-2. Lower body clothing
-3. Footwear
-4. Accessories (if applicable, considering weather conditions)
-5. Brief explanation of why this outfit works for the conditions
+IMPORTANT: You MUST respond with ONLY valid JSON in the exact format shown below. Do not include any other text, explanations, or markdown formatting outside the JSON.
 
-Keep the recommendation practical and weather-appropriate.`;
+Required JSON format:
+{
+  "items": [
+    {
+      "name": "Item Name",
+      "description": "Detailed description of the item",
+      "blurb": "One sentence about why this item is perfect for these conditions and complements the outfit"
+    }
+  ],
+  "overallDescription": "A personable summary of the outfit as a whole and why it works perfectly for today's conditions, speaking as a friendly fashion advisor"
+}
+
+Include appropriate clothing items based on the weather and activity (e.g., tops, bottoms, outerwear, footwear, accessories). Keep recommendations practical and weather-appropriate. Speak warmly and personably in the overallDescription.`;
 
   return prompt;
 }

@@ -1,0 +1,82 @@
+import { Outfit, ClothingItem } from '@/types/outfit';
+
+/**
+ * Parses a text response from the AI into a structured Outfit
+ *
+ * Handles:
+ * - JSON wrapped in markdown code blocks (```json...```)
+ * - Plain JSON
+ * - Validates the structure has required fields
+ *
+ * @param text - Raw text response from the AI API
+ * @returns Parsed and validated Outfit
+ * @throws Error if text is not valid JSON or missing required fields
+ */
+export function parseOutfitJSON(text: string): Outfit {
+  let jsonText = text.trim();
+
+  // Strip markdown code blocks if present
+  const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    jsonText = codeBlockMatch[1].trim();
+  }
+
+  // Parse JSON
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch (error) {
+    throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
+  // Validate structure
+  if (typeof parsed !== 'object' || parsed === null) {
+    throw new Error('Parsed JSON is not an object');
+  }
+
+  const obj = parsed as Record<string, unknown>;
+
+  // Validate items array
+  if (!Array.isArray(obj.items)) {
+    throw new Error('Missing or invalid "items" array in response');
+  }
+
+  // Validate and construct items array
+  const items: ClothingItem[] = [];
+  for (let i = 0; i < obj.items.length; i++) {
+    const item = obj.items[i];
+    if (typeof item !== 'object' || item === null) {
+      throw new Error(`Item at index ${i} is not an object`);
+    }
+
+    const itemObj = item as Record<string, unknown>;
+
+    if (typeof itemObj.name !== 'string') {
+      throw new Error(`Item at index ${i} missing or invalid "name" field`);
+    }
+    if (typeof itemObj.description !== 'string') {
+      throw new Error(`Item at index ${i} missing or invalid "description" field`);
+    }
+    if (typeof itemObj.blurb !== 'string') {
+      throw new Error(`Item at index ${i} missing or invalid "blurb" field`);
+    }
+
+    // Construct validated ClothingItem
+    items.push({
+      name: itemObj.name,
+      description: itemObj.description,
+      blurb: itemObj.blurb,
+    });
+  }
+
+  // Validate overallDescription
+  if (typeof obj.overallDescription !== 'string') {
+    throw new Error('Missing or invalid "overallDescription" field in response');
+  }
+
+  // Return properly typed object constructed from validated data
+  return {
+    items,
+    overallDescription: obj.overallDescription,
+  };
+}

@@ -7,7 +7,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStore } from '@/store/store';
 
 export default function OutfitScreen() {
-  const { generateOutfit, outfit, prompt, loading, error } = useClothingRecommend();
+  const { generateOutfit, outfit, loading, error } = useClothingRecommend();
 
   const activity = useStore((state) => state.activity);
   const setActivity = useStore((state) => state.setActivity);
@@ -67,31 +67,39 @@ export default function OutfitScreen() {
           </ThemedView>
         )}
 
-        {prompt && (
-          <>
-            <ThemedView style={styles.section}>
-              <ThemedText type="subtitle" style={styles.sectionTitle}>
-                Prompt Sent to API:
+        {outfit && (
+          <ThemedView style={styles.section}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              Outfit Recommendation
+            </ThemedText>
+
+            {/* Overall Description */}
+            <ThemedView style={styles.overallDescriptionContainer}>
+              <ThemedText style={styles.overallDescriptionText}>
+                {outfit.overallDescription}
               </ThemedText>
-              <ThemedView style={styles.promptContainer}>
-                <ThemedText style={styles.promptText}>{prompt}</ThemedText>
-              </ThemedView>
             </ThemedView>
 
-            {outfit && (
-              <ThemedView style={styles.section}>
-                <ThemedText type="subtitle" style={styles.sectionTitle}>
-                  Outfit Recommendation:
-                </ThemedText>
-                <ThemedView style={styles.outfitContainer}>
-                  <ThemedText style={styles.outfitText}>{outfit}</ThemedText>
+            {/* Clothing Items */}
+            <ThemedView style={styles.itemsContainer}>
+              {outfit.items.map((item, index) => (
+                <ThemedView key={index} style={styles.itemCard}>
+                  <ThemedText type="subtitle" style={styles.itemName}>
+                    {item.name}
+                  </ThemedText>
+                  <ThemedText style={styles.itemDescription}>
+                    {item.description}
+                  </ThemedText>
+                  <ThemedText style={styles.itemBlurb}>
+                    {item.blurb}
+                  </ThemedText>
                 </ThemedView>
-              </ThemedView>
-            )}
-          </>
+              ))}
+            </ThemedView>
+          </ThemedView>
         )}
 
-        {!loading && !error && !outfit && !prompt && (
+        {!loading && !error && !outfit && (
           <ThemedText style={styles.description}>
             Press the button above to generate an outfit recommendation based on current weather and your preferences.
           </ThemedText>
@@ -148,28 +156,42 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#ff6b6b',
   },
-  promptContainer: {
-    padding: 15,
-    backgroundColor: 'rgba(128, 128, 128, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 128, 128, 0.2)',
-  },
-  promptText: {
-    fontSize: 13,
-    lineHeight: 20,
-    opacity: 0.8,
-  },
-  outfitContainer: {
+  overallDescriptionContainer: {
     padding: 15,
     backgroundColor: 'rgba(10, 126, 164, 0.1)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(10, 126, 164, 0.2)',
+    marginBottom: 15,
   },
-  outfitText: {
+  overallDescriptionText: {
     fontSize: 15,
     lineHeight: 22,
+    fontStyle: 'italic',
+  },
+  itemsContainer: {
+    gap: 12,
+  },
+  itemCard: {
+    padding: 15,
+    backgroundColor: 'rgba(128, 128, 128, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(128, 128, 128, 0.15)',
+  },
+  itemName: {
+    marginBottom: 8,
+  },
+  itemDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  itemBlurb: {
+    fontSize: 13,
+    lineHeight: 18,
+    opacity: 0.8,
+    fontStyle: 'italic',
   },
   description: {
     marginTop: 20,

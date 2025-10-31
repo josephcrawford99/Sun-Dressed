@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { combine } from 'zustand/middleware';
+import { Outfit } from '@/types/outfit';
 
 /**
  * Outfit style options
@@ -15,7 +16,8 @@ export const useStore = create(
       style: 'neutral' as OutfitStyle,
       activity: '',
       prompt: null as string | null,
-      outfit: null as string | null,
+      outfit: null as Outfit | null,
+      outfitRawText: null as string | null,
     },
     (set) => {
       return {
@@ -28,8 +30,11 @@ export const useStore = create(
         setPrompt: (nextPrompt: string | null) => {
           set({ prompt: nextPrompt });
         },
-        setOutfit: (nextOutfit: string | null) => {
+        setOutfit: (nextOutfit: Outfit | null) => {
           set({ outfit: nextOutfit });
+        },
+        setOutfitRawText: (nextOutfitRawText: string | null) => {
+          set({ outfitRawText: nextOutfitRawText });
         },
       };
     },
