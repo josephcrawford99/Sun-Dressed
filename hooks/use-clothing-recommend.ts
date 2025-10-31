@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '@/store/store';
+import { useWeather } from '@/hooks/use-weather';
 import { generateOutfitRecommendation } from '@/services/gemini-service';
 import { buildOutfitPrompt } from '@/services/prompt-generator';
 
@@ -18,7 +19,7 @@ export interface UseClothingRecommendResult {
  * Hook to generate clothing recommendations based on weather and user preferences
  *
  * Uses Gemini API to generate outfit suggestions combining:
- * - Current weather conditions from zustand store
+ * - Current weather conditions from TanStack Query
  * - User style preferences and planned activity from zustand store
  *
  * @returns Object containing generateOutfit function and state (outfit, prompt, loading, error)
@@ -29,10 +30,12 @@ export function useClothingRecommend(): UseClothingRecommendResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get data from zustand store
+  // Get user preferences from zustand store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
-  const weather = useStore((state) => state.weather);
+
+  // Get weather data from TanStack Query
+  const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
 
   /**
    * Generates an outfit recommendation
@@ -45,6 +48,16 @@ export function useClothingRecommend(): UseClothingRecommendResult {
     setPrompt(null);
 
     // Validate weather data
+    if (weatherLoading) {
+      setError('Weather data is still loading. Please wait...');
+      return;
+    }
+
+    if (weatherError) {
+      setError(`Weather error: ${weatherError.message}`);
+      return;
+    }
+
     if (!weather) {
       setError('Weather data not available. Please ensure weather has loaded.');
       return;

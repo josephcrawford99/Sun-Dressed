@@ -1,24 +1,24 @@
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useWeather } from '@/hooks/use-weather';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useStore } from '@/store/store';
-import { useEffect } from 'react';
+
+// Create a client
+const queryClient = new QueryClient();
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
-export default function RootLayout() {
+function AppContent() {
   const colorScheme = useColorScheme();
-  const fetchWeather = useStore((state) => state.fetchWeather);
 
-  // Fetch weather data when app loads
-  useEffect(() => {
-    fetchWeather();
-  }, [fetchWeather]);
+  // Prefetch weather data when app loads
+  useWeather();
 
   return (
     <SafeAreaProvider>
@@ -29,5 +29,13 @@ export default function RootLayout() {
         <StatusBar style="auto" />
       </ThemeProvider>
     </SafeAreaProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+    </QueryClientProvider>
   );
 }
