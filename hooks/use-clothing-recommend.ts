@@ -1,104 +1,52 @@
 import { useWeather } from '@/hooks/use-weather';
-import { generateOutfitRecommendation } from '@/services/gemini-service';
+import { generateOutfitRecommendation, OutfitGenerationResult } from '@/services/gemini-service';
 import { useStore } from '@/store/store';
-import { Outfit } from '@/types/outfit';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
-import { useState } from 'react';
-
-/**
- * Return type for the useClothingRecommend hook
- */
-export interface UseClothingRecommendResult {
-  generateOutfit: () => Promise<void>;
-  outfit: Outfit | null;
-  prompt: string | null;
-  loading: boolean;
-  error: string | null;
-}
+import { useMutation, UseMutationResult } from '@tanstack/react-query';
 
 /**
  * Hook to generate clothing recommendations based on weather and user preferences
  *
- * Uses Gemini API to generate outfit suggestions combining:
+ * Uses TanStack Query mutation with Gemini API to generate outfit suggestions combining:
  * - Current weather conditions from TanStack Query
  * - User style preferences and planned activity from zustand store
  *
- * @returns Object containing generateOutfit function and state (outfit, prompt, loading, error)
+ * @returns TanStack Query mutation result with mutate function, data, loading state, and error
  */
-export function useClothingRecommend(): UseClothingRecommendResult {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Get user preferences and outfit data from zustand store
+export function useClothingRecommend(): UseMutationResult<OutfitGenerationResult, Error, void> {
+  // Get user preferences from zustand store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
-  const outfit = useStore((state) => state.outfit);
-  const prompt = useStore((state) => state.prompt);
-  const setOutfit = useStore((state) => state.setOutfit);
-  const setOutfitRawText = useStore((state) => state.setOutfitRawText);
-  const setPrompt = useStore((state) => state.setPrompt);
 
   // Get weather data from TanStack Query
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
 
-  /**
-   * Generates an outfit recommendation
-   * Validates required data, builds prompt, and calls Gemini API
-   */
-  const generateOutfit = async () => {
-    // Reset state
-    setError(null);
-    setOutfit(null);
-    setOutfitRawText(null);
-    setPrompt(null);
+  return useMutation<OutfitGenerationResult, Error, void>({
+    mutationFn: async () => {
+      // Validate weather data
+      if (weatherLoading) {
+        throw new Error('Weather data is still loading. Please wait...');
+      }
 
-    // Validate weather data
-    if (weatherLoading) {
-      setError('Weather data is still loading. Please wait...');
-      return;
-    }
+      if (weatherError) {
+        throw new Error(`Weather error: ${weatherError.message}`);
+      }
 
-    if (weatherError) {
-      setError(`Weather error: ${weatherError.message}`);
-      return;
-    }
+      if (!weather) {
+        throw new Error('Weather data not available. Please ensure weather has loaded.');
+      }
 
-    if (!weather) {
-      setError('Weather data not available. Please ensure weather has loaded.');
-      return;
-    }
-
-    // Start loading
-    setLoading(true);
-
-    try {
       // Build the prompt
-      const generatedPrompt = buildOutfitPrompt(
+      const prompt = buildOutfitPrompt(
         { style, activity },
         weather,
         tempFormat
       );
-      setPrompt(generatedPrompt);
 
       // Generate outfit recommendation (returns both structured and raw data)
-      const result = await generateOutfitRecommendation(generatedPrompt);
-      setOutfit(result.recommendation);
-      setOutfitRawText(result.rawText);
-    } catch (err) {
-      // Handle errors
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate outfit recommendation';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return {
-    generateOutfit,
-    outfit,
-    prompt,
-    loading,
-    error,
-  };
+      return await generateOutfitRecommendation(prompt);
+    },
+    retry: 2,
+  });
 }

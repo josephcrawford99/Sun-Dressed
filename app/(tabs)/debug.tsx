@@ -1,20 +1,30 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
+import { buildOutfitPrompt } from '@/utils/prompt-generator';
 
 export default function DebugScreen() {
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
 
-  // Get user preferences and outfit data from store
+  // Get user preferences from store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
-  const prompt = useStore((state) => state.prompt);
-  const outfitRawText = useStore((state) => state.outfitRawText);
+
+  // Get outfit mutation data
+  const outfitMutation = useClothingRecommend();
+  const outfitRawText = outfitMutation.data?.rawText;
+
+  // Reconstruct the prompt that would be used
+  const prompt = useMemo(() => {
+    if (!weather) return null;
+    return buildOutfitPrompt({ style, activity }, weather, tempFormat);
+  }, [weather, style, activity, tempFormat]);
   // Collapsible state
   const [expanded, setExpanded] = useState({
     preferences: true,
@@ -86,7 +96,7 @@ export default function DebugScreen() {
         <ThemedView style={styles.section}>
           <Pressable onPress={() => toggleSection('prompt')}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              {expanded.prompt ? '▼' : '▶'} Last Gemini Prompt
+              {expanded.prompt ? '▼' : '▶'} Current Gemini Prompt
             </ThemedText>
           </Pressable>
           {expanded.prompt && (
@@ -97,7 +107,7 @@ export default function DebugScreen() {
                 </ThemedView>
               ) : (
                 <ThemedText style={styles.infoText}>
-                  No prompt yet. Generate an outfit to see the prompt.
+                  Prompt unavailable. Weather data must be loaded first.
                 </ThemedText>
               )}
             </>

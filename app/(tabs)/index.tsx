@@ -7,7 +7,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStore } from '@/store/store';
 
 export default function OutfitScreen() {
-  const { generateOutfit, outfit, loading, error } = useClothingRecommend();
+  const { mutate, data, isPending, error } = useClothingRecommend();
 
   const activity = useStore((state) => state.activity);
   const setActivity = useStore((state) => state.setActivity);
@@ -15,6 +15,8 @@ export default function OutfitScreen() {
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'background');
   const borderColor = useThemeColor({}, 'border');
+
+  const outfit = data?.recommendation;
 
   return (
     <ThemedView style={styles.container}>
@@ -51,19 +53,19 @@ export default function OutfitScreen() {
           style={({ pressed }) => [
             styles.generateButton,
             pressed && styles.generateButtonPressed,
-            loading && styles.generateButtonDisabled,
+            isPending && styles.generateButtonDisabled,
           ]}
-          onPress={generateOutfit}
-          disabled={loading}
+          onPress={() => mutate()}
+          disabled={isPending}
         >
           <ThemedText style={styles.generateButtonText}>
-            {loading ? 'Generating...' : 'Generate Outfit'}
+            {isPending ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
           </ThemedText>
         </Pressable>
 
         {error && (
           <ThemedView style={styles.errorContainer}>
-            <ThemedText style={styles.errorText}>{error}</ThemedText>
+            <ThemedText style={styles.errorText}>{error.message}</ThemedText>
           </ThemedView>
         )}
 
@@ -99,7 +101,7 @@ export default function OutfitScreen() {
           </ThemedView>
         )}
 
-        {!loading && !error && !outfit && (
+        {!isPending && !error && !outfit && (
           <ThemedText style={styles.description}>
             Press the button above to generate an outfit recommendation based on current weather and your preferences.
           </ThemedText>

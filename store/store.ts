@@ -1,12 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TempFormat } from '@/services/openweathermap-service';
-import { Outfit, OutfitStyle } from '@/types/outfit';
+import { OutfitStyle } from '@/types/outfit';
 import { create } from 'zustand';
 import { combine, createJSONStorage, persist } from 'zustand/middleware';
 
 
 /**
  * Zustand store for user preferences
+ * go to partialize to add items to persist. otherwise add to combine.
  */
 export const useStore = create(
   persist(
@@ -15,9 +16,6 @@ export const useStore = create(
         style: 'neutral' as OutfitStyle,
         activity: '',
         tempFormat: 'imperial' as TempFormat,
-        prompt: null as string | null,
-        outfit: null as Outfit | null,
-        outfitRawText: null as string | null,
       },
       (set) => {
         return {
@@ -29,15 +27,6 @@ export const useStore = create(
           },
           setTempFormat: (nextTempFormat: TempFormat) => {
             set({ tempFormat: nextTempFormat });
-          },
-          setPrompt: (nextPrompt: string | null) => {
-            set({ prompt: nextPrompt });
-          },
-          setOutfit: (nextOutfit: Outfit | null) => {
-            set({ outfit: nextOutfit });
-          },
-          setOutfitRawText: (nextOutfitRawText: string | null) => {
-            set({ outfitRawText: nextOutfitRawText });
           },
         };
       },
