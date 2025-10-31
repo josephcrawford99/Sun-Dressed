@@ -11,6 +11,11 @@ export interface ClothingItem {
 }
 
 /**
+ * Outfit style options
+ */
+export type OutfitStyle = 'masculine' | 'feminine' | 'neutral';
+
+/**
  * Complete outfit with items and overall description
  */
 export interface Outfit {

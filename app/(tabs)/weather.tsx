@@ -3,9 +3,12 @@ import { Image, ScrollView, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useWeather } from '@/hooks/use-weather';
+import { useStore } from '@/store/store';
 
 export default function WeatherScreen() {
     const { data: weather, isLoading: loading, error } = useWeather();
+    const tempFormat = useStore((state) => state.tempFormat);
+    const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
 
     return (
         <ThemedView style={styles.container}>
@@ -26,10 +29,10 @@ export default function WeatherScreen() {
                         <ThemedView style={styles.section}>
                             <ThemedText type="subtitle" style={styles.sectionTitle}>Temperature</ThemedText>
                             <ThemedText style={styles.dataText}>
-                                High: {Math.round(weather.daily[0].temp.max)}°C
+                                High: {Math.round(weather.daily[0].temp.max)}{tempSymbol}
                             </ThemedText>
                             <ThemedText style={styles.dataText}>
-                                Low: {Math.round(weather.daily[0].temp.min)}°C
+                                Low: {Math.round(weather.daily[0].temp.min)}{tempSymbol}
                             </ThemedText>
                         </ThemedView>
 
