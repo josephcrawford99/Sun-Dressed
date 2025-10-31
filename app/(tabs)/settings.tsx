@@ -9,7 +9,7 @@ import { TempFormat } from '@/services/openweathermap-service';
 import { useStore } from '@/store/store';
 import { OutfitStyle } from '@/types/outfit';
 
-export default function MeScreen() {
+export default function SettingsScreen() {
   const style = useStore((state) => state.style);
   const setStyle = useStore((state) => state.setStyle);
   const tempFormat = useStore((state) => state.tempFormat);
@@ -67,7 +67,7 @@ export default function MeScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>
-        Me
+        Settings
       </ThemedText>
 
       <ThemedView style={styles.section}>
