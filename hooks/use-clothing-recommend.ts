@@ -23,6 +23,7 @@ export function useClothingRecommend(): UseMutationResult<OutfitGenerationResult
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
 
   return useMutation<OutfitGenerationResult, Error, void>({
+    mutationKey: ['outfit-generation'],
     mutationFn: async () => {
       // Validate weather data
       if (weatherLoading) {
