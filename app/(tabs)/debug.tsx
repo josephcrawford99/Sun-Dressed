@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -14,6 +15,18 @@ export default function DebugScreen() {
   const prompt = useStore((state) => state.prompt);
   const outfit = useStore((state) => state.outfit);
 
+  // Collapsible state
+  const [expanded, setExpanded] = useState({
+    preferences: true,
+    weather: false,
+    prompt: true,
+    outfit: true,
+  });
+
+  const toggleSection = (section: keyof typeof expanded) => {
+    setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -23,69 +36,91 @@ export default function DebugScreen() {
 
         {/* User Preferences Section */}
         <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            User Preferences
-          </ThemedText>
-          <ThemedView style={styles.dataContainer}>
-            <ThemedText style={styles.label}>Style:</ThemedText>
-            <ThemedText style={styles.value}>{style || 'Not set'}</ThemedText>
+          <Pressable onPress={() => toggleSection('preferences')}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              {expanded.preferences ? '▼' : '▶'} User Preferences
+            </ThemedText>
+          </Pressable>
+          {expanded.preferences && (
+            <ThemedView style={styles.dataContainer}>
+              <ThemedText style={styles.label}>Style:</ThemedText>
+              <ThemedText style={styles.value}>{style || 'Not set'}</ThemedText>
 
-            <ThemedText style={styles.label}>Activity:</ThemedText>
-            <ThemedText style={styles.value}>{activity || 'Not set'}</ThemedText>
-          </ThemedView>
+              <ThemedText style={styles.label}>Activity:</ThemedText>
+              <ThemedText style={styles.value}>{activity || 'Not set'}</ThemedText>
+            </ThemedView>
+          )}
         </ThemedView>
 
         {/* Weather Data Section */}
         <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Weather Data
-          </ThemedText>
-          {weatherLoading && (
-            <ThemedText style={styles.infoText}>Loading weather data...</ThemedText>
-          )}
-          {weatherError && (
-            <ThemedText style={styles.errorText}>
-              Error: {weatherError.message}
+          <Pressable onPress={() => toggleSection('weather')}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              {expanded.weather ? '▼' : '▶'} Weather Data
             </ThemedText>
-          )}
-          {weather && (
-            <ThemedView style={styles.jsonContainer}>
-              <ThemedText style={styles.jsonText}>
-                {JSON.stringify(weather, null, 2)}
-              </ThemedText>
-            </ThemedView>
+          </Pressable>
+          {expanded.weather && (
+            <>
+              {weatherLoading && (
+                <ThemedText style={styles.infoText}>Loading weather data...</ThemedText>
+              )}
+              {weatherError && (
+                <ThemedText style={styles.errorText}>
+                  Error: {weatherError.message}
+                </ThemedText>
+              )}
+              {weather && (
+                <ThemedView style={styles.jsonContainer}>
+                  <ThemedText style={styles.jsonText}>
+                    {JSON.stringify(weather, null, 2)}
+                  </ThemedText>
+                </ThemedView>
+              )}
+            </>
           )}
         </ThemedView>
 
         {/* Gemini API - Prompt Section */}
         <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Last Gemini Prompt
-          </ThemedText>
-          {prompt ? (
-            <ThemedView style={styles.dataContainer}>
-              <ThemedText style={styles.promptText}>{prompt}</ThemedText>
-            </ThemedView>
-          ) : (
-            <ThemedText style={styles.infoText}>
-              No prompt yet. Generate an outfit to see the prompt.
+          <Pressable onPress={() => toggleSection('prompt')}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              {expanded.prompt ? '▼' : '▶'} Last Gemini Prompt
             </ThemedText>
+          </Pressable>
+          {expanded.prompt && (
+            <>
+              {prompt ? (
+                <ThemedView style={styles.dataContainer}>
+                  <ThemedText style={styles.promptText}>{prompt}</ThemedText>
+                </ThemedView>
+              ) : (
+                <ThemedText style={styles.infoText}>
+                  No prompt yet. Generate an outfit to see the prompt.
+                </ThemedText>
+              )}
+            </>
           )}
         </ThemedView>
 
         {/* Gemini API - Outfit Response Section */}
         <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Last Outfit Recommendation
-          </ThemedText>
-          {outfit ? (
-            <ThemedView style={styles.dataContainer}>
-              <ThemedText style={styles.outfitText}>{outfit}</ThemedText>
-            </ThemedView>
-          ) : (
-            <ThemedText style={styles.infoText}>
-              No outfit yet. Generate an outfit to see the recommendation.
+          <Pressable onPress={() => toggleSection('outfit')}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              {expanded.outfit ? '▼' : '▶'} Last Outfit Recommendation
             </ThemedText>
+          </Pressable>
+          {expanded.outfit && (
+            <>
+              {outfit ? (
+                <ThemedView style={styles.dataContainer}>
+                  <ThemedText style={styles.outfitText}>{outfit}</ThemedText>
+                </ThemedView>
+              ) : (
+                <ThemedText style={styles.infoText}>
+                  No outfit yet. Generate an outfit to see the recommendation.
+                </ThemedText>
+              )}
+            </>
           )}
         </ThemedView>
       </ScrollView>
