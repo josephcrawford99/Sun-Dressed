@@ -1,67 +1,102 @@
-import { StyleSheet, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { useStore } from '@/store/store';
 
 export default function OutfitScreen() {
   const { generateOutfit, outfit, prompt, loading, error } = useClothingRecommend();
 
+  const activity = useStore((state) => state.activity);
+  const setActivity = useStore((state) => state.setActivity);
+
+  const textColor = useThemeColor({}, 'text');
+  const backgroundColor = useThemeColor({}, 'background');
+  const borderColor = useThemeColor({}, 'border');
+
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Outfit
-      </ThemedText>
-
-      <Pressable
-        style={({ pressed }) => [
-          styles.generateButton,
-          pressed && styles.generateButtonPressed,
-          loading && styles.generateButtonDisabled,
-        ]}
-        onPress={generateOutfit}
-        disabled={loading}
+      <ScrollView
+        style={{ flex: 1, padding: 20 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
       >
-        <ThemedText style={styles.generateButtonText}>
-          {loading ? 'Generating...' : 'Generate Outfit'}
+        <ThemedText type="title" style={styles.title}>
+          Outfit
         </ThemedText>
-      </Pressable>
 
-      {error && (
-        <ThemedView style={styles.errorContainer}>
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            Activity
+          </ThemedText>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                color: textColor,
+                backgroundColor: backgroundColor,
+                borderColor: borderColor,
+              },
+            ]}
+            value={activity}
+            onChangeText={setActivity}
+            placeholder="e.g., going to work, hiking, casual day"
+            placeholderTextColor={borderColor}
+          />
         </ThemedView>
-      )}
 
-      {prompt && (
-        <ScrollView style={styles.scrollView}>
-          <ThemedView style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Prompt Sent to API:
-            </ThemedText>
-            <ThemedView style={styles.promptContainer}>
-              <ThemedText style={styles.promptText}>{prompt}</ThemedText>
-            </ThemedView>
+        <Pressable
+          style={({ pressed }) => [
+            styles.generateButton,
+            pressed && styles.generateButtonPressed,
+            loading && styles.generateButtonDisabled,
+          ]}
+          onPress={generateOutfit}
+          disabled={loading}
+        >
+          <ThemedText style={styles.generateButtonText}>
+            {loading ? 'Generating...' : 'Generate Outfit'}
+          </ThemedText>
+        </Pressable>
+
+        {error && (
+          <ThemedView style={styles.errorContainer}>
+            <ThemedText style={styles.errorText}>{error}</ThemedText>
           </ThemedView>
+        )}
 
-          {outfit && (
+        {prompt && (
+          <>
             <ThemedView style={styles.section}>
               <ThemedText type="subtitle" style={styles.sectionTitle}>
-                Outfit Recommendation:
+                Prompt Sent to API:
               </ThemedText>
-              <ThemedView style={styles.outfitContainer}>
-                <ThemedText style={styles.outfitText}>{outfit}</ThemedText>
+              <ThemedView style={styles.promptContainer}>
+                <ThemedText style={styles.promptText}>{prompt}</ThemedText>
               </ThemedView>
             </ThemedView>
-          )}
-        </ScrollView>
-      )}
 
-      {!loading && !error && !outfit && !prompt && (
-        <ThemedText style={styles.description}>
-          Press the button above to generate an outfit recommendation based on current weather and your preferences.
-        </ThemedText>
-      )}
+            {outfit && (
+              <ThemedView style={styles.section}>
+                <ThemedText type="subtitle" style={styles.sectionTitle}>
+                  Outfit Recommendation:
+                </ThemedText>
+                <ThemedView style={styles.outfitContainer}>
+                  <ThemedText style={styles.outfitText}>{outfit}</ThemedText>
+                </ThemedView>
+              </ThemedView>
+            )}
+          </>
+        )}
+
+        {!loading && !error && !outfit && !prompt && (
+          <ThemedText style={styles.description}>
+            Press the button above to generate an outfit recommendation based on current weather and your preferences.
+          </ThemedText>
+        )}
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -69,10 +104,22 @@ export default function OutfitScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   title: {
     marginBottom: 30,
+  },
+  section: {
+    marginBottom: 20,
+    width: '100%',
+  },
+  sectionTitle: {
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
   },
   generateButton: {
     backgroundColor: '#0a7ea4',
@@ -100,15 +147,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#ff6b6b',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  section: {
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    marginBottom: 10,
   },
   promptContainer: {
     padding: 15,
