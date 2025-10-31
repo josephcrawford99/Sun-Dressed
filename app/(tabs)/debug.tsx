@@ -13,8 +13,7 @@ export default function DebugScreen() {
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
   const prompt = useStore((state) => state.prompt);
-  const outfit = useStore((state) => state.outfit);
-
+  const outfitRawText = useStore((state) => state.outfitRawText);
   // Collapsible state
   const [expanded, setExpanded] = useState({
     preferences: true,
@@ -111,9 +110,9 @@ export default function DebugScreen() {
           </Pressable>
           {expanded.outfit && (
             <>
-              {outfit ? (
+              {outfitRawText ? (
                 <ThemedView style={styles.dataContainer}>
-                  <ThemedText style={styles.outfitText}>{outfit}</ThemedText>
+                  <ThemedText style={styles.outfitText}>{outfitRawText}</ThemedText>
                 </ThemedView>
               ) : (
                 <ThemedText style={styles.infoText}>
