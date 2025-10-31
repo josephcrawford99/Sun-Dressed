@@ -15,7 +15,14 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-      }}>
+        animation: 'fade',
+        transitionSpec: {
+          animation: 'timing',
+          config: {
+            duration: 100,
+          },
+        }}}>
+
       <Tabs.Screen
         name="weather"
         options={{
@@ -31,10 +38,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="me"
+        name="settings"
         options={{
-          title: 'Me',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="me" color={color} />,
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="settings" color={color} />,
         }}
       />
       {__DEV__ && (
