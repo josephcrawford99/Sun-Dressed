@@ -25,14 +25,16 @@ export interface UseClothingRecommendResult {
  * @returns Object containing generateOutfit function and state (outfit, prompt, loading, error)
  */
 export function useClothingRecommend(): UseClothingRecommendResult {
-  const [outfit, setOutfit] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get user preferences from zustand store
+  // Get user preferences and outfit data from zustand store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
+  const outfit = useStore((state) => state.outfit);
+  const prompt = useStore((state) => state.prompt);
+  const setOutfit = useStore((state) => state.setOutfit);
+  const setPrompt = useStore((state) => state.setPrompt);
 
   // Get weather data from TanStack Query
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
