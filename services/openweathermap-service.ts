@@ -6,6 +6,17 @@
 import axios from 'axios';
 
 /**
+ * Temperature format/units options (matches OpenWeatherMap API units parameter)
+ */
+export type TempFormat = 'metric' | 'imperial';
+
+/**
+ * Fields to exclude from the OpenWeatherMap API response
+ * Excludes: minutely, hourly, and alerts (not currently used in the app)
+ */
+export const EXCLUDED_FIELDS = 'minutely,hourly,alerts';
+
+/**
  * OpenWeatherMap OneCall 3.0 API response type
  * Matches the actual API structure
  */
@@ -77,12 +88,14 @@ export interface WeatherFetchResult {
  *
  * @param latitude - Latitude coordinate
  * @param longitude - Longitude coordinate
+ * @param units - Units of measurement ('metric' for Celsius, 'imperial' for Fahrenheit, defaults to 'imperial')
  * @returns Promise with raw weather data, processed data, and raw JSON string
  * @throws Error if API key is missing or fetch fails
  */
 export async function fetchWeatherData(
   latitude: number,
-  longitude: number
+  longitude: number,
+  units: TempFormat = 'imperial'
 ): Promise<WeatherFetchResult> {
   // Get API key from environment
   const apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -92,7 +105,7 @@ export async function fetchWeatherData(
 
   // Fetch weather from OneCall 3.0 API using axios
   const response = await axios.get<WeatherData>(
-    `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`
+    `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}&exclude=${EXCLUDED_FIELDS}`
   );
 
   const data = response.data;

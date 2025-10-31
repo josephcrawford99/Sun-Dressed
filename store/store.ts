@@ -1,11 +1,8 @@
+import { TempFormat } from '@/services/openweathermap-service';
+import { Outfit, OutfitStyle } from '@/types/outfit';
 import { create } from 'zustand';
 import { combine } from 'zustand/middleware';
-import { Outfit } from '@/types/outfit';
 
-/**
- * Outfit style options
- */
-export type OutfitStyle = 'masculine' | 'feminine' | 'neutral';
 
 /**
  * Zustand store for user preferences
@@ -15,6 +12,7 @@ export const useStore = create(
     {
       style: 'neutral' as OutfitStyle,
       activity: '',
+      tempFormat: 'imperial' as TempFormat,
       prompt: null as string | null,
       outfit: null as Outfit | null,
       outfitRawText: null as string | null,
@@ -26,6 +24,9 @@ export const useStore = create(
         },
         setActivity: (nextActivity: string) => {
           set({ activity: nextActivity });
+        },
+        setTempFormat: (nextTempFormat: TempFormat) => {
+          set({ tempFormat: nextTempFormat });
         },
         setPrompt: (nextPrompt: string | null) => {
           set({ prompt: nextPrompt });

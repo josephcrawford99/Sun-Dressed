@@ -12,6 +12,7 @@ export default function DebugScreen() {
   // Get user preferences and outfit data from store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
+  const tempFormat = useStore((state) => state.tempFormat);
   const prompt = useStore((state) => state.prompt);
   const outfitRawText = useStore((state) => state.outfitRawText);
   // Collapsible state
@@ -44,6 +45,8 @@ export default function DebugScreen() {
             <ThemedView style={styles.dataContainer}>
               <ThemedText style={styles.label}>Style:</ThemedText>
               <ThemedText style={styles.value}>{style || 'Not set'}</ThemedText>
+              <ThemedText style={styles.label}>Temperature Format:</ThemedText>
+              <ThemedText style={styles.value}>{tempFormat || 'Not set'}</ThemedText>
 
               <ThemedText style={styles.label}>Activity:</ThemedText>
               <ThemedText style={styles.value}>{activity || 'Not set'}</ThemedText>

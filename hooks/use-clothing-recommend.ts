@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useStore } from '@/store/store';
 import { useWeather } from '@/hooks/use-weather';
 import { generateOutfitRecommendation } from '@/services/gemini-service';
-import { buildOutfitPrompt } from '@/services/prompt-generator';
+import { useStore } from '@/store/store';
 import { Outfit } from '@/types/outfit';
+import { buildOutfitPrompt } from '@/utils/prompt-generator';
+import { useState } from 'react';
 
 /**
  * Return type for the useClothingRecommend hook
@@ -32,6 +32,7 @@ export function useClothingRecommend(): UseClothingRecommendResult {
   // Get user preferences and outfit data from zustand store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
+  const tempFormat = useStore((state) => state.tempFormat);
   const outfit = useStore((state) => state.outfit);
   const prompt = useStore((state) => state.prompt);
   const setOutfit = useStore((state) => state.setOutfit);
@@ -75,7 +76,8 @@ export function useClothingRecommend(): UseClothingRecommendResult {
       // Build the prompt
       const generatedPrompt = buildOutfitPrompt(
         { style, activity },
-        weather
+        weather,
+        tempFormat
       );
       setPrompt(generatedPrompt);
 

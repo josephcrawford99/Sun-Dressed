@@ -1,5 +1,5 @@
-import { WeatherData } from '@/hooks/use-openweathermap';
-import { OutfitStyle } from '@/store/store';
+import { TempFormat, WeatherData } from '@/services/openweathermap-service';
+import { OutfitStyle } from '@/types/outfit';
 
 /**
  * User preferences for outfit generation
@@ -14,9 +14,11 @@ export interface UserPreferences {
  *
  * @param userPrefs - User's style preferences and planned activity
  * @param weatherData - Current weather data including temperature, forecast, UV index, etc.
+ * @param tempFormat - Temperature format to use in the prompt ('metric' or 'imperial')
  * @returns Structured prompt string to send to Gemini API
  */
-export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: WeatherData): string {
+export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: WeatherData, tempFormat: TempFormat): string {
+  const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
   // Extract weather information
   const currentTemp = weatherData.current?.temp ? Math.round(weatherData.current.temp) : 'N/A';
   const feelsLike = weatherData.current?.feels_like ? Math.round(weatherData.current.feels_like) : 'N/A';
@@ -39,9 +41,9 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
   const prompt = `You are a fashion advisor. Based on the following weather conditions and user preferences, suggest a complete outfit.
 
 WEATHER CONDITIONS:
-- Current Temperature: ${currentTemp}°C (Feels like: ${feelsLike}°C)
-- Today's High: ${highTemp}°C
-- Today's Low: ${lowTemp}°C
+- Current Temperature: ${currentTemp}${tempSymbol} (Feels like: ${feelsLike}${tempSymbol})
+- Today's High: ${highTemp}${tempSymbol}
+- Today's Low: ${lowTemp}${tempSymbol}
 - Chance of Rain: ${chanceOfRain}%
 - UV Index: ${uvIndex}
 - Conditions: ${weatherDescription}
