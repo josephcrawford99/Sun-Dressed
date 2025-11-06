@@ -8,13 +8,20 @@ export type ThemedCardProps = ViewProps & {
 };
 
 export function ThemedCard({ variant = 'default', style, children, ...rest }: ThemedCardProps) {
-  const borderColor = useThemeColor({}, 'border');
+  const cardDefaultBg = useThemeColor({}, 'cardDefault');
+  const cardDefaultBorder = useThemeColor({}, 'cardDefaultBorder');
+  const cardErrorBg = useThemeColor({}, 'cardError');
+  const cardErrorBorder = useThemeColor({}, 'cardErrorBorder');
+  const cardInfoBg = useThemeColor({}, 'cardInfo');
+  const cardInfoBorder = useThemeColor({}, 'cardInfoBorder');
+  const cardDataBg = useThemeColor({}, 'cardData');
+  const cardDataBorder = useThemeColor({}, 'cardDataBorder');
 
   const variantStyles = {
-    default: { backgroundColor: 'rgba(128, 128, 128, 0.05)', borderColor },
-    error: { backgroundColor: 'rgba(255, 107, 107, 0.1)', borderColor: 'rgba(255, 107, 107, 0.3)' },
-    info: { backgroundColor: 'rgba(10, 126, 164, 0.1)', borderColor: 'rgba(10, 126, 164, 0.3)' },
-    data: { backgroundColor: 'rgba(128, 128, 128, 0.1)', borderColor },
+    default: { backgroundColor: cardDefaultBg, borderColor: cardDefaultBorder },
+    error: { backgroundColor: cardErrorBg, borderColor: cardErrorBorder },
+    info: { backgroundColor: cardInfoBg, borderColor: cardInfoBorder },
+    data: { backgroundColor: cardDataBg, borderColor: cardDataBorder },
   };
 
   return (
