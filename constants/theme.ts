@@ -19,6 +19,8 @@ export const Colors = {
     cardInfoBorder: 'rgba(254, 208, 0, 0.4)',
     cardData: 'rgba(128, 128, 128, 0.1)',
     cardDataBorder: 'rgba(128, 128, 128, 0.2)',
+    cardWarning: 'rgba(59, 130, 246, 0.1)',
+    cardWarningBorder: 'rgba(59, 130, 246, 0.3)',
   },
   dark: {
     text: '#ECEDEE',
@@ -35,6 +37,8 @@ export const Colors = {
     cardInfoBorder: 'rgba(239, 139, 110, 0.5)',
     cardData: 'rgba(128, 128, 128, 0.15)',
     cardDataBorder: 'rgba(128, 128, 128, 0.3)',
+    cardWarning: 'rgba(96, 165, 250, 0.15)',
+    cardWarningBorder: 'rgba(96, 165, 250, 0.4)',
   },
 };
 

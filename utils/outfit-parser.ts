@@ -74,9 +74,21 @@ export function parseOutfitJSON(text: string): Outfit {
     throw new Error('Missing or invalid "overallDescription" field in response');
   }
 
+  // Validate warmCoatRecommended
+  if (typeof obj.warmCoatRecommended !== 'boolean') {
+    throw new Error('Missing or invalid "warmCoatRecommended" field in response');
+  }
+
+  // Validate rainGearRecommended
+  if (typeof obj.rainGearRecommended !== 'boolean') {
+    throw new Error('Missing or invalid "rainGearRecommended" field in response');
+  }
+
   // Return properly typed object constructed from validated data
   return {
     items,
     overallDescription: obj.overallDescription,
+    warmCoatRecommended: obj.warmCoatRecommended,
+    rainGearRecommended: obj.rainGearRecommended,
   };
 }

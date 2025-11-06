@@ -66,7 +66,9 @@ Required JSON format:
       "blurb": "One sentence about why this item is perfect for these conditions and complements the outfit"
     }
   ],
-  "overallDescription": "A personable summary of the outfit as a whole and why it works perfectly for today's conditions, speaking as a friendly fashion advisor"
+  "overallDescription": "A personable summary of the outfit as a whole and why it works perfectly for today's conditions, speaking as a friendly fashion advisor",
+  "warmCoatRecommended": boolean (true if weather conditions suggest a warm coat is needed based on temperature, wind, or overall conditions),
+  "rainGearRecommended": boolean (true if weather conditions suggest rain gear is needed based on chance of rain or current precipitation)
 }
 
 Include appropriate clothing items based on the weather and activity (e.g., tops, bottoms, outerwear, footwear, accessories). Keep recommendations practical and weather-appropriate. Speak warmly and personably in the overallDescription.`;
