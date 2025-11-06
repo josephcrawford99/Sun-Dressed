@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import RadioGroup, { RadioButtonProps } from 'react-native-radio-buttons-group';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { Section } from '@/components/ui/section';
+import { ThemedRadioGroup } from '@/components/ui/radio-group';
 import { TempFormat } from '@/services/openweathermap-service';
 import { useStore } from '@/store/store';
 import { OutfitStyle } from '@/types/outfit';
@@ -15,54 +14,16 @@ export default function SettingsScreen() {
   const tempFormat = useStore((state) => state.tempFormat);
   const setTempFormat = useStore((state) => state.setTempFormat);
 
-  const textColor = useThemeColor({}, 'text');
+  const styleOptions = [
+    { id: 'masculine', label: 'Masculine', value: 'masculine' },
+    { id: 'feminine', label: 'Feminine', value: 'feminine' },
+    { id: 'neutral', label: 'Neutral', value: 'neutral' },
+  ];
 
-  const styleRadioButtons: RadioButtonProps[] = useMemo(
-    () => [
-      {
-        id: 'masculine',
-        label: 'Masculine',
-        value: 'masculine',
-        color: textColor,
-        labelStyle: { color: textColor },
-      },
-      {
-        id: 'feminine',
-        label: 'Feminine',
-        value: 'feminine',
-        color: textColor,
-        labelStyle: { color: textColor },
-      },
-      {
-        id: 'neutral',
-        label: 'Neutral',
-        value: 'neutral',
-        color: textColor,
-        labelStyle: { color: textColor },
-      },
-    ],
-    [textColor],
-  );
-
-  const tempFormatRadioButtons: RadioButtonProps[] = useMemo(
-    () => [
-      {
-        id: 'imperial',
-        label: 'Fahrenheit (°F)',
-        value: 'imperial',
-        color: textColor,
-        labelStyle: { color: textColor },
-      },
-      {
-        id: 'metric',
-        label: 'Celsius (°C)',
-        value: 'metric',
-        color: textColor,
-        labelStyle: { color: textColor },
-      },
-    ],
-    [textColor],
-  );
+  const tempFormatOptions = [
+    { id: 'imperial', label: 'Fahrenheit (°F)', value: 'imperial' },
+    { id: 'metric', label: 'Celsius (°C)', value: 'metric' },
+  ];
 
   return (
     <ThemedView style={styles.container}>
@@ -70,27 +31,21 @@ export default function SettingsScreen() {
         Settings
       </ThemedText>
 
-      <ThemedView style={styles.section}>
-        <ThemedText type="subtitle" style={styles.sectionTitle}>
-          Outfit Style
-        </ThemedText>
-        <RadioGroup
-          radioButtons={styleRadioButtons}
+      <Section title="Outfit Style" style={styles.section}>
+        <ThemedRadioGroup
+          options={styleOptions}
           onPress={(selectedId) => setStyle(selectedId as OutfitStyle)}
           selectedId={style || undefined}
         />
-      </ThemedView>
+      </Section>
 
-      <ThemedView style={styles.section}>
-        <ThemedText type="subtitle" style={styles.sectionTitle}>
-          Temperature Format
-        </ThemedText>
-        <RadioGroup
-          radioButtons={tempFormatRadioButtons}
+      <Section title="Temperature Format" style={styles.section}>
+        <ThemedRadioGroup
+          options={tempFormatOptions}
           onPress={(selectedId) => setTempFormat(selectedId as TempFormat)}
           selectedId={tempFormat || undefined}
         />
-      </ThemedView>
+      </Section>
     </ThemedView>
   );
 }
@@ -105,9 +60,5 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 30,
-    width: '100%',
-  },
-  sectionTitle: {
-    marginBottom: 15,
   },
 });

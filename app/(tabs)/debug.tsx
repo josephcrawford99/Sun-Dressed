@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ThemedCard } from '@/components/ui/card';
 import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
@@ -52,7 +53,7 @@ export default function DebugScreen() {
             </ThemedText>
           </Pressable>
           {expanded.preferences && (
-            <ThemedView style={styles.dataContainer}>
+            <ThemedCard variant="data">
               <ThemedText style={styles.label}>Style:</ThemedText>
               <ThemedText style={styles.value}>{style || 'Not set'}</ThemedText>
               <ThemedText style={styles.label}>Temperature Format:</ThemedText>
@@ -60,7 +61,7 @@ export default function DebugScreen() {
 
               <ThemedText style={styles.label}>Activity:</ThemedText>
               <ThemedText style={styles.value}>{activity || 'Not set'}</ThemedText>
-            </ThemedView>
+            </ThemedCard>
           )}
         </ThemedView>
 
@@ -82,11 +83,11 @@ export default function DebugScreen() {
                 </ThemedText>
               )}
               {weather && (
-                <ThemedView style={styles.jsonContainer}>
+                <ThemedCard variant="data">
                   <ThemedText style={styles.jsonText}>
                     {JSON.stringify(weather, null, 2)}
                   </ThemedText>
-                </ThemedView>
+                </ThemedCard>
               )}
             </>
           )}
@@ -102,9 +103,9 @@ export default function DebugScreen() {
           {expanded.prompt && (
             <>
               {prompt ? (
-                <ThemedView style={styles.dataContainer}>
+                <ThemedCard variant="data">
                   <ThemedText style={styles.promptText}>{prompt}</ThemedText>
-                </ThemedView>
+                </ThemedCard>
               ) : (
                 <ThemedText style={styles.infoText}>
                   Prompt unavailable. Weather data must be loaded first.
@@ -124,9 +125,9 @@ export default function DebugScreen() {
           {expanded.outfit && (
             <>
               {outfitRawText ? (
-                <ThemedView style={styles.dataContainer}>
+                <ThemedCard variant="data">
                   <ThemedText style={styles.outfitText}>{outfitRawText}</ThemedText>
-                </ThemedView>
+                </ThemedCard>
               ) : (
                 <ThemedText style={styles.infoText}>
                   No outfit yet. Generate an outfit to see the recommendation.
@@ -156,20 +157,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     marginBottom: 10,
-  },
-  dataContainer: {
-    padding: 15,
-    backgroundColor: 'rgba(128, 128, 128, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 128, 128, 0.2)',
-  },
-  jsonContainer: {
-    padding: 15,
-    backgroundColor: 'rgba(128, 128, 128, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 128, 128, 0.2)',
   },
   jsonText: {
     fontFamily: 'monospace',
