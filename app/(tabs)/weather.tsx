@@ -45,6 +45,9 @@ export default function WeatherScreen() {
                                 <ThemedText style={{fontSize: 24}}>
                                     {capitalizeAllWords(weather.daily[0].weather[0].description)}
                                 </ThemedText>
+                                <ThemedText style={{ fontSize: 24 }}>
+                                    {"  " + Math.round(weather.current.temp)} {tempSymbol}
+                                </ThemedText>
                             </ThemedView>
                         {/* Temperature Display */}
                         <Section title="Temperature">

@@ -6,7 +6,6 @@
 import { Outfit } from '@/types/outfit';
 import { parseOutfitJSON } from '@/utils/outfit-parser';
 import axios from 'axios';
-
 /**
  * Gemini API response structure
  */
