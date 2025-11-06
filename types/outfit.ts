@@ -23,4 +23,8 @@ export interface Outfit {
   items: ClothingItem[];
   /** Overall outfit description from the fashion advisor perspective */
   overallDescription: string;
+  /** Whether a warm coat is recommended for the weather conditions */
+  warmCoatRecommended: boolean;
+  /** Whether rain gear is recommended for the weather conditions */
+  rainGearRecommended: boolean;
 }

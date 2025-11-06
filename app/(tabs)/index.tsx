@@ -53,26 +53,40 @@ export default function OutfitScreen() {
             )}
 
             {outfit && (
-              <Section title="Outfit Recommendation">
-                {/* Overall Description */}
-                <ThemedCard variant="info" style={styles.overallDescriptionContainer}>
-                  <ThemedText style={styles.overallDescriptionText}>
-                    {outfit.overallDescription}
-                  </ThemedText>
-                </ThemedCard>
+              <>
+                {/* Weather Warnings */}
+                {outfit.warmCoatRecommended && (
+                  <ThemedCard variant="warning" style={styles.warningCard}>
+                    <ThemedText>Warm Coat Recommended</ThemedText>
+                  </ThemedCard>
+                )}
+                {outfit.rainGearRecommended && (
+                  <ThemedCard variant="warning" style={styles.warningCard}>
+                    <ThemedText>Rain Gear Recommended</ThemedText>
+                  </ThemedCard>
+                )}
 
-                {/* Clothing Items */}
-                <ThemedView style={styles.itemsContainer}>
-                  {outfit.items.map((item, index) => (
-                    <OutfitItemCard
-                      key={index}
-                      name={item.name}
-                      description={item.description}
-                      blurb={item.blurb}
-                    />
-                  ))}
-                </ThemedView>
-              </Section>
+                <Section title="Outfit Recommendation">
+                  {/* Overall Description */}
+                  <ThemedCard variant="info" style={styles.overallDescriptionContainer}>
+                    <ThemedText style={styles.overallDescriptionText}>
+                      {outfit.overallDescription}
+                    </ThemedText>
+                  </ThemedCard>
+
+                  {/* Clothing Items */}
+                  <ThemedView style={styles.itemsContainer}>
+                    {outfit.items.map((item, index) => (
+                      <OutfitItemCard
+                        key={index}
+                        name={item.name}
+                        description={item.description}
+                        blurb={item.blurb}
+                      />
+                    ))}
+                  </ThemedView>
+                </Section>
+              </>
             )}
 
 
@@ -149,5 +163,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     opacity: 0.7,
     textAlign: 'center',
+  },
+  warningCard: {
+    marginBottom: 12,
   },
 });

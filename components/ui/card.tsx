@@ -3,7 +3,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { StyleSheet, type ViewProps } from 'react-native';
 
 export type ThemedCardProps = ViewProps & {
-  variant?: 'default' | 'error' | 'info' | 'data';
+  variant?: 'default' | 'error' | 'info' | 'data' | 'warning';
   children: React.ReactNode;
 };
 
@@ -16,12 +16,15 @@ export function ThemedCard({ variant = 'default', style, children, ...rest }: Th
   const cardInfoBorder = useThemeColor({}, 'cardInfoBorder');
   const cardDataBg = useThemeColor({}, 'cardData');
   const cardDataBorder = useThemeColor({}, 'cardDataBorder');
+  const cardWarningBg = useThemeColor({}, 'cardWarning');
+  const cardWarningBorder = useThemeColor({}, 'cardWarningBorder');
 
   const variantStyles = {
     default: { backgroundColor: cardDefaultBg, borderColor: cardDefaultBorder },
     error: { backgroundColor: cardErrorBg, borderColor: cardErrorBorder },
     info: { backgroundColor: cardInfoBg, borderColor: cardInfoBorder },
     data: { backgroundColor: cardDataBg, borderColor: cardDataBorder },
+    warning: { backgroundColor: cardWarningBg, borderColor: cardWarningBorder },
   };
 
   return (
