@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     lineHeight: 32,
     fontFamily: Fonts.title,
