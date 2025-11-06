@@ -26,6 +26,18 @@ export default function WeatherScreen() {
 
                 {weather && (
                     <ThemedView style={styles.weatherContent}>
+                        {/* Weather Description */}
+                        <Section title="Conditions">
+                            <ThemedView style={styles.conditionsRow}>
+                                <Image
+                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
+                                    style={styles.weatherIcon}
+                                />
+                                <ThemedText style={styles.dataText}>
+                                    {weather.daily[0].weather[0].description}
+                                </ThemedText>
+                            </ThemedView>
+                        </Section>
                         {/* Temperature Display */}
                         <Section title="Temperature">
                             <ThemedText style={styles.dataText}>
@@ -50,18 +62,7 @@ export default function WeatherScreen() {
                             </ThemedText>
                         </Section>
 
-                        {/* Weather Description */}
-                        <Section title="Conditions">
-                            <ThemedView style={styles.conditionsRow}>
-                                <Image
-                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
-                                    style={styles.weatherIcon}
-                                />
-                                <ThemedText style={styles.dataText}>
-                                    {weather.daily[0].weather[0].description}
-                                </ThemedText>
-                            </ThemedView>
-                        </Section>
+
                     </ThemedView>
                 )}
             </ScrollView>

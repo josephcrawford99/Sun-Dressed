@@ -20,15 +20,14 @@ export default function OutfitScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
+        Outfit
+      </ThemedText>
       <ScrollView
         style={{ flex: 1, padding: 20 }}
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <ThemedText type="title" style={styles.title}>
-          Outfit
-        </ThemedText>
-
         <Section title="Activity">
           <ThemedTextInput
             value={activity}
@@ -89,7 +88,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    marginBottom: 30,
+    marginBottom: 20,
+    padding: 20,
+    paddingBottom: 0,
   },
   generateButton: {
     marginBottom: 20,
