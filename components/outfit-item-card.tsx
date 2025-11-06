@@ -1,4 +1,5 @@
-import { StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedCard } from '@/components/ui/card';
@@ -10,13 +11,21 @@ export type OutfitItemCardProps = {
 };
 
 export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
   return (
     <ThemedCard variant="default">
-      <ThemedText type="subtitle" style={styles.itemName}>
-        {name}
-      </ThemedText>
-      <ThemedText style={styles.itemDescription}>{description}</ThemedText>
-      <ThemedText style={styles.itemBlurb}>{blurb}</ThemedText>
+      <Pressable onPress={() => setIsCollapsed(!isCollapsed)}>
+        <ThemedText type="subtitle" style={styles.itemName}>
+          {name}
+        </ThemedText>
+        <ThemedText style={[styles.itemDescription, isCollapsed && styles.itemDescriptionLast]}>
+          {description}
+        </ThemedText>
+        {!isCollapsed && (
+          <ThemedText style={styles.itemBlurb}>{blurb}</ThemedText>
+        )}
+      </Pressable>
     </ThemedCard>
   );
 }
@@ -29,6 +38,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 8,
+  },
+  itemDescriptionLast: {
+    marginBottom: 0,
   },
   itemBlurb: {
     fontSize: 13,
