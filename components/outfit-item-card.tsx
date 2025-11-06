@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedCard } from '@/components/ui/card';
+import { Chevron } from '@/components/ui/chevron';
 
 export type OutfitItemCardProps = {
   name: string;
@@ -16,9 +18,12 @@ export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps
   return (
     <ThemedCard variant="default">
       <Pressable onPress={() => setIsCollapsed(!isCollapsed)}>
-        <ThemedText type="subtitle" style={styles.itemName}>
-          {name}
-        </ThemedText>
+        <View style={styles.header}>
+          <ThemedText type="subtitle" style={styles.itemName}>
+            {name}
+          </ThemedText>
+          <Chevron isCollapsed={isCollapsed} />
+        </View>
         <ThemedText style={[styles.itemDescription, isCollapsed && styles.itemDescriptionLast]}>
           {description}
         </ThemedText>
@@ -31,8 +36,15 @@ export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps
 }
 
 const styles = StyleSheet.create({
-  itemName: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
+  },
+  itemName: {
+    marginBottom: 0,
+    flex: 1,
   },
   itemDescription: {
     fontSize: 14,
