@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 
 import { OutfitItemCard } from '@/components/outfit-item-card';
 import { ThemedBackground } from '@/components/themed-background';
@@ -10,6 +10,7 @@ import { ThemedTextInput } from '@/components/ui/input';
 import { Section } from '@/components/ui/section';
 import { Shadows } from '@/constants/theme';
 import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStore } from '@/store/store';
 
 export default function OutfitScreen() {
@@ -17,6 +18,8 @@ export default function OutfitScreen() {
 
   const activity = useStore((state) => state.activity);
   const setActivity = useStore((state) => state.setActivity);
+
+  const tintColor = useThemeColor({}, 'tint');
 
   const outfit = data?.recommendation;
 
@@ -75,7 +78,11 @@ export default function OutfitScreen() {
 
           </ThemedView>
 
-          <ThemedView style={styles.spacer} />
+          <ThemedView style={styles.spacer}>
+            {isPending && (
+              <ActivityIndicator size="large" color={tintColor} style={styles.loadingIndicator} />
+            )}
+          </ThemedView>
           {!isPending && !error && !outfit && (
             <ThemedText style={styles.description}>
               Press the button below to generate an outfit recommendation based on current weather and your preferences.
@@ -112,6 +119,11 @@ const styles = StyleSheet.create({
   },
   spacer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingIndicator: {
+    marginVertical: 20,
   },
   generateButton: {
     marginTop: 20,

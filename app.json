@@ -6,8 +6,8 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "sundressed",
-    "userInterfaceStyle": "automatic",
-    // "userInterfaceStyle": "light",
+    // "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
 
     "newArchEnabled": true,
     "ios": {
