@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import RadioGroup, { RadioButtonProps } from 'react-native-radio-buttons-group';
 
+import { Fonts } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export type RadioOption = {
@@ -25,7 +26,7 @@ export function ThemedRadioGroup({ options, selectedId, onPress }: ThemedRadioGr
         label: option.label,
         value: option.value,
         color: textColor,
-        labelStyle: { color: textColor },
+        labelStyle: { color: textColor, fontFamily: Fonts.body },
       })),
     [options, textColor]
   );

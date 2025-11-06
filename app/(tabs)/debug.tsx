@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   jsonText: {
-    fontFamily: 'monospace',
     fontSize: 12,
     lineHeight: 18,
   },
