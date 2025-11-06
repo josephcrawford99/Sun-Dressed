@@ -5,6 +5,7 @@ import { Section } from '@/components/ui/section';
 import { Shadows } from '@/constants/theme';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
+import { capitalizeAllWords } from '@/utils/strings';
 import { Image, ScrollView, StyleSheet } from 'react-native';
 
 export default function WeatherScreen() {
@@ -43,7 +44,7 @@ export default function WeatherScreen() {
                                     style={styles.weatherIcon}
                                 />
                                 <ThemedText style={styles.dataText}>
-                                    {weather.daily[0].weather[0].description}
+                                    {capitalizeAllWords(weather.daily[0].weather[0].description)}
                                 </ThemedText>
                             </ThemedView>
                         </Section>
