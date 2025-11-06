@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
+import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedCard } from '@/components/ui/card';
@@ -39,7 +40,7 @@ export default function DebugScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedBackground style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <ThemedText type="title" style={styles.title}>
           Debug
@@ -137,7 +138,7 @@ export default function DebugScreen() {
           )}
         </ThemedView>
       </ScrollView>
-    </ThemedView>
+    </ThemedBackground>
   );
 }
 
