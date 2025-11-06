@@ -18,6 +18,8 @@ export interface UserPreferences {
  * @returns Structured prompt string to send to Gemini API
  */
 export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: WeatherData, tempFormat: TempFormat): string {
+  const currentTime = new Date();
+
   const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
   // Extract weather information
   const currentTemp = weatherData.current?.temp ? Math.round(weatherData.current.temp) : 'N/A';
@@ -41,6 +43,7 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
   const prompt = `You are a fashion advisor. Based on the following weather conditions and user preferences, suggest a complete outfit.
 
 WEATHER CONDITIONS:
+- Time of day: ${currentTime.toLocaleTimeString()}
 - Current Temperature: ${currentTemp}${tempSymbol} (Feels like: ${feelsLike}${tempSymbol})
 - Today's High: ${highTemp}${tempSymbol}
 - Today's Low: ${lowTemp}${tempSymbol}
@@ -49,8 +52,8 @@ WEATHER CONDITIONS:
 - Conditions: ${weatherDescription}
 
 USER PREFERENCES:
-- User's gender (will be masculine, feminine, neutral): ${userPrefs.style || 'neutral'}
-- Activity: ${userPrefs.activity || 'general daily activities'}
+- User's gender (will be masculine, feminine, neutral) (do not include in the response, this is for internal use only): ${userPrefs.style || 'neutral'}
+- Activity: ${userPrefs.activity || 'general daily activities (do not include in the response)'}
 
 IMPORTANT: You MUST respond with ONLY valid JSON in the exact format shown below. Do not include any other text, explanations, or markdown formatting outside the JSON.
 

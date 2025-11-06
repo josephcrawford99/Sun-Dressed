@@ -33,58 +33,61 @@ export default function OutfitScreen() {
             Outfit
           </ThemedText>
         </ThemedView>
-
         <ThemedView style={styles.content}>
-          <Section title="Activity">
-          <ThemedTextInput
-            value={activity}
-            onChangeText={setActivity}
-            placeholder="e.g., going to work, hiking, casual day"
-          />
-        </Section>
+          <ThemedView>
+            <Section title="Activity">
+              <ThemedTextInput
+                value={activity}
+                onChangeText={setActivity}
+                placeholder="e.g., going to work, hiking, casual day"
+              />
+            </Section>
 
-        <ThemedButton
-          onPress={() => mutate()}
-          disabled={isPending}
-          style={styles.generateButton}
-        >
-          {isPending ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
-        </ThemedButton>
+            {error && (
+              <ThemedCard variant="error" style={styles.errorContainer}>
+                <ThemedText style={styles.errorText}>{error.message}</ThemedText>
+              </ThemedCard>
+            )}
 
-        {error && (
-          <ThemedCard variant="error" style={styles.errorContainer}>
-            <ThemedText style={styles.errorText}>{error.message}</ThemedText>
-          </ThemedCard>
-        )}
+            {outfit && (
+              <Section title="Outfit Recommendation">
+                {/* Overall Description */}
+                <ThemedCard variant="info" style={styles.overallDescriptionContainer}>
+                  <ThemedText style={styles.overallDescriptionText}>
+                    {outfit.overallDescription}
+                  </ThemedText>
+                </ThemedCard>
 
-        {outfit && (
-          <Section title="Outfit Recommendation">
-            {/* Overall Description */}
-            <ThemedCard variant="info" style={styles.overallDescriptionContainer}>
-              <ThemedText style={styles.overallDescriptionText}>
-                {outfit.overallDescription}
-              </ThemedText>
-            </ThemedCard>
+                {/* Clothing Items */}
+                <ThemedView style={styles.itemsContainer}>
+                  {outfit.items.map((item, index) => (
+                    <OutfitItemCard
+                      key={index}
+                      name={item.name}
+                      description={item.description}
+                      blurb={item.blurb}
+                    />
+                  ))}
+                </ThemedView>
+              </Section>
+            )}
 
-            {/* Clothing Items */}
-            <ThemedView style={styles.itemsContainer}>
-              {outfit.items.map((item, index) => (
-                <OutfitItemCard
-                  key={index}
-                  name={item.name}
-                  description={item.description}
-                  blurb={item.blurb}
-                />
-              ))}
-            </ThemedView>
-          </Section>
-        )}
 
-        {!isPending && !error && !outfit && (
-          <ThemedText style={styles.description}>
-            Press the button above to generate an outfit recommendation based on current weather and your preferences.
-          </ThemedText>
-        )}
+          </ThemedView>
+
+          <ThemedView style={styles.spacer} />
+          {!isPending && !error && !outfit && (
+            <ThemedText style={styles.description}>
+              Press the button below to generate an outfit recommendation based on current weather and your preferences.
+            </ThemedText>
+          )}
+          <ThemedButton
+            onPress={() => mutate()}
+            disabled={isPending}
+            style={styles.generateButton}
+          >
+            {isPending ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
+          </ThemedButton>
         </ThemedView>
       </ScrollView>
     </ThemedBackground>
@@ -105,9 +108,13 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingTop: 15,
+    flex: 1,
+  },
+  spacer: {
+    flex: 1,
   },
   generateButton: {
-    marginBottom: 20,
+    marginTop: 20,
   },
   errorContainer: {
     marginBottom: 20,
