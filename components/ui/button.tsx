@@ -9,7 +9,7 @@ export type ThemedButtonProps = PressableProps & {
 
 export function ThemedButton({ children, style, disabled, ...rest }: ThemedButtonProps) {
   const backgroundColor = useThemeColor({}, 'tint');
-  const textColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
 
   return (
     <Pressable

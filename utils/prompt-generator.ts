@@ -59,7 +59,7 @@ Required JSON format:
   "items": [
     {
       "name": "Item Name",
-      "description": "Detailed description of the item",
+      "description": "Short description of what the item is",
       "blurb": "One sentence about why this item is perfect for these conditions and complements the outfit"
     }
   ],
