@@ -5,10 +5,11 @@ import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedCard } from '@/components/ui/card';
-import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
+import { useQueryClient } from '@tanstack/react-query';
+import { OutfitGenerationResult } from '@/services/gemini-service';
 
 export default function DebugScreen() {
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
@@ -18,9 +19,12 @@ export default function DebugScreen() {
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
 
-  // Get outfit mutation data
-  const outfitMutation = useClothingRecommend();
-  const outfitRawText = outfitMutation.data?.rawText;
+  // Access React Query cache to get last outfit mutation data
+  const queryClient = useQueryClient();
+  const mutationCache = queryClient.getMutationCache();
+  const mutations = mutationCache.findAll({ mutationKey: ['outfit-generation'] });
+  const lastMutation = mutations[mutations.length - 1];
+  const outfitRawText = (lastMutation?.state.data as OutfitGenerationResult | undefined)?.rawText || null;
 
   // Reconstruct the prompt that would be used
   const prompt = useMemo(() => {
@@ -123,18 +127,10 @@ export default function DebugScreen() {
               {expanded.outfit ? '▼' : '▶'} Last Outfit Recommendation
             </ThemedText>
           </Pressable>
-          {expanded.outfit && (
-            <>
-              {outfitRawText ? (
-                <ThemedCard variant="data">
-                  <ThemedText style={styles.outfitText}>{outfitRawText}</ThemedText>
-                </ThemedCard>
-              ) : (
-                <ThemedText style={styles.infoText}>
-                  No outfit yet. Generate an outfit to see the recommendation.
-                </ThemedText>
-              )}
-            </>
+          {outfitRawText && (
+            <ThemedCard variant="data">
+              <ThemedText style={styles.outfitText}>{outfitRawText}</ThemedText>
+            </ThemedCard>
           )}
         </ThemedView>
       </ScrollView>
