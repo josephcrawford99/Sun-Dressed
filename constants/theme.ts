@@ -18,7 +18,7 @@ export const Colors = {
     text: '#ECEDEE',
     background: '#151718',
     border: '#444',
-    tint: '#FFFD74',
+    tint: '#ef8b6e',
     icon: '#9BA1A6',
   },
 };

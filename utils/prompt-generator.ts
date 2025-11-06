@@ -49,7 +49,7 @@ WEATHER CONDITIONS:
 - Conditions: ${weatherDescription}
 
 USER PREFERENCES:
-- Clothing Gender Preference (will be masculine, feminine, neutral): ${userPrefs.style || 'neutral'}
+- User's gender (will be masculine, feminine, neutral): ${userPrefs.style || 'neutral'}
 - Activity: ${userPrefs.activity || 'general daily activities'}
 
 IMPORTANT: You MUST respond with ONLY valid JSON in the exact format shown below. Do not include any other text, explanations, or markdown formatting outside the JSON.
