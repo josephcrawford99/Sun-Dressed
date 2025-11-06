@@ -37,17 +37,15 @@ export default function WeatherScreen() {
                     {weather && (
                         <>
                             {/* Weather Description */}
-                            <Section title="Conditions" style={styles.conditionsSection}>
                             <ThemedView style={styles.conditionsRow}>
                                 <Image
-                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
+                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@4x.png` }}
                                     style={styles.weatherIcon}
                                 />
-                                <ThemedText style={styles.dataText}>
+                                <ThemedText style={{fontSize: 24}}>
                                     {capitalizeAllWords(weather.daily[0].weather[0].description)}
                                 </ThemedText>
                             </ThemedView>
-                        </Section>
                         {/* Temperature Display */}
                         <Section title="Temperature">
                             <ThemedText style={styles.dataText}>
@@ -107,8 +105,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     weatherIcon: {
-        width: 50,
-        height: 50,
+        width: 75,
+        height: 75,
         marginRight: 6,
     },
     error: {
