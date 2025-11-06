@@ -1,9 +1,13 @@
-import { Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
+import { OutfitItemCard } from '@/components/outfit-item-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ThemedButton } from '@/components/ui/button';
+import { ThemedCard } from '@/components/ui/card';
+import { ThemedTextInput } from '@/components/ui/input';
+import { Section } from '@/components/ui/section';
 import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStore } from '@/store/store';
 
 export default function OutfitScreen() {
@@ -11,10 +15,6 @@ export default function OutfitScreen() {
 
   const activity = useStore((state) => state.activity);
   const setActivity = useStore((state) => state.setActivity);
-
-  const textColor = useThemeColor({}, 'text');
-  const backgroundColor = useThemeColor({}, 'background');
-  const borderColor = useThemeColor({}, 'border');
 
   const outfit = data?.recommendation;
 
@@ -29,76 +29,49 @@ export default function OutfitScreen() {
           Outfit
         </ThemedText>
 
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Activity
-          </ThemedText>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                color: textColor,
-                backgroundColor: backgroundColor,
-                borderColor: borderColor,
-              },
-            ]}
+        <Section title="Activity">
+          <ThemedTextInput
             value={activity}
             onChangeText={setActivity}
             placeholder="e.g., going to work, hiking, casual day"
-            placeholderTextColor={borderColor}
           />
-        </ThemedView>
+        </Section>
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.generateButton,
-            pressed && styles.generateButtonPressed,
-            isPending && styles.generateButtonDisabled,
-          ]}
+        <ThemedButton
           onPress={() => mutate()}
           disabled={isPending}
+          style={styles.generateButton}
         >
-          <ThemedText style={styles.generateButtonText}>
-            {isPending ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
-          </ThemedText>
-        </Pressable>
+          {isPending ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
+        </ThemedButton>
 
         {error && (
-          <ThemedView style={styles.errorContainer}>
+          <ThemedCard variant="error" style={styles.errorContainer}>
             <ThemedText style={styles.errorText}>{error.message}</ThemedText>
-          </ThemedView>
+          </ThemedCard>
         )}
 
         {outfit && (
-          <ThemedView style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Outfit Recommendation
-            </ThemedText>
-
+          <Section title="Outfit Recommendation">
             {/* Overall Description */}
-            <ThemedView style={styles.overallDescriptionContainer}>
+            <ThemedCard variant="info" style={styles.overallDescriptionContainer}>
               <ThemedText style={styles.overallDescriptionText}>
                 {outfit.overallDescription}
               </ThemedText>
-            </ThemedView>
+            </ThemedCard>
 
             {/* Clothing Items */}
             <ThemedView style={styles.itemsContainer}>
               {outfit.items.map((item, index) => (
-                <ThemedView key={index} style={styles.itemCard}>
-                  <ThemedText type="subtitle" style={styles.itemName}>
-                    {item.name}
-                  </ThemedText>
-                  <ThemedText style={styles.itemDescription}>
-                    {item.description}
-                  </ThemedText>
-                  <ThemedText style={styles.itemBlurb}>
-                    {item.blurb}
-                  </ThemedText>
-                </ThemedView>
+                <OutfitItemCard
+                  key={index}
+                  name={item.name}
+                  description={item.description}
+                  blurb={item.blurb}
+                />
               ))}
             </ThemedView>
-          </ThemedView>
+          </Section>
         )}
 
         {!isPending && !error && !outfit && (
@@ -118,52 +91,16 @@ const styles = StyleSheet.create({
   title: {
     marginBottom: 30,
   },
-  section: {
-    marginBottom: 20,
-    width: '100%',
-  },
-  sectionTitle: {
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-  },
   generateButton: {
-    backgroundColor: '#0a7ea4',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
     marginBottom: 20,
-  },
-  generateButtonPressed: {
-    opacity: 0.7,
-  },
-  generateButtonDisabled: {
-    opacity: 0.5,
-  },
-  generateButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   errorContainer: {
-    padding: 15,
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
-    borderRadius: 8,
     marginBottom: 20,
   },
   errorText: {
     color: '#ff6b6b',
   },
   overallDescriptionContainer: {
-    padding: 15,
-    backgroundColor: 'rgba(10, 126, 164, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(10, 126, 164, 0.2)',
     marginBottom: 15,
   },
   overallDescriptionText: {
@@ -173,27 +110,6 @@ const styles = StyleSheet.create({
   },
   itemsContainer: {
     gap: 12,
-  },
-  itemCard: {
-    padding: 15,
-    backgroundColor: 'rgba(128, 128, 128, 0.05)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 128, 128, 0.15)',
-  },
-  itemName: {
-    marginBottom: 8,
-  },
-  itemDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  itemBlurb: {
-    fontSize: 13,
-    lineHeight: 18,
-    opacity: 0.8,
-    fontStyle: 'italic',
   },
   description: {
     marginTop: 20,

@@ -2,6 +2,7 @@ import { Image, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Section } from '@/components/ui/section';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 
@@ -26,35 +27,31 @@ export default function WeatherScreen() {
                 {weather && (
                     <ThemedView style={styles.weatherContent}>
                         {/* Temperature Display */}
-                        <ThemedView style={styles.section}>
-                            <ThemedText type="subtitle" style={styles.sectionTitle}>Temperature</ThemedText>
+                        <Section title="Temperature">
                             <ThemedText style={styles.dataText}>
                                 High: {Math.round(weather.daily[0].temp.max)}{tempSymbol}
                             </ThemedText>
                             <ThemedText style={styles.dataText}>
                                 Low: {Math.round(weather.daily[0].temp.min)}{tempSymbol}
                             </ThemedText>
-                        </ThemedView>
+                        </Section>
 
                         {/* Chance of Rain */}
-                        <ThemedView style={styles.section}>
-                            <ThemedText type="subtitle" style={styles.sectionTitle}>Precipitation</ThemedText>
+                        <Section title="Precipitation">
                             <ThemedText style={styles.dataText}>
                                 Chance of Rain: {Math.round(weather.daily[0].pop * 100)}%
                             </ThemedText>
-                        </ThemedView>
+                        </Section>
 
                         {/* UV Index */}
-                        <ThemedView style={styles.section}>
-                            <ThemedText type="subtitle" style={styles.sectionTitle}>UV Index</ThemedText>
+                        <Section title="UV Index">
                             <ThemedText style={styles.dataText}>
                                 UV Index: {Math.round(weather.daily[0].uvi)}
                             </ThemedText>
-                        </ThemedView>
+                        </Section>
 
                         {/* Weather Description */}
-                        <ThemedView style={styles.section}>
-                            <ThemedText type="subtitle" style={styles.sectionTitle}>Conditions</ThemedText>
+                        <Section title="Conditions">
                             <ThemedView style={styles.conditionsRow}>
                                 <Image
                                     source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
@@ -64,7 +61,7 @@ export default function WeatherScreen() {
                                     {weather.daily[0].weather[0].description}
                                 </ThemedText>
                             </ThemedView>
-                        </ThemedView>
+                        </Section>
                     </ThemedView>
                 )}
             </ScrollView>
@@ -81,12 +78,6 @@ const styles = StyleSheet.create({
     },
     weatherContent: {
         flex: 1,
-    },
-    section: {
-        marginBottom: 0,
-    },
-    sectionTitle: {
-        marginBottom: 0,
     },
     dataText: {
         fontSize: 18,
