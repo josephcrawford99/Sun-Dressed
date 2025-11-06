@@ -26,7 +26,7 @@ export const Colors = {
     border: '#444',
     tint: '#ef8b6e',
     icon: '#9BA1A6',
-    iconTint: '#9BA1A6',
+    iconTint: '#ef8b6e',
     cardDefault: 'rgba(128, 128, 128, 0.1)',
     cardDefaultBorder: 'rgba(128, 128, 128, 0.3)',
     cardError: 'rgba(255, 107, 107, 0.15)',
