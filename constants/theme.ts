@@ -11,14 +11,14 @@ export const Colors = {
     text: '#11181C',
     background: '#fff',
     border: '#ccc',
-    tint: '#0a7ea4',
+    tint: '#FED000',
     icon: '#687076',
   },
   dark: {
     text: '#ECEDEE',
     background: '#151718',
     border: '#444',
-    tint: '#fff',
+    tint: '#FFFD74',
     icon: '#9BA1A6',
   },
 };
@@ -47,3 +47,10 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+export const Shadows = {
+  stickyHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+};

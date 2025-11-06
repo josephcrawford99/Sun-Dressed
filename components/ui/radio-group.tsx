@@ -31,6 +31,12 @@ export function ThemedRadioGroup({ options, selectedId, onPress }: ThemedRadioGr
   );
 
   return (
-    <RadioGroup radioButtons={radioButtons} onPress={onPress} selectedId={selectedId} />
+    <RadioGroup
+      radioButtons={radioButtons}
+      onPress={onPress}
+      selectedId={selectedId}
+      layout="row"
+      containerStyle={{ flexWrap: 'wrap' }}
+    />
   );
 }

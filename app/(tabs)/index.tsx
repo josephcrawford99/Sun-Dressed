@@ -8,6 +8,7 @@ import { ThemedButton } from '@/components/ui/button';
 import { ThemedCard } from '@/components/ui/card';
 import { ThemedTextInput } from '@/components/ui/input';
 import { Section } from '@/components/ui/section';
+import { Shadows } from '@/constants/theme';
 import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
 import { useStore } from '@/store/store';
 
@@ -21,15 +22,20 @@ export default function OutfitScreen() {
 
   return (
     <ThemedBackground style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Outfit
-      </ThemedText>
       <ScrollView
-        style={{ flex: 1, padding: 20 }}
+        style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1 }}
+        stickyHeaderIndices={[0]}
         keyboardShouldPersistTaps="handled"
       >
-        <Section title="Activity">
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title" style={styles.title}>
+            Outfit
+          </ThemedText>
+        </ThemedView>
+
+        <ThemedView style={styles.content}>
+          <Section title="Activity">
           <ThemedTextInput
             value={activity}
             onChangeText={setActivity}
@@ -79,6 +85,7 @@ export default function OutfitScreen() {
             Press the button above to generate an outfit recommendation based on current weather and your preferences.
           </ThemedText>
         )}
+        </ThemedView>
       </ScrollView>
     </ThemedBackground>
   );
@@ -88,10 +95,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  titleContainer: {
+    ...Shadows.stickyHeader,
+  },
   title: {
-    marginBottom: 20,
     padding: 20,
-    paddingBottom: 0,
+    paddingVertical: 12,
+  },
+  content: {
+    padding: 20,
+    paddingTop: 15,
   },
   generateButton: {
     marginBottom: 20,
