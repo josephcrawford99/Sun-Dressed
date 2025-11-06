@@ -2,6 +2,7 @@ import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Section } from '@/components/ui/section';
+import { Shadows } from '@/constants/theme';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 import { Image, ScrollView, StyleSheet } from 'react-native';
@@ -23,7 +24,6 @@ export default function WeatherScreen() {
                         Weather
                     </ThemedText>
                 </ThemedView>
-
                 <ThemedView style={styles.content}>
                     {loading && (
                         <ThemedText>Loading weather data...</ThemedText>
@@ -36,7 +36,7 @@ export default function WeatherScreen() {
                     {weather && (
                         <>
                             {/* Weather Description */}
-                            <Section title="Conditions">
+                            <Section title="Conditions" style={styles.conditionsSection}>
                             <ThemedView style={styles.conditionsRow}>
                                 <Image
                                     source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
@@ -84,14 +84,18 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     titleContainer: {
-        paddingBottom: 12,
+        ...Shadows.stickyHeader,
     },
     title: {
         padding: 20,
-        marginTop: 0,
+        paddingVertical: 12,
     },
     content: {
         padding: 20,
+        paddingTop: 15,
+    },
+    conditionsSection: {
+        marginBottom: 8,
     },
     dataText: {
         fontSize: 18,
