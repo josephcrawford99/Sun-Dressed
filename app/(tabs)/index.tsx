@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { OutfitItemCard } from '@/components/outfit-item-card';
+import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedButton } from '@/components/ui/button';
@@ -19,7 +20,7 @@ export default function OutfitScreen() {
   const outfit = data?.recommendation;
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedBackground style={styles.container}>
       <ThemedText type="title" style={styles.title}>
         Outfit
       </ThemedText>
@@ -79,7 +80,7 @@ export default function OutfitScreen() {
           </ThemedText>
         )}
       </ScrollView>
-    </ThemedView>
+    </ThemedBackground>
   );
 }
 

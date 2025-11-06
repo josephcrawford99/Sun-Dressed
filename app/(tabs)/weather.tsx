@@ -1,10 +1,10 @@
-import { Image, ScrollView, StyleSheet } from 'react-native';
-
+import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Section } from '@/components/ui/section';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
+import { Image, ScrollView, StyleSheet } from 'react-native';
 
 export default function WeatherScreen() {
     const { data: weather, isLoading: loading, error } = useWeather();
@@ -12,22 +12,31 @@ export default function WeatherScreen() {
     const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
 
     return (
-        <ThemedView style={styles.container}>
-            <ScrollView style={{ flex: 1, padding: 20 }}>
-                <ThemedText type="title" style={styles.title}>Weather</ThemedText>
+        <ThemedBackground style={styles.container}>
+            <ScrollView
+                style={{ flex: 1 }}
+                stickyHeaderIndices={[0]}
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
+                <ThemedView style={styles.titleContainer}>
+                    <ThemedText type="title" style={styles.title}>
+                        Weather
+                    </ThemedText>
+                </ThemedView>
 
-                {loading && (
-                    <ThemedText>Loading weather data...</ThemedText>
-                )}
+                <ThemedView style={styles.content}>
+                    {loading && (
+                        <ThemedText>Loading weather data...</ThemedText>
+                    )}
 
-                {error && (
-                    <ThemedText style={styles.error}>Error: {error.message}</ThemedText>
-                )}
+                    {error && (
+                        <ThemedText style={styles.error}>Error: {error.message}</ThemedText>
+                    )}
 
-                {weather && (
-                    <ThemedView style={styles.weatherContent}>
-                        {/* Weather Description */}
-                        <Section title="Conditions">
+                    {weather && (
+                        <>
+                            {/* Weather Description */}
+                            <Section title="Conditions">
                             <ThemedView style={styles.conditionsRow}>
                                 <Image
                                     source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@2x.png` }}
@@ -61,12 +70,12 @@ export default function WeatherScreen() {
                                 UV Index: {Math.round(weather.daily[0].uvi)}
                             </ThemedText>
                         </Section>
-
-
-                    </ThemedView>
+                    </>
                 )}
+                </ThemedView>
             </ScrollView>
-        </ThemedView>
+        </ThemedBackground >
+
     );
 }
 
@@ -74,11 +83,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    title: {
-        marginBottom: 0,
+    titleContainer: {
+        paddingBottom: 12,
     },
-    weatherContent: {
-        flex: 1,
+    title: {
+        padding: 20,
+        marginTop: 0,
+    },
+    content: {
+        padding: 20,
     },
     dataText: {
         fontSize: 18,
@@ -91,7 +104,7 @@ const styles = StyleSheet.create({
     weatherIcon: {
         width: 50,
         height: 50,
-        marginRight: 8,
+        marginRight: 6,
     },
     error: {
         color: '#ff6b6b',

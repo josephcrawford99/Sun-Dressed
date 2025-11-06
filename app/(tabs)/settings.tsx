@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native';
 
+import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Section } from '@/components/ui/section';
 import { ThemedRadioGroup } from '@/components/ui/radio-group';
+import { Section } from '@/components/ui/section';
 import { TempFormat } from '@/services/openweathermap-service';
 import { useStore } from '@/store/store';
 import { OutfitStyle } from '@/types/outfit';
@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedBackground style={styles.container}>
       <ThemedText type="title" style={styles.title}>
         Settings
       </ThemedText>
@@ -46,7 +46,7 @@ export default function SettingsScreen() {
           selectedId={tempFormat || undefined}
         />
       </Section>
-    </ThemedView>
+    </ThemedBackground>
   );
 }
 

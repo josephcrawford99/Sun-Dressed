@@ -23,10 +23,10 @@ export function Section({ title, style, children, ...rest }: SectionProps) {
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 20,
+    marginBottom: 15,
     width: '100%',
   },
   sectionTitle: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
 });
