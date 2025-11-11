@@ -40,7 +40,6 @@ export default function WeatherScreen() {
                             {weather.name && (
                                 <ThemedText style={{ fontSize: 12 }}>Location: {weather.name}</ThemedText>
                             )}
-                            <ThemedText style={{ fontSize: 12 }}>Coordinates: {weather.lat.toFixed(2)}, {weather.lon.toFixed(2)}</ThemedText>
 
                             {/* Weather Description */}
                             <ThemedView style={styles.conditionsRow}>
@@ -58,11 +57,15 @@ export default function WeatherScreen() {
                         {/* Temperature Display */}
                         <Section title="Temperature">
                             <ThemedText style={styles.dataText}>
+                                Feels Like: {Math.round(weather.temp.feels_like)}{tempSymbol}
+                            </ThemedText>
+                            <ThemedText style={styles.dataText}>
                                 High: {Math.round(weather.temp.max)}{tempSymbol}
                             </ThemedText>
                             <ThemedText style={styles.dataText}>
                                 Low: {Math.round(weather.temp.min)}{tempSymbol}
                             </ThemedText>
+
                         </Section>
 
                         {/* Chance of Rain */}

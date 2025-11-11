@@ -23,6 +23,31 @@ export default function OutfitScreen() {
 
   const outfit = data?.recommendation;
 
+  // Format error message for better UX
+  const getErrorMessage = (error: Error): string => {
+    const message = error.message.toLowerCase();
+
+    // Check for specific error types
+    if (message.includes('503') || message.includes('service unavailable')) {
+      return 'The outfit service is temporarily unavailable. Please try again in a moment.';
+    }
+    if (message.includes('network') || message.includes('timeout')) {
+      return 'Network error. Please check your connection and try again.';
+    }
+    if (message.includes('location permission')) {
+      return 'Location permission is required to get weather data for outfit recommendations. Please enable location access in Settings.';
+    }
+    if (message.includes('api key')) {
+      return 'Configuration error. Please contact support.';
+    }
+    if (message.includes('rate limit')) {
+      return 'Too many requests. Please wait a moment and try again.';
+    }
+
+    // Default friendly message
+    return 'Unable to generate outfit recommendation. Please try again.';
+  };
+
   return (
     <ThemedBackground style={styles.container}>
       <ScrollView
@@ -48,7 +73,7 @@ export default function OutfitScreen() {
 
             {error && (
               <ThemedCard variant="error" style={styles.errorContainer}>
-                <ThemedText style={styles.errorText}>{error.message}</ThemedText>
+                <ThemedText style={styles.errorText}>{getErrorMessage(error)}</ThemedText>
               </ThemedCard>
             )}
 

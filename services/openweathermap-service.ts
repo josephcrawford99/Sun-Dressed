@@ -11,6 +11,35 @@ import axios from 'axios';
 export type TempFormat = 'metric' | 'imperial';
 
 /**
+ * Centralized error handler for OpenWeatherMap API calls
+ * Converts axios errors into user-friendly error messages
+ *
+ * @param error - The error caught from axios request
+ * @throws Error with user-friendly message
+ */
+function handleWeatherApiError(error: unknown): never {
+  if (axios.isAxiosError(error)) {
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 503) {
+        throw new Error('Weather service unavailable (503). Please try again later.');
+      }
+      if (status === 401) {
+        throw new Error('Weather API key authentication failed.');
+      }
+      if (status === 429) {
+        throw new Error('Weather API rate limit exceeded. Please try again later.');
+      }
+      throw new Error(`Weather API error (${status}): ${error.response.statusText}`);
+    }
+    if (error.request) {
+      throw new Error('Network error: Unable to reach weather service. Check your connection.');
+    }
+  }
+  throw error;
+}
+
+/**
  * Fields to exclude from the OpenWeatherMap API response
  * Excludes: minutely, hourly, and alerts (not currently used in the app)
  */
@@ -234,15 +263,19 @@ export async function fetch30WeatherData(
   }
 
   // Fetch weather from OneCall 3.0 API using axios
-  const response = await axios.get<OpenWeather30Response>(
-    `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}&exclude=${EXCLUDED_FIELDS}`
-  );
+  try {
+    const response = await axios.get<OpenWeather30Response>(
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}&exclude=${EXCLUDED_FIELDS}`
+    );
 
-  // Return both raw and transformed data
-  return {
-    data: transform30ToWeatherData(response.data),
-    raw: response.data,
-  };
+    // Return both raw and transformed data
+    return {
+      data: transform30ToWeatherData(response.data),
+      raw: response.data,
+    };
+  } catch (error) {
+    handleWeatherApiError(error);
+  }
 }
 
 /**
@@ -270,23 +303,27 @@ export async function fetch25WeatherData(
   }
 
   // Fetch current weather from 2.5 API
-  const currentResponse = await axios.get<OpenWeather25CurrentResponse>(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}`
-  );
+  try {
+    const currentResponse = await axios.get<OpenWeather25CurrentResponse>(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}`
+    );
 
-  // OPTIONAL: Uncomment to also fetch forecast data (adds extra API call)
-  // const forecastResponse = await axios.get<OpenWeather25ForecastResponse>(
-  //   `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}`
-  // );
+    // OPTIONAL: Uncomment to also fetch forecast data (adds extra API call)
+    // const forecastResponse = await axios.get<OpenWeather25ForecastResponse>(
+    //   `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${units}`
+    // );
 
-  // Return both raw and transformed data
-  return {
-    data: transform25ToWeatherData(currentResponse.data),
-    raw: {
-      current: currentResponse.data,
-      // forecast: forecastResponse.data, // Uncomment if fetching forecast above
-    },
-  };
+    // Return both raw and transformed data
+    return {
+      data: transform25ToWeatherData(currentResponse.data),
+      raw: {
+        current: currentResponse.data,
+        // forecast: forecastResponse.data, // Uncomment if fetching forecast above
+      },
+    };
+  } catch (error) {
+    handleWeatherApiError(error);
+  }
 }
 
 /**

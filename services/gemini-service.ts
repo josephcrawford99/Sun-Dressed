@@ -6,6 +6,36 @@
 import { Outfit } from '@/types/outfit';
 import { parseOutfitJSON } from '@/utils/outfit-parser';
 import axios from 'axios';
+
+/**
+ * Centralized error handler for Gemini API calls
+ * Converts axios errors into user-friendly error messages
+ *
+ * @param error - The error caught from axios request
+ * @throws Error with user-friendly message
+ */
+function handleGeminiApiError(error: unknown): never {
+  if (axios.isAxiosError(error)) {
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 503) {
+        throw new Error('Service unavailable (503). The Gemini API is temporarily down.');
+      }
+      if (status === 429) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+      }
+      if (status === 401 || status === 403) {
+        throw new Error('API key authentication failed. Please check configuration.');
+      }
+      throw new Error(`Gemini API error (${status}): ${error.response.statusText}`);
+    }
+    if (error.request) {
+      throw new Error('Network error: Unable to reach Gemini API. Check your connection.');
+    }
+  }
+  throw error;
+}
+
 /**
  * Gemini API response structure
  */
@@ -57,33 +87,37 @@ export async function generateOutfitRecommendation(prompt: string): Promise<Outf
   };
 
   // Make API request using axios
-  const response = await axios.post<GeminiResponse>(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-    requestBody,
-    {
-      headers: {
-        'x-goog-api-key': apiKey,
-        'Content-Type': 'application/json',
-      },
+  try {
+    const response = await axios.post<GeminiResponse>(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+      requestBody,
+      {
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    // Extract generated text
+    const data = response.data;
+    if (!data.candidates || data.candidates.length === 0) {
+      throw new Error('No response generated from Gemini API');
     }
-  );
 
-  // Extract generated text
-  const data = response.data;
-  if (!data.candidates || data.candidates.length === 0) {
-    throw new Error('No response generated from Gemini API');
+    const rawText = data.candidates[0]?.content?.parts[0]?.text;
+    if (!rawText) {
+      throw new Error('Invalid response format from Gemini API');
+    }
+
+    // Parse the JSON response
+    const recommendation = parseOutfitJSON(rawText);
+
+    return {
+      recommendation,
+      rawText,
+    };
+  } catch (error) {
+    handleGeminiApiError(error);
   }
-
-  const rawText = data.candidates[0]?.content?.parts[0]?.text;
-  if (!rawText) {
-    throw new Error('Invalid response format from Gemini API');
-  }
-
-  // Parse the JSON response
-  const recommendation = parseOutfitJSON(rawText);
-
-  return {
-    recommendation,
-    rawText,
-  };
 }
