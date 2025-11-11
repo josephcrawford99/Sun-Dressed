@@ -58,9 +58,9 @@ export default function WeatherScreen() {
 
                     {weather && dataUpdatedAt && (
                         <>
-                            <ThemedText style={{ fontSize: 12 }}>Last updated: {new Date(dataUpdatedAt).toLocaleString()}</ThemedText>
+                            <ThemedText style={styles.metadataText}>Last updated: {new Date(dataUpdatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</ThemedText>
                             {weather.name && (
-                                <ThemedText style={{ fontSize: 12 }}>Location: {weather.name}</ThemedText>
+                                <ThemedText style={styles.metadataText}>Location: {weather.name}</ThemedText>
                             )}
 
                             {/* Weather Description */}
@@ -121,11 +121,11 @@ const styles = StyleSheet.create({
     },
     title: {
         padding: 20,
-        paddingVertical: 12,
+        paddingVertical: 8,
     },
     content: {
         padding: 20,
-        paddingTop: 15,
+        paddingTop: 6,
     },
     conditionsSection: {
         marginBottom: 8,
@@ -154,5 +154,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
         opacity: 0.6,
         marginBottom: 8,
+    },
+    metadataText: {
+        fontSize: 12,
+        marginBottom: 2,
     },
 });

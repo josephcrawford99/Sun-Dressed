@@ -1,6 +1,6 @@
+import { getItemsList } from '@/constants/clothing-icons';
 import { TempFormat, WeatherData } from '@/services/openweathermap-service';
 import { OutfitStyle } from '@/types/outfit';
-import { getItemsList } from '@/constants/clothing-icons';
 
 /**
  * User preferences for outfit generation
@@ -37,6 +37,7 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
   // Build weather conditions list, only including available data
   const weatherConditions = [
     `- Time of day: ${currentTime.toLocaleTimeString()}`,
+    `- Location: ${weatherData.name}`,
     `- Current Temperature: ${currentTemp}${tempSymbol} (Feels like: ${feelsLike}${tempSymbol})`,
     `- Today's High: ${highTemp}${tempSymbol}`,
     `- Today's Low: ${lowTemp}${tempSymbol}`,

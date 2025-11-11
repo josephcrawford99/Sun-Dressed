@@ -375,15 +375,6 @@ function estimatePrecipitationProbability(current: OpenWeather25CurrentResponse)
     return 0.7; // 70% if weather condition indicates snow
   }
 
-  // Estimate based on cloud coverage
-  const cloudiness = current.clouds.all;
-  if (cloudiness > 80) {
-    return 0.4; // 40% for very cloudy
-  }
-  if (cloudiness > 50) {
-    return 0.2; // 20% for moderately cloudy
-  }
-
   return 0; // Clear or lightly cloudy
 }
 
