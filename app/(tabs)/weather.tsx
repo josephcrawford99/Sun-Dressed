@@ -6,12 +6,25 @@ import { Shadows } from '@/constants/theme';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 import { capitalizeAllWords } from '@/utils/strings';
-import { Image, ScrollView, StyleSheet } from 'react-native';
+import { useIsFetching, useQueryClient } from '@tanstack/react-query';
+import { Image, RefreshControl, ScrollView, StyleSheet } from 'react-native';
 
 export default function WeatherScreen() {
     const { data: weather, isLoading: loading, error, dataUpdatedAt } = useWeather();
     const tempFormat = useStore((state) => state.tempFormat);
     const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
+
+    const queryClient = useQueryClient();
+
+    // Check if the 2.5 query is currently fetching
+    const isFetching25 = useIsFetching({ queryKey: ['weather-2.5', tempFormat] }) > 0;
+
+    // Pull-to-refresh handler - only invalidates the 2.5 API query
+    const onRefresh = async () => {
+        await queryClient.invalidateQueries({
+            queryKey: ['weather-2.5', tempFormat]
+        });
+    };
 
     return (
         <ThemedBackground style={styles.container}>
@@ -19,6 +32,9 @@ export default function WeatherScreen() {
                 style={{ flex: 1 }}
                 stickyHeaderIndices={[0]}
                 contentContainerStyle={{ flexGrow: 1 }}
+                refreshControl={
+                    <RefreshControl refreshing={isFetching25} onRefresh={onRefresh} />
+                }
             >
                 <ThemedView style={styles.titleContainer}>
                     <ThemedText type="title" style={styles.title}>
@@ -123,5 +139,10 @@ const styles = StyleSheet.create({
     },
     error: {
         color: '#ff6b6b',
+    },
+    hintText: {
+        fontSize: 12,
+        opacity: 0.6,
+        marginBottom: 8,
     },
 });

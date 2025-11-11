@@ -1,4 +1,4 @@
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet } from 'react-native';
 
 import { OutfitItemCard } from '@/components/outfit-item-card';
 import { ThemedBackground } from '@/components/themed-background';
@@ -14,7 +14,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStore } from '@/store/store';
 
 export default function OutfitScreen() {
-  const { mutate, data, isPending, error } = useClothingRecommend();
+  const { refetch, data, isFetching, error } = useClothingRecommend();
 
   const activity = useStore((state) => state.activity);
   const setActivity = useStore((state) => state.setActivity);
@@ -22,6 +22,11 @@ export default function OutfitScreen() {
   const tintColor = useThemeColor({}, 'tint');
 
   const outfit = data?.recommendation;
+
+  // Pull-to-refresh handler
+  const onRefresh = async () => {
+    await refetch();
+  };
 
   // Format error message for better UX
   const getErrorMessage = (error: Error): string => {
@@ -55,6 +60,9 @@ export default function OutfitScreen() {
         contentContainerStyle={{ flexGrow: 1 }}
         stickyHeaderIndices={[0]}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
+        }
       >
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title" style={styles.title}>
@@ -118,21 +126,21 @@ export default function OutfitScreen() {
           </ThemedView>
 
           <ThemedView style={styles.spacer}>
-            {isPending && (
+            {isFetching && (
               <ActivityIndicator size="large" color={tintColor} style={styles.loadingIndicator} />
             )}
           </ThemedView>
-          {!isPending && !error && !outfit && (
+          {!isFetching && !error && !outfit && (
             <ThemedText style={styles.description}>
-              Press the button below to generate an outfit recommendation based on current weather and your preferences.
+              Pull down to generate an outfit recommendation or press the button below based on current weather and your preferences.
             </ThemedText>
           )}
           <ThemedButton
-            onPress={() => mutate()}
-            disabled={isPending}
+            onPress={() => refetch()}
+            disabled={isFetching}
             style={styles.generateButton}
           >
-            {isPending ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
+            {isFetching ? 'Generating...' : data ? 'Regenerate Outfit' : 'Generate Outfit'}
           </ThemedButton>
         </ThemedView>
       </ScrollView>
