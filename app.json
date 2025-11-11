@@ -17,7 +17,7 @@
       "bundleIdentifier": "com.sundressed.app",
       "buildNumber": "1.0.0",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SunDressed needs your location to provide accurate weather-based outfit recommendations for your area.",
+        "NSLocationWhenInUseUsageDescription": "Sun Dressed needs your location to provide accurate weather-based outfit recommendations for your area.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },

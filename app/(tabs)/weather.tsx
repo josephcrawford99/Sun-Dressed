@@ -9,7 +9,7 @@ import { capitalizeAllWords } from '@/utils/strings';
 import { Image, ScrollView, StyleSheet } from 'react-native';
 
 export default function WeatherScreen() {
-    const { data: weather, isLoading: loading, error } = useWeather();
+    const { data: weather, isLoading: loading, error, dataUpdatedAt } = useWeather();
     const tempFormat = useStore((state) => state.tempFormat);
     const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
 
@@ -34,8 +34,11 @@ export default function WeatherScreen() {
                         <ThemedText style={styles.error}>Error: {error.message}</ThemedText>
                     )}
 
-                    {weather && (
+                    {weather && dataUpdatedAt && (
                         <>
+                            <ThemedText style={{ fontSize: 12 }}>Last updated: {new Date(dataUpdatedAt).toLocaleString()}</ThemedText>
+                            <ThemedText style={{ fontSize: 12 }}>location: {weather.lat}, {weather.lon}</ThemedText>
+
                             {/* Weather Description */}
                             <ThemedView style={styles.conditionsRow}>
                                 <Image

@@ -1,7 +1,7 @@
-import { fetchWeatherData, WeatherData, TempFormat } from '@/services/openweathermap-service';
+import { fetchWeatherData, TempFormat, WeatherData } from '@/services/openweathermap-service';
+import { useStore } from '@/store/store';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import * as Location from 'expo-location';
-import { useStore } from '@/store/store';
 
 const WEATHER_STALE_TIME = 5 * 60 * 1000
 
