@@ -41,21 +41,30 @@ export default function SettingsScreen() {
         </ThemedView>
 
         <ThemedView style={styles.content}>
-          <Section title="Outfit Style" style={styles.section}>
-            <ThemedRadioGroup
-              options={styleOptions}
-              onPress={(selectedId) => setStyle(selectedId as OutfitStyle)}
-              selectedId={style || undefined}
-            />
-          </Section>
+          <ThemedView>
+            <Section title="Outfit Style" style={styles.section}>
+              <ThemedRadioGroup
+                options={styleOptions}
+                onPress={(selectedId) => setStyle(selectedId as OutfitStyle)}
+                selectedId={style || undefined}
+              />
+            </Section>
 
-          <Section title="Temperature Format" style={styles.section}>
-            <ThemedRadioGroup
-              options={tempFormatOptions}
-              onPress={(selectedId) => setTempFormat(selectedId as TempFormat)}
-              selectedId={tempFormat || undefined}
-            />
-          </Section>
+            <Section title="Temperature Format" style={styles.section}>
+              <ThemedRadioGroup
+                options={tempFormatOptions}
+                onPress={(selectedId) => setTempFormat(selectedId as TempFormat)}
+                selectedId={tempFormat || undefined}
+              />
+            </Section>
+          </ThemedView>
+
+          <ThemedView style={styles.spacer} />
+
+          <ThemedText style={styles.credits}>
+            Made with &lt;3 by Developer Joey Crawford and Marketing Strategist
+            Courtney Wong for Sun Dressed™
+          </ThemedText>
         </ThemedView>
       </ScrollView>
     </ThemedBackground>
@@ -76,8 +85,19 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingTop: 15,
+    flex: 1,
   },
   section: {
     marginBottom: 30,
+  },
+  spacer: {
+    flex: 1,
+  },
+  credits: {
+    fontSize: 11,
+    opacity: 0.5,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingBottom: 20,
   },
 });
