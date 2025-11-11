@@ -1,4 +1,5 @@
 import { Outfit, ClothingItem } from '@/types/outfit';
+import { ALLOWED_ITEM_NAMES } from '@/constants/clothing-icons';
 
 /**
  * Parses a text response from the AI into a structured Outfit
@@ -54,6 +55,10 @@ export function parseOutfitJSON(text: string): Outfit {
     if (typeof itemObj.name !== 'string') {
       throw new Error(`Item at index ${i} missing or invalid "name" field`);
     }
+    // Validate that the item name is in the allowed list
+    if (!ALLOWED_ITEM_NAMES.includes(itemObj.name)) {
+      throw new Error(`Item "${itemObj.name}" at index ${i} is not in the allowed clothing items list. LLM must only use items from the provided list.`);
+    }
     if (typeof itemObj.description !== 'string') {
       throw new Error(`Item at index ${i} missing or invalid "description" field`);
     }
@@ -62,8 +67,9 @@ export function parseOutfitJSON(text: string): Outfit {
     }
 
     // Construct validated ClothingItem
+    // Safe to cast since we validated it's in the allowed list above
     items.push({
-      name: itemObj.name,
+      name: itemObj.name as ClothingItem['name'],
       description: itemObj.description,
       blurb: itemObj.blurb,
     });

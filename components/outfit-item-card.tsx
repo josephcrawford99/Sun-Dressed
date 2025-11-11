@@ -1,22 +1,23 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-
 import { ThemedText } from '@/components/themed-text';
 import { ThemedCard } from '@/components/ui/card';
 import { Chevron } from '@/components/ui/chevron';
+import { CLOTHING_ICONS, AllowedClothingItem } from '@/constants/clothing-icons';
 
 export type OutfitItemCardProps = {
-  name: string;
+  name: AllowedClothingItem;
   description: string;
   blurb: string;
 };
 
 export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const icon = CLOTHING_ICONS[name];
 
   return (
-    <ThemedCard variant="default">
+    <ThemedCard variant="default" icon={icon}>
       <Pressable onPress={() => setIsCollapsed(!isCollapsed)}>
         <View style={styles.header}>
           <ThemedText type="subtitle" style={styles.itemName}>

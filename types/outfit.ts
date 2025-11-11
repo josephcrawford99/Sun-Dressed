@@ -1,9 +1,11 @@
+import { AllowedClothingItem } from '@/constants/clothing-icons';
+
 /**
  * Represents a single clothing item in an outfit recommendation
  */
 export interface ClothingItem {
-  /** Name of the clothing item (e.g., "Light Cotton T-Shirt") */
-  name: string;
+  /** Name of the clothing item - must be from the allowed items list */
+  name: AllowedClothingItem;
   /** Detailed description of the item */
   description: string;
   /** One sentence explanation of why this item is good for the conditions and outfit */

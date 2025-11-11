@@ -89,12 +89,12 @@ export default function OutfitScreen() {
               <>
                 {/* Weather Warnings */}
                 {outfit.warmCoatRecommended && (
-                  <ThemedCard variant="warning" style={styles.warningCard}>
+                  <ThemedCard variant="warning" style={styles.warningCard} icon={{ type: 'MaterialIcons', name: 'severe-cold' }}>
                     <ThemedText>Warm Coat Recommended</ThemedText>
                   </ThemedCard>
                 )}
                 {outfit.rainGearRecommended && (
-                  <ThemedCard variant="warning" style={styles.warningCard}>
+                  <ThemedCard variant="warning" style={styles.warningCard} icon={{ type: 'Ionicons', name: 'rainy-outline' }}>
                     <ThemedText>Rain Gear Recommended</ThemedText>
                   </ThemedCard>
                 )}
@@ -132,7 +132,7 @@ export default function OutfitScreen() {
           </ThemedView>
           {!isFetching && !error && !outfit && (
             <ThemedText style={styles.description}>
-              Pull down to generate an outfit recommendation or press the button below based on current weather and your preferences.
+              Pull down or press the button below to generate your outfit.
             </ThemedText>
           )}
           <ThemedButton
