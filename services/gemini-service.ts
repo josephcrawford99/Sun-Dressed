@@ -11,7 +11,7 @@ import { GoogleGenAI } from '@google/genai';
 /**
  * Default model name for Gemini API
  */
-export const DEFAULT_MODEL = 'gemini-2.5-flash';
+export const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
 
 /**
  * Configuration options for Gemini API calls
