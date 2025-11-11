@@ -22,34 +22,38 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
 
   const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
   // Extract weather information
-  const currentTemp = weatherData.current?.temp ? Math.round(weatherData.current.temp) : 'N/A';
-  const feelsLike = weatherData.current?.feels_like ? Math.round(weatherData.current.feels_like) : 'N/A';
-
-  // Get today's forecast data (first item in daily array)
-  const todayForecast = weatherData.daily?.[0];
-  const highTemp = todayForecast?.temp?.max ? Math.round(todayForecast.temp.max) : 'N/A';
-  const lowTemp = todayForecast?.temp?.min ? Math.round(todayForecast.temp.min) : 'N/A';
+  const currentTemp = Math.round(weatherData.temp.current);
+  const feelsLike = Math.round(weatherData.temp.feels_like);
+  const highTemp = Math.round(weatherData.temp.max);
+  const lowTemp = Math.round(weatherData.temp.min);
 
   // Get precipitation chance (pop = probability of precipitation)
-  const chanceOfRain = todayForecast?.pop ? Math.round(todayForecast.pop * 100) : 0;
-
-  // Get UV index
-  const uvIndex = todayForecast?.uvi || weatherData.current?.uvi || 0;
+  const chanceOfRain = Math.round(weatherData.pop * 100);
 
   // Get weather description
-  const weatherDescription = weatherData.current?.weather?.[0]?.description || 'unknown conditions';
+  const weatherDescription = weatherData.description;
+
+  // Build weather conditions list, only including available data
+  const weatherConditions = [
+    `- Time of day: ${currentTime.toLocaleTimeString()}`,
+    `- Current Temperature: ${currentTemp}${tempSymbol} (Feels like: ${feelsLike}${tempSymbol})`,
+    `- Today's High: ${highTemp}${tempSymbol}`,
+    `- Today's Low: ${lowTemp}${tempSymbol}`,
+    `- Chance of Rain: ${chanceOfRain}%`,
+  ];
+
+  // Only add UV Index if available
+  if (weatherData.uvi !== undefined) {
+    weatherConditions.push(`- UV Index: ${Math.round(weatherData.uvi)}`);
+  }
+
+  weatherConditions.push(`- Conditions: ${weatherDescription}`);
 
   // Build the prompt
   const prompt = `You are a fashion advisor. Based on the following weather conditions and user preferences, suggest a complete outfit.
 
 WEATHER CONDITIONS:
-- Time of day: ${currentTime.toLocaleTimeString()}
-- Current Temperature: ${currentTemp}${tempSymbol} (Feels like: ${feelsLike}${tempSymbol})
-- Today's High: ${highTemp}${tempSymbol}
-- Today's Low: ${lowTemp}${tempSymbol}
-- Chance of Rain: ${chanceOfRain}%
-- UV Index: ${uvIndex}
-- Conditions: ${weatherDescription}
+${weatherConditions.join('\n')}
 
 USER PREFERENCES:
 - User's gender (will be masculine, feminine, neutral) (do not include in the response, this is for internal use only): ${userPrefs.style || 'neutral'}

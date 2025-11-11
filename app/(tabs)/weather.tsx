@@ -37,44 +37,47 @@ export default function WeatherScreen() {
                     {weather && dataUpdatedAt && (
                         <>
                             <ThemedText style={{ fontSize: 12 }}>Last updated: {new Date(dataUpdatedAt).toLocaleString()}</ThemedText>
-                            <ThemedText style={{ fontSize: 12 }}>location: {weather.lat}, {weather.lon}</ThemedText>
+                            {weather.name && (
+                                <ThemedText style={{ fontSize: 12 }}>Location: {weather.name}</ThemedText>
+                            )}
+                            <ThemedText style={{ fontSize: 12 }}>Coordinates: {weather.lat.toFixed(2)}, {weather.lon.toFixed(2)}</ThemedText>
 
                             {/* Weather Description */}
                             <ThemedView style={styles.conditionsRow}>
                                 <Image
-                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.daily[0].weather[0].icon}@4x.png` }}
+                                    source={{ uri: `https://openweathermap.org/img/wn/${weather.icon}@4x.png` }}
                                     style={styles.weatherIcon}
                                 />
                                 <ThemedText style={{fontSize: 24}}>
-                                    {capitalizeAllWords(weather.daily[0].weather[0].description)}
+                                    {capitalizeAllWords(weather.description)}
                                 </ThemedText>
                                 <ThemedText style={{ fontSize: 24 }}>
-                                    {"  " + Math.round(weather.current.temp)} {tempSymbol}
+                                    {"  " + Math.round(weather.temp.current)} {tempSymbol}
                                 </ThemedText>
                             </ThemedView>
                         {/* Temperature Display */}
                         <Section title="Temperature">
                             <ThemedText style={styles.dataText}>
-                                High: {Math.round(weather.daily[0].temp.max)}{tempSymbol}
+                                High: {Math.round(weather.temp.max)}{tempSymbol}
                             </ThemedText>
                             <ThemedText style={styles.dataText}>
-                                Low: {Math.round(weather.daily[0].temp.min)}{tempSymbol}
+                                Low: {Math.round(weather.temp.min)}{tempSymbol}
                             </ThemedText>
                         </Section>
 
                         {/* Chance of Rain */}
                         <Section title="Precipitation">
                             <ThemedText style={styles.dataText}>
-                                Chance of Rain: {Math.round(weather.daily[0].pop * 100)}%
+                                Chance of Rain: {Math.round(weather.pop * 100)}%
                             </ThemedText>
                         </Section>
-
-                        {/* UV Index */}
-                        <Section title="UV Index">
-                            <ThemedText style={styles.dataText}>
-                                UV Index: {Math.round(weather.daily[0].uvi)}
-                            </ThemedText>
-                        </Section>
+                        {weather.uvi !== undefined && (
+                            <Section title="UV Index">
+                                <ThemedText style={styles.dataText}>
+                                    UV Index: {Math.round(weather.uvi)}
+                                </ThemedText>
+                            </Section>
+                        )}
                     </>
                 )}
                 </ThemedView>
