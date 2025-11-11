@@ -1,11 +1,9 @@
-import { AllowedClothingItem } from '@/constants/clothing-icons';
-
 /**
  * Represents a single clothing item in an outfit recommendation
  */
 export interface ClothingItem {
-  /** Name of the clothing item - must be from the allowed items list */
-  name: AllowedClothingItem;
+  /** Name of the clothing item from LLM response (e.g., "Boots" or "Boots (feminine)") */
+  name: string;
   /** Detailed description of the item */
   description: string;
   /** One sentence explanation of why this item is good for the conditions and outfit */

@@ -1,5 +1,6 @@
 import { Outfit, ClothingItem } from '@/types/outfit';
-import { ALLOWED_ITEM_NAMES } from '@/constants/clothing-icons';
+import { getItemsList } from '@/constants/clothing-icons';
+import { useStore } from '@/store/store';
 
 /**
  * Parses a text response from the AI into a structured Outfit
@@ -42,6 +43,10 @@ export function parseOutfitJSON(text: string): Outfit {
     throw new Error('Missing or invalid "items" array in response');
   }
 
+  // Get user's style preference from store for validation
+  const userStyle = useStore.getState().style;
+  const allowedItemNames = getItemsList(userStyle);
+
   // Validate and construct items array
   const items: ClothingItem[] = [];
   for (let i = 0; i < obj.items.length; i++) {
@@ -55,8 +60,8 @@ export function parseOutfitJSON(text: string): Outfit {
     if (typeof itemObj.name !== 'string') {
       throw new Error(`Item at index ${i} missing or invalid "name" field`);
     }
-    // Validate that the item name is in the allowed list
-    if (!ALLOWED_ITEM_NAMES.includes(itemObj.name)) {
+    // Validate that the item name is in the allowed list for this user's style
+    if (!allowedItemNames.includes(itemObj.name)) {
       throw new Error(`Item "${itemObj.name}" at index ${i} is not in the allowed clothing items list. LLM must only use items from the provided list.`);
     }
     if (typeof itemObj.description !== 'string') {
@@ -67,9 +72,8 @@ export function parseOutfitJSON(text: string): Outfit {
     }
 
     // Construct validated ClothingItem
-    // Safe to cast since we validated it's in the allowed list above
     items.push({
-      name: itemObj.name as ClothingItem['name'],
+      name: itemObj.name,
       description: itemObj.description,
       blurb: itemObj.blurb,
     });

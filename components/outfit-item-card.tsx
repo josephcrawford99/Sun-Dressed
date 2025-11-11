@@ -4,24 +4,29 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedCard } from '@/components/ui/card';
 import { Chevron } from '@/components/ui/chevron';
-import { CLOTHING_ICONS, AllowedClothingItem } from '@/constants/clothing-icons';
+import { mapResponseItemToIcon } from '@/constants/clothing-icons';
+import { useStore } from '@/store/store';
 
 export type OutfitItemCardProps = {
-  name: AllowedClothingItem;
+  name: string;
   description: string;
   blurb: string;
 };
 
 export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const icon = CLOTHING_ICONS[name];
+  const userStyle = useStore((state) => state.style);
+  const icon = mapResponseItemToIcon(name, userStyle);
+
+  // Strip gender suffix from display name (e.g., "Boots (feminine)" -> "Boots")
+  const displayName = name.replace(/\s+\((masculine|feminine)\)$/, '');
 
   return (
     <ThemedCard variant="default" icon={icon}>
       <Pressable onPress={() => setIsCollapsed(!isCollapsed)}>
         <View style={styles.header}>
           <ThemedText type="subtitle" style={styles.itemName}>
-            {name}
+            {displayName}
           </ThemedText>
           <Chevron isCollapsed={isCollapsed} />
         </View>

@@ -1,6 +1,6 @@
 import { TempFormat, WeatherData } from '@/services/openweathermap-service';
 import { OutfitStyle } from '@/types/outfit';
-import { ALLOWED_ITEM_NAMES } from '@/constants/clothing-icons';
+import { getItemsList } from '@/constants/clothing-icons';
 
 /**
  * User preferences for outfit generation
@@ -62,7 +62,9 @@ USER PREFERENCES:
 
 ALLOWED CLOTHING ITEMS:
 You MUST ONLY use item names from this list. Do not suggest any items not on this list:
-${ALLOWED_ITEM_NAMES.join(', ')}
+${getItemsList(userPrefs.style || 'neutral').join(', ')}
+
+IMPORTANT: Item names in your response must match EXACTLY as shown above, including any text in parentheses.
 
 IMPORTANT: You MUST respond with ONLY valid JSON in the exact format shown below. Do not include any other text, explanations, or markdown formatting outside the JSON.
 
