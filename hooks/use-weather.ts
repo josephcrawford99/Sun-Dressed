@@ -26,7 +26,7 @@ async function fetch30Weather(units: TempFormat): Promise<Weather30Result> {
   // Get location permission
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
-    throw new Error('Location permission denied');
+    throw new Error('Location permission is required to get weather data. Please enable location access in your device settings.');
   }
 
   // Get current location
@@ -48,7 +48,7 @@ async function fetch25Weather(units: TempFormat): Promise<Weather25Result> {
   // Get location permission
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
-    throw new Error('Location permission denied');
+    throw new Error('Location permission is required to get weather data. Please enable location access in your device settings.');
   }
 
   // Get current location
@@ -103,11 +103,18 @@ export function useWeather(): UseQueryResult<WeatherData, Error> {
     [query30.data, query25.data]
   );
 
-  // Determine overall loading state (loading if both are loading or neither has data yet)
+  // Determine overall loading state (loading if either is loading and we have no data)
   const isLoading = (query30.isLoading || query25.isLoading) && !mergedData;
 
-  // Determine overall error state (error only if both failed)
-  const error = query30.error && query25.error ? query30.error : null;
+  // Determine overall error state:
+  // - Show error if both failed
+  // - OR if either failed and we have no data to fall back on
+  const error =
+    query30.error && query25.error
+      ? query30.error
+      : !mergedData && (query30.error || query25.error)
+      ? (query30.error || query25.error)
+      : null;
 
   // Return latest dataUpdatedAt from either query
   const dataUpdatedAt = Math.max(

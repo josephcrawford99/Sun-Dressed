@@ -7,7 +7,7 @@ import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 import { capitalizeAllWords } from '@/utils/strings';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
-import { Image, RefreshControl, ScrollView, StyleSheet } from 'react-native';
+import { Image, Linking, Pressable, RefreshControl, ScrollView, StyleSheet } from 'react-native';
 
 export default function WeatherScreen() {
     const { data: weather, isLoading: loading, error, dataUpdatedAt } = useWeather();
@@ -47,7 +47,13 @@ export default function WeatherScreen() {
                     )}
 
                     {error && (
-                        <ThemedText style={styles.error}>Error: {error.message}</ThemedText>
+                        <Pressable onPress={() => Linking.openSettings()}>
+                            <ThemedText style={styles.error}>
+                                Error: {error.message}
+                                {'\n\n'}
+                                <ThemedText style={styles.errorLink}>Tap to open settings →</ThemedText>
+                            </ThemedText>
+                        </Pressable>
                     )}
 
                     {weather && dataUpdatedAt && (
@@ -139,6 +145,10 @@ const styles = StyleSheet.create({
     },
     error: {
         color: '#ff6b6b',
+    },
+    errorLink: {
+        textDecorationLine: 'underline',
+        fontWeight: '600',
     },
     hintText: {
         fontSize: 12,
