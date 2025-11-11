@@ -8,15 +8,17 @@
     "icon": "./assets/images/temp-icon.png",
     "scheme": "sundressed",
     "userInterfaceStyle": "automatic",
-    "platforms": ["ios"],
-
+    "platforms": [
+      "ios"
+    ],
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.sundressed.app",
       "buildNumber": "1.0.0",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SunDressed needs your location to provide accurate weather-based outfit recommendations for your area."
+        "NSLocationWhenInUseUsageDescription": "SunDressed needs your location to provide accurate weather-based outfit recommendations for your area.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "plugins": [
@@ -37,6 +39,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "52adb47e-89e8-464d-8952-797b05a7d506"
+      }
     }
   }
 }
