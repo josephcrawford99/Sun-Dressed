@@ -16,12 +16,16 @@ We focus on **testing behavior, not implementation**, ensuring tests are resilie
 ```
 __tests__/
 ├── README.md                    # This file - testing documentation
+├── test-helpers/                # Reusable test utilities and mocks
+│   └── index.ts                 # Mock data creators and helpers
 ├── unit/                        # Unit tests for individual modules
 │   ├── utils/                   # Tests for utility functions
 │   ├── services/                # Tests for API services
 │   ├── store/                   # Tests for state management
-│   └── hooks/                   # Tests for custom hooks
-├── integration/                 # Integration tests
+│   ├── hooks/                   # Tests for custom hooks (future)
+│   └── components/              # Tests for UI components
+│       └── ui/                  # Tests for UI component library
+├── integration/                 # Integration tests (future)
 │   └── workflows/               # Multi-step user workflows
 └── release/                     # Release/smoke tests
     └── critical-paths.test.ts   # Critical functionality tests
@@ -64,15 +68,171 @@ npm test -- --testNamePattern="capitalizeAllWords"
 yarn test --testNamePattern="capitalizeAllWords"
 ```
 
+### Run Release Tests Only
+```bash
+npm test:release
+# or
+yarn test:release
+```
+
 ## Test Coverage Goals
 
 - **Utilities**: 100% coverage (pure functions, easy to test)
-- **Services**: 90%+ coverage (API interactions, error handling)
-- **State Management**: 90%+ coverage (business logic)
+- **Services**: 100% coverage (API interactions, error handling)
+- **State Management**: 100% coverage (business logic)
+- **Components**: 80%+ coverage (UI components and user interactions)
 - **Hooks**: 80%+ coverage (React hook logic)
-- **Components**: 70%+ coverage (user interactions)
 
-## Writing Tests
+## Current Test Statistics
+
+- **Total Tests**: 331 tests across 10 test suites
+- **Coverage**:
+  - Low-level features (utils, services, store): 100% statements, 98%+ branches
+  - UI components: 85+ tests covering core components
+  - Integration tests: 30 tests covering critical user workflows
+
+---
+
+## Writing Resilient Tests (IMPORTANT!)
+
+When adding new features to the app, you want tests that verify behavior **without breaking** when you make changes. Follow these principles to write **resilient, maintainable tests**:
+
+### ✅ DO: Test Behavior, Not Implementation
+
+```typescript
+// ✅ GOOD - Tests what the function does
+it('should capitalize each word', () => {
+  expect(capitalizeAllWords('hello world')).toBe('Hello World');
+});
+
+// ❌ BAD - Tests how it's implemented
+it('should use split and map', () => {
+  const spy = jest.spyOn(String.prototype, 'split');
+  capitalizeAllWords('hello world');
+  expect(spy).toHaveBeenCalled();
+});
+```
+
+### ✅ DO: Test Component Contracts (Props In, Events Out)
+
+```typescript
+// ✅ GOOD - Tests the interface
+it('should call onPress when button is pressed', () => {
+  const mockOnPress = jest.fn();
+  const { getByText } = render(<Button onPress={mockOnPress}>Submit</Button>);
+  fireEvent.press(getByText('Submit'));
+  expect(mockOnPress).toHaveBeenCalled();
+});
+
+// ❌ BAD - Tests internal state or props
+it('should have correct internal state', () => {
+  const button = render(<Button>Submit</Button>);
+  expect(button.instance().state.pressed).toBe(false);
+});
+```
+
+### ✅ DO: Use Semantic Queries
+
+```typescript
+// ✅ GOOD - Finds elements like a user would
+const button = getByText('Submit');
+const input = getByLabelText('Email Address');
+const heading = getByRole('heading');
+
+// ❌ BAD - Relies on test IDs or implementation details
+const button = container.querySelector('.button-class');
+```
+
+### ✅ DO: Test Edge Cases and Error Handling
+
+```typescript
+// ✅ GOOD - Tests edge cases
+it('should handle empty string', () => {
+  expect(capitalizeAllWords('')).toBe('');
+});
+
+it('should handle null gracefully', () => {
+  expect(() => parseJSON(null)).toThrow('Invalid input');
+});
+
+// Also test: long inputs, special characters, boundary conditions
+```
+
+### ❌ DON'T: Test Styling Details
+
+```typescript
+// ❌ BAD - Breaks when you change colors/fonts
+it('should have blue background', () => {
+  const button = render(<Button />);
+  expect(button.props.style.backgroundColor).toBe('#007AFF');
+});
+
+// ✅ GOOD - Test styling only if it's business logic
+it('should be disabled when loading', () => {
+  const { getByText } = render(<Button disabled>Submit</Button>);
+  expect(getByText('Submit')).toBeDisabled();
+});
+```
+
+### ❌ DON'T: Use Snapshot Tests (Usually)
+
+```typescript
+// ❌ BAD - Brittle, breaks with any change
+it('should match snapshot', () => {
+  const tree = renderer.create(<MyComponent />).toJSON();
+  expect(tree).toMatchSnapshot();
+});
+
+// ✅ GOOD - Test specific, intentional behavior
+it('should render name and description', () => {
+  const { getByText } = render(<MyComponent name="Test" description="Desc" />);
+  expect(getByText('Test')).toBeTruthy();
+  expect(getByText('Desc')).toBeTruthy();
+});
+```
+
+### ✅ DO: Use Test Helpers for Common Data
+
+```typescript
+// ✅ GOOD - Use helpers from __tests__/test-helpers/index.ts
+import { createMockWeatherData, createMockOutfit } from '@/__tests__/test-helpers';
+
+it('should handle weather data', () => {
+  const weather = createMockWeatherData({
+    current: { temp: 85 }
+  });
+  const result = processWeather(weather);
+  expect(result.isHot).toBe(true);
+});
+```
+
+### ✅ DO: Mock External Dependencies, Not Internal Logic
+
+```typescript
+// ✅ GOOD - Mock external APIs
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+// ❌ BAD - Mock internal functions of the module you're testing
+jest.mock('@/utils/strings', () => ({
+  capitalizeAllWords: jest.fn(),
+}));
+```
+
+### Why These Practices Matter
+
+When you follow these practices:
+- ✅ **Add new props** → Tests still pass
+- ✅ **Change styling** → Tests still pass
+- ✅ **Refactor internals** → Tests still pass
+- ✅ **Add features** → Old tests don't break
+- ✅ **Change theme** → Tests still pass
+
+The tests verify **what users care about** (does it work?) not **how it's built** (implementation details).
+
+---
+
+## Writing Tests - Examples
 
 ### Unit Test Example
 
@@ -118,6 +278,50 @@ describe('fetchWeatherData', () => {
 });
 ```
 
+### Component Test Example
+
+```typescript
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react-native';
+import { ThemedButton } from '@/components/ui/button';
+
+jest.mock('@/hooks/use-theme-color', () => ({
+  useThemeColor: () => '#007AFF',
+}));
+
+describe('ThemedButton', () => {
+  it('should call onPress when pressed', () => {
+    // Arrange
+    const mockOnPress = jest.fn();
+    const { getByText } = render(
+      <ThemedButton onPress={mockOnPress}>Submit</ThemedButton>
+    );
+
+    // Act
+    fireEvent.press(getByText('Submit'));
+
+    // Assert
+    expect(mockOnPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not call onPress when disabled', () => {
+    // Arrange
+    const mockOnPress = jest.fn();
+    const { getByText } = render(
+      <ThemedButton onPress={mockOnPress} disabled>
+        Submit
+      </ThemedButton>
+    );
+
+    // Act
+    fireEvent.press(getByText('Submit'));
+
+    // Assert
+    expect(mockOnPress).not.toHaveBeenCalled();
+  });
+});
+```
+
 ### State Management Test Example
 
 ```typescript
@@ -133,6 +337,29 @@ describe('useStore', () => {
     });
 
     expect(result.current.style).toBe('casual');
+  });
+});
+```
+
+### Using Test Helpers
+
+```typescript
+import { createMockWeatherData, createMockOutfit } from '@/__tests__/test-helpers';
+
+describe('buildOutfitPrompt', () => {
+  it('should include weather data in prompt', () => {
+    // Arrange - Use helper to create mock data
+    const weather = createMockWeatherData({
+      current: { temp: 75 }
+    });
+    const userPrefs = { style: 'casual', activity: 'walking' };
+
+    // Act
+    const prompt = buildOutfitPrompt(userPrefs, weather, 'imperial');
+
+    // Assert
+    expect(prompt).toContain('75°F');
+    expect(prompt).toContain('walking');
   });
 });
 ```
@@ -180,6 +407,20 @@ it('should do something', () => {
 - Avoid real network calls
 
 ## Common Testing Utilities
+
+### Test Helpers Available
+
+Import from `@/__tests__/test-helpers`:
+
+- `createMockWeatherData(overrides?)` - Create complete mock weather data
+- `createMockClothingItem(overrides?)` - Create mock clothing item
+- `createMockOutfit(overrides?)` - Create complete mock outfit
+- `createMinimalWeatherData()` - Create minimal weather data (for testing error handling)
+- `waitForAsync(ms?)` - Wait for async operations
+- `setupMockEnv(vars)` - Set up mock environment variables
+- `cleanupMockEnv(keys)` - Clean up environment variables
+- `createMockAxiosResponse(data)` - Create mock axios response
+- `createMockAxiosError(message, code?, statusCode?)` - Create mock axios error
 
 ### Mocking AsyncStorage
 ```typescript
@@ -238,7 +479,7 @@ node --inspect-brk node_modules/.bin/jest --runInBand
 npm test -- --verbose
 ```
 
-### Update Snapshots
+### Update Snapshots (if used)
 ```bash
 npm test -- --updateSnapshot
 ```
@@ -247,7 +488,9 @@ npm test -- --updateSnapshot
 
 Before each release, run the release test suite:
 ```bash
-npm test -- __tests__/release/
+npm test:release
+# or
+yarn test:release
 ```
 
 These tests verify:
@@ -285,11 +528,15 @@ Check `tsconfig.json` paths and `jest.config.js` moduleNameMapper
 
 When adding new features:
 1. Write tests first (TDD approach recommended)
-2. Ensure tests pass: `npm test`
-3. Check coverage: `npm test -- --coverage`
-4. Aim for >80% coverage on new code
-5. Update this documentation if needed
+2. Follow resilient testing practices (see above)
+3. Use test helpers from `__tests__/test-helpers` for mock data
+4. Ensure tests pass: `npm test`
+5. Check coverage: `npm test -- --coverage`
+6. Aim for >80% coverage on new code
+7. Update this documentation if needed
 
 ---
+
+**Remember**: Good tests verify behavior, not implementation. They should give you confidence to refactor and add features without breaking existing functionality.
 
 Last Updated: 2025-11-15

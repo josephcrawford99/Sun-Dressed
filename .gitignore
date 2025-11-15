@@ -48,3 +48,4 @@ claude.*
 
 # app submission checklist
 APP_SUBMISSION_CHECKLIST.md
+coverage/
