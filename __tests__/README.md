@@ -2,96 +2,37 @@
 
 This directory contains all automated tests for the Sun Dressed application. We follow industry-standard testing practices using Jest and React Native Testing Library.
 
-## Testing Philosophy
-
-Our testing strategy follows the **Testing Pyramid** principle:
-- **70% Unit Tests**: Fast, isolated tests for individual functions and modules
-- **20% Integration Tests**: Tests for component interactions and workflows
-- **10% E2E Tests**: Full user workflow tests (not included in this implementation)
-
-We focus on **testing behavior, not implementation**, ensuring tests are resilient to refactoring.
-
-## Directory Structure
-
-```
-__tests__/
-├── README.md                    # This file - testing documentation
-├── test-helpers/                # Reusable test utilities and mocks
-│   └── index.ts                 # Mock data creators and helpers
-├── unit/                        # Unit tests for individual modules
-│   ├── utils/                   # Tests for utility functions
-│   ├── services/                # Tests for API services
-│   ├── store/                   # Tests for state management
-│   ├── hooks/                   # Tests for custom hooks (future)
-│   └── components/              # Tests for UI components
-│       └── ui/                  # Tests for UI component library
-├── integration/                 # Integration tests (future)
-│   └── workflows/               # Multi-step user workflows
-└── release/                     # Release/smoke tests
-    └── critical-paths.test.ts   # Critical functionality tests
-```
-
 ## Running Tests
 
 ### Run All Tests
 ```bash
 npm test
-# or
-yarn test
 ```
 
 ### Run Tests in Watch Mode (Development)
 ```bash
 npm test -- --watch
-# or
-yarn test --watch
 ```
 
 ### Run Tests with Coverage
 ```bash
 npm test -- --coverage
-# or
-yarn test --coverage
 ```
 
 ### Run Specific Test File
 ```bash
 npm test -- __tests__/unit/utils/strings.test.ts
-# or
-yarn test __tests__/unit/utils/strings.test.ts
 ```
 
 ### Run Tests Matching Pattern
 ```bash
 npm test -- --testNamePattern="capitalizeAllWords"
-# or
-yarn test --testNamePattern="capitalizeAllWords"
 ```
 
 ### Run Release Tests Only
 ```bash
 npm test:release
-# or
-yarn test:release
 ```
-
-## Test Coverage Goals
-
-- **Utilities**: 100% coverage (pure functions, easy to test)
-- **Services**: 100% coverage (API interactions, error handling)
-- **State Management**: 100% coverage (business logic)
-- **Components**: 80%+ coverage (UI components and user interactions)
-- **Hooks**: 80%+ coverage (React hook logic)
-
-## Current Test Statistics
-
-- **Total Tests**: 331 tests across 10 test suites
-- **Coverage**:
-  - Low-level features (utils, services, store): 100% statements, 98%+ branches
-  - UI components: 85+ tests covering core components
-  - Integration tests: 30 tests covering critical user workflows
-
----
 
 ## Writing Resilient Tests (IMPORTANT!)
 
@@ -219,151 +160,6 @@ jest.mock('@/utils/strings', () => ({
 }));
 ```
 
-### Why These Practices Matter
-
-When you follow these practices:
-- ✅ **Add new props** → Tests still pass
-- ✅ **Change styling** → Tests still pass
-- ✅ **Refactor internals** → Tests still pass
-- ✅ **Add features** → Old tests don't break
-- ✅ **Change theme** → Tests still pass
-
-The tests verify **what users care about** (does it work?) not **how it's built** (implementation details).
-
----
-
-## Writing Tests - Examples
-
-### Unit Test Example
-
-```typescript
-import { capitalizeAllWords } from '@/utils/strings';
-
-describe('capitalizeAllWords', () => {
-  it('should capitalize each word in a sentence', () => {
-    expect(capitalizeAllWords('hello world')).toBe('Hello World');
-  });
-
-  it('should handle empty strings', () => {
-    expect(capitalizeAllWords('')).toBe('');
-  });
-
-  it('should handle edge cases', () => {
-    expect(capitalizeAllWords('  multiple   spaces  ')).toBe('  Multiple   Spaces  ');
-  });
-});
-```
-
-### Service Test Example (with Mocking)
-
-```typescript
-import axios from 'axios';
-import { fetchWeatherData } from '@/services/openweathermap-service';
-
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-describe('fetchWeatherData', () => {
-  it('should fetch weather data successfully', async () => {
-    const mockData = { /* mock weather data */ };
-    mockedAxios.get.mockResolvedValue({ data: mockData });
-
-    const result = await fetchWeatherData(40.7128, -74.0060);
-
-    expect(result.data).toEqual(mockData);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining('api.openweathermap.org')
-    );
-  });
-});
-```
-
-### Component Test Example
-
-```typescript
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
-import { ThemedButton } from '@/components/ui/button';
-
-jest.mock('@/hooks/use-theme-color', () => ({
-  useThemeColor: () => '#007AFF',
-}));
-
-describe('ThemedButton', () => {
-  it('should call onPress when pressed', () => {
-    // Arrange
-    const mockOnPress = jest.fn();
-    const { getByText } = render(
-      <ThemedButton onPress={mockOnPress}>Submit</ThemedButton>
-    );
-
-    // Act
-    fireEvent.press(getByText('Submit'));
-
-    // Assert
-    expect(mockOnPress).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not call onPress when disabled', () => {
-    // Arrange
-    const mockOnPress = jest.fn();
-    const { getByText } = render(
-      <ThemedButton onPress={mockOnPress} disabled>
-        Submit
-      </ThemedButton>
-    );
-
-    // Act
-    fireEvent.press(getByText('Submit'));
-
-    // Assert
-    expect(mockOnPress).not.toHaveBeenCalled();
-  });
-});
-```
-
-### State Management Test Example
-
-```typescript
-import { renderHook, act } from '@testing-library/react-native';
-import { useStore } from '@/store/store';
-
-describe('useStore', () => {
-  it('should update style preference', () => {
-    const { result } = renderHook(() => useStore());
-
-    act(() => {
-      result.current.setStyle('casual');
-    });
-
-    expect(result.current.style).toBe('casual');
-  });
-});
-```
-
-### Using Test Helpers
-
-```typescript
-import { createMockWeatherData, createMockOutfit } from '@/__tests__/test-helpers';
-
-describe('buildOutfitPrompt', () => {
-  it('should include weather data in prompt', () => {
-    // Arrange - Use helper to create mock data
-    const weather = createMockWeatherData({
-      current: { temp: 75 }
-    });
-    const userPrefs = { style: 'casual', activity: 'walking' };
-
-    // Act
-    const prompt = buildOutfitPrompt(userPrefs, weather, 'imperial');
-
-    // Assert
-    expect(prompt).toContain('75°F');
-    expect(prompt).toContain('walking');
-  });
-});
-```
-
 ## Best Practices
 
 ### 1. Test Independence
@@ -422,43 +218,6 @@ Import from `@/__tests__/test-helpers`:
 - `createMockAxiosResponse(data)` - Create mock axios response
 - `createMockAxiosError(message, code?, statusCode?)` - Create mock axios error
 
-### Mocking AsyncStorage
-```typescript
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-}));
-```
-
-### Mocking Axios
-```typescript
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-```
-
-### Testing Async Functions
-```typescript
-it('should handle async operations', async () => {
-  const result = await asyncFunction();
-  expect(result).toBeDefined();
-});
-```
-
-### Testing Error Handling
-```typescript
-it('should throw error for invalid input', () => {
-  expect(() => myFunction(null)).toThrow('Invalid input');
-});
-```
-
-## Continuous Integration
-
-Tests should be run:
-- Before every commit (pre-commit hook)
-- On every pull request
-- Before deployment
-- On scheduled intervals (nightly builds)
 
 ### Pre-commit Hook Example
 Add to `.git/hooks/pre-commit`:
@@ -523,20 +282,3 @@ Ensure AsyncStorage is properly mocked in `jest.setup.js`
 
 ### Module Resolution Errors
 Check `tsconfig.json` paths and `jest.config.js` moduleNameMapper
-
-## Contributing
-
-When adding new features:
-1. Write tests first (TDD approach recommended)
-2. Follow resilient testing practices (see above)
-3. Use test helpers from `__tests__/test-helpers` for mock data
-4. Ensure tests pass: `npm test`
-5. Check coverage: `npm test -- --coverage`
-6. Aim for >80% coverage on new code
-7. Update this documentation if needed
-
----
-
-**Remember**: Good tests verify behavior, not implementation. They should give you confidence to refactor and add features without breaking existing functionality.
-
-Last Updated: 2025-11-15
