@@ -216,6 +216,10 @@ export interface WeatherData {
   };
   pop: number;
   uvi?: number;
+  wind: {
+    speed: number;
+    gust?: number;
+  };
   description: string;
   icon: string;
 }
@@ -345,6 +349,10 @@ export function transform30ToWeatherData(data: OpenWeather30Response): WeatherDa
     },
     pop: data.daily[0].pop,
     uvi: data.current.uvi,
+    wind: {
+      speed: data.current.wind_speed,
+      gust: data.current.wind_gust,
+    },
     description: data.current.weather[0].description,
     icon: data.current.weather[0].icon,
   };
@@ -434,6 +442,10 @@ export function transform25ToWeatherData(
     },
     pop: avgPop,
     uvi: undefined, // 2.5 API doesn't provide UV index
+    wind: {
+      speed: current.wind.speed,
+      gust: current.wind.gust,
+    },
     description: current.weather[0].description,
     icon: current.weather[0].icon,
   };
@@ -478,6 +490,8 @@ export function mergeWeatherData(
     pop: data30.pop !== undefined ? data30.pop : data25.pop,
     // Use 3.0 for UV index (2.5 doesn't have it)
     uvi: data30.uvi,
+    // Use 2.5 for wind (fresher, updates every 5 minutes)
+    wind: data25.wind,
     // Use 2.5 for current weather description and icon (fresher)
     description: data25.description,
     icon: data25.icon,

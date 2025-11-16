@@ -92,6 +92,11 @@ export default function DebugScreen() {
                   Last updated: {new Date(weather30State.dataUpdatedAt).toLocaleString()}
                 </ThemedText>
               ) : null}
+              {weather30State?.data?.raw?.daily?.[0]?.dt ? (
+                <ThemedText style={styles.infoText}>
+                  Daily[0] Date: {new Date(weather30State.data.raw.daily[0].dt * 1000).toLocaleDateString()} {new Date(weather30State.data.raw.daily[0].dt * 1000).toLocaleTimeString()}
+                </ThemedText>
+              ) : null}
               {weather30State?.data?.raw ? (
                 <ThemedCard variant="data">
                   <ThemedText style={styles.jsonText}>

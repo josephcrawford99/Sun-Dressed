@@ -58,7 +58,6 @@ export default function WeatherScreen() {
 
                     {weather && dataUpdatedAt && (
                         <>
-                            <ThemedText style={styles.metadataText}>Last updated: {new Date(dataUpdatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</ThemedText>
                             {weather.name && (
                                 <ThemedText style={styles.metadataText}>Location: {weather.name}</ThemedText>
                             )}
@@ -96,6 +95,19 @@ export default function WeatherScreen() {
                                 Chance of Rain: {Math.round(weather.pop * 100)}%
                             </ThemedText>
                         </Section>
+
+                        {/* Wind */}
+                        <Section title="Wind">
+                            <ThemedText style={styles.dataText}>
+                                Wind Speed: {Math.round(weather.wind.speed)} {tempFormat === 'imperial' ? 'mph' : 'm/s'}
+                            </ThemedText>
+                            {weather.wind.gust !== undefined && (
+                                <ThemedText style={styles.dataText}>
+                                    Wind Gust: {Math.round(weather.wind.gust)} {tempFormat === 'imperial' ? 'mph' : 'm/s'}
+                                </ThemedText>
+                            )}
+                        </Section>
+
                         {weather.uvi !== undefined && (
                             <Section title="UV Index">
                                 <ThemedText style={styles.dataText}>

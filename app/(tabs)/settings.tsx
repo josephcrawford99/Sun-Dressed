@@ -23,8 +23,8 @@ export default function SettingsScreen() {
   ];
 
   const tempFormatOptions = [
-    { id: 'imperial', label: 'Fahrenheit (°F)', value: 'imperial' },
-    { id: 'metric', label: 'Celsius (°C)', value: 'metric' },
+    { id: 'imperial', label: 'Imperial (°F, mph)', value: 'imperial' },
+    { id: 'metric', label: 'Metric (°C, m/s)', value: 'metric' },
   ];
 
   return (
@@ -50,7 +50,7 @@ export default function SettingsScreen() {
               />
             </Section>
 
-            <Section title="Temperature Format" style={styles.section}>
+            <Section title="Units" style={styles.section}>
               <ThemedRadioGroup
                 options={tempFormatOptions}
                 onPress={(selectedId) => setTempFormat(selectedId as TempFormat)}

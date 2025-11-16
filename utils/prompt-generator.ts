@@ -22,6 +22,8 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
   const currentTime = new Date();
 
   const tempSymbol = tempFormat === 'metric' ? '°C' : '°F';
+  const windSpeedUnit = tempFormat === 'imperial' ? 'mph' : 'm/s';
+
   // Extract weather information
   const currentTemp = Math.round(weatherData.temp.current);
   const feelsLike = Math.round(weatherData.temp.feels_like);
@@ -42,7 +44,13 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
     `- Today's High: ${highTemp}${tempSymbol}`,
     `- Today's Low: ${lowTemp}${tempSymbol}`,
     `- Chance of Rain: ${chanceOfRain}%`,
+    `- Wind Speed: ${Math.round(weatherData.wind.speed)} ${windSpeedUnit}`,
   ];
+
+  // Only add Wind Gust if available
+  if (weatherData.wind.gust !== undefined) {
+    weatherConditions.push(`- Wind Gust: ${Math.round(weatherData.wind.gust)} ${windSpeedUnit}`);
+  }
 
   // Only add UV Index if available
   if (weatherData.uvi !== undefined) {
