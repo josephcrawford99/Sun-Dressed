@@ -1,62 +1,9 @@
 import { buildOutfitPrompt, UserPreferences } from '@/utils/prompt-generator';
-import { WeatherData, TempFormat } from '@/services/openweathermap-service';
+import { WeatherData } from '@/types/weather';
+import { createMockWeatherData } from '../../test-helpers';
 
 describe('buildOutfitPrompt', () => {
-  // Mock weather data with all fields present
-  const completeWeatherData: WeatherData = {
-    lat: 40.7128,
-    lon: -74.006,
-    timezone: 'America/New_York',
-    current: {
-      dt: 1699000000,
-      temp: 72,
-      feels_like: 68,
-      humidity: 65,
-      uvi: 5,
-      wind_speed: 10,
-      weather: [
-        {
-          id: 800,
-          main: 'Clear',
-          description: 'clear sky',
-          icon: '01d',
-        },
-      ],
-    },
-    daily: [
-      {
-        dt: 1699000000,
-        sunrise: 1698998000,
-        sunset: 1699038000,
-        temp: {
-          min: 60,
-          max: 75,
-          day: 70,
-          night: 62,
-          eve: 68,
-          morn: 61,
-        },
-        feels_like: {
-          day: 68,
-          night: 60,
-          eve: 66,
-          morn: 59,
-        },
-        humidity: 65,
-        wind_speed: 10,
-        weather: [
-          {
-            id: 800,
-            main: 'Clear',
-            description: 'clear sky',
-            icon: '01d',
-          },
-        ],
-        pop: 0.3,
-        uvi: 6,
-      },
-    ],
-  };
+  const completeWeatherData: WeatherData = createMockWeatherData();
 
   const defaultUserPrefs: UserPreferences = {
     style: 'neutral',
@@ -72,7 +19,6 @@ describe('buildOutfitPrompt', () => {
       expect(prompt).toContain("Today's High: 75°F");
       expect(prompt).toContain("Today's Low: 60°F");
       expect(prompt).toContain('Chance of Rain: 30%');
-      expect(prompt).toContain('UV Index: 6');
       expect(prompt).toContain('Conditions: clear sky');
     });
 
@@ -113,289 +59,34 @@ describe('buildOutfitPrompt', () => {
     });
   });
 
-  describe('Missing Weather Data - Current Temperature', () => {
-    it('should handle missing current temperature', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          temp: undefined as any,
-        },
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Current Temperature: N/A');
-    });
-
-    it('should handle missing feels_like temperature', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          feels_like: undefined as any,
-        },
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Feels like: N/A');
-    });
-
-    it('should handle missing entire current object', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: undefined as any,
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Current Temperature: N/A');
-      expect(prompt).toContain('Feels like: N/A');
-    });
-  });
-
-  describe('Missing Weather Data - Daily Forecast', () => {
-    it('should handle missing daily forecast', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: undefined as any,
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain("Today's High: N/A");
-      expect(prompt).toContain("Today's Low: N/A");
-      expect(prompt).toContain('Chance of Rain: 0%');
-    });
-
-    it('should handle empty daily forecast array', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain("Today's High: N/A");
-      expect(prompt).toContain("Today's Low: N/A");
-      expect(prompt).toContain('Chance of Rain: 0%');
-    });
-
-    it('should handle missing temp.max in daily forecast', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            temp: {
-              ...completeWeatherData.daily[0].temp,
-              max: undefined as any,
-            },
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain("Today's High: N/A");
-    });
-
-    it('should handle missing temp.min in daily forecast', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            temp: {
-              ...completeWeatherData.daily[0].temp,
-              min: undefined as any,
-            },
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain("Today's Low: N/A");
-    });
-
-    it('should handle missing temp object in daily forecast', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            temp: undefined as any,
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain("Today's High: N/A");
-      expect(prompt).toContain("Today's Low: N/A");
-    });
-  });
-
-  describe('Missing Weather Data - Precipitation', () => {
-    it('should handle missing pop (probability of precipitation)', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            pop: undefined as any,
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Chance of Rain: 0%');
-    });
-
-    it('should handle zero pop (0% chance of rain)', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            pop: 0,
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Chance of Rain: 0%');
-    });
-
-    it('should round pop to nearest percent', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            pop: 0.456,
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Chance of Rain: 46%');
-    });
-
-    it('should handle 100% chance of rain', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            pop: 1.0,
-          },
-        ],
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Chance of Rain: 100%');
-    });
-  });
-
-  describe('Missing Weather Data - UV Index', () => {
-    it('should use daily UV index when available', () => {
+  describe('Wind Data', () => {
+    it('should include wind speed', () => {
       const prompt = buildOutfitPrompt(defaultUserPrefs, completeWeatherData, 'imperial');
 
-      expect(prompt).toContain('UV Index: 6');
+      expect(prompt).toContain('Wind Speed: 10 mph');
     });
 
-    it('should fall back to current UV index when daily is missing', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            uvi: undefined as any,
-          },
-        ],
-      };
+    it('should include wind gust when available', () => {
+      const prompt = buildOutfitPrompt(defaultUserPrefs, completeWeatherData, 'imperial');
+
+      expect(prompt).toContain('Wind Gust: 15 mph');
+    });
+
+    it('should not include wind gust when undefined', () => {
+      const weatherData = createMockWeatherData({
+        wind: { speed: 10 },
+      });
 
       const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
 
-      expect(prompt).toContain('UV Index: 5');
+      expect(prompt).toContain('Wind Speed: 10 mph');
+      expect(prompt).not.toContain('Wind Gust');
     });
 
-    it('should default to 0 when both UV indices are missing', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          uvi: undefined as any,
-        },
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            uvi: undefined as any,
-          },
-        ],
-      };
+    it('should use m/s for wind speed in metric', () => {
+      const prompt = buildOutfitPrompt(defaultUserPrefs, completeWeatherData, 'metric');
 
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('UV Index: 0');
-    });
-  });
-
-  describe('Missing Weather Data - Description', () => {
-    it('should handle missing weather description', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          weather: undefined as any,
-        },
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Conditions: unknown conditions');
-    });
-
-    it('should handle empty weather array', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          weather: [],
-        },
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Conditions: unknown conditions');
-    });
-
-    it('should use weather description when available', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          weather: [
-            {
-              id: 500,
-              main: 'Rain',
-              description: 'light rain',
-              icon: '10d',
-            },
-          ],
-        },
-      };
-
-      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
-
-      expect(prompt).toContain('Conditions: light rain');
+      expect(prompt).toContain('Wind Speed: 10 m/s');
     });
   });
 
@@ -482,14 +173,14 @@ describe('buildOutfitPrompt', () => {
 
   describe('Temperature Rounding', () => {
     it('should round current temperature to nearest integer', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          temp: 72.7,
+      const weatherData = createMockWeatherData({
+        temp: {
+          current: 72.7,
           feels_like: 68.3,
+          min: 60,
+          max: 75,
         },
-      };
+      });
 
       const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
 
@@ -498,24 +189,45 @@ describe('buildOutfitPrompt', () => {
     });
 
     it('should round high and low temperatures to nearest integer', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            temp: {
-              ...completeWeatherData.daily[0].temp,
-              max: 75.8,
-              min: 60.2,
-            },
-          },
-        ],
-      };
+      const weatherData = createMockWeatherData({
+        temp: {
+          current: 72,
+          feels_like: 68,
+          min: 60.2,
+          max: 75.8,
+        },
+      });
 
       const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
 
       expect(prompt).toContain("Today's High: 76°F");
       expect(prompt).toContain("Today's Low: 60°F");
+    });
+  });
+
+  describe('Precipitation', () => {
+    it('should handle zero pop (0% chance of rain)', () => {
+      const weatherData = createMockWeatherData({ pop: 0 });
+
+      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
+
+      expect(prompt).toContain('Chance of Rain: 0%');
+    });
+
+    it('should round pop to nearest percent', () => {
+      const weatherData = createMockWeatherData({ pop: 0.456 });
+
+      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
+
+      expect(prompt).toContain('Chance of Rain: 46%');
+    });
+
+    it('should handle 100% chance of rain', () => {
+      const weatherData = createMockWeatherData({ pop: 1.0 });
+
+      const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
+
+      expect(prompt).toContain('Chance of Rain: 100%');
     });
   });
 
@@ -563,14 +275,14 @@ describe('buildOutfitPrompt', () => {
 
   describe('Edge Cases', () => {
     it('should handle negative temperatures', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          temp: -5,
+      const weatherData = createMockWeatherData({
+        temp: {
+          current: -5,
           feels_like: -10,
+          min: -15,
+          max: 0,
         },
-      };
+      });
 
       const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
 
@@ -579,22 +291,14 @@ describe('buildOutfitPrompt', () => {
     });
 
     it('should handle very high temperatures', () => {
-      const weatherData: WeatherData = {
-        ...completeWeatherData,
-        current: {
-          ...completeWeatherData.current,
-          temp: 110,
+      const weatherData = createMockWeatherData({
+        temp: {
+          current: 110,
+          feels_like: 115,
+          min: 95,
+          max: 115,
         },
-        daily: [
-          {
-            ...completeWeatherData.daily[0],
-            temp: {
-              ...completeWeatherData.daily[0].temp,
-              max: 115,
-            },
-          },
-        ],
-      };
+      });
 
       const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
 
@@ -613,24 +317,12 @@ describe('buildOutfitPrompt', () => {
       expect(prompt).toContain("going to a friend's birthday party @ 6pm");
     });
 
-    it('should handle all weather data missing', () => {
-      const weatherData: WeatherData = {
-        lat: 0,
-        lon: 0,
-        timezone: 'UTC',
-        current: {} as any,
-        daily: [],
-      };
+    it('should include location name when available', () => {
+      const weatherData = createMockWeatherData({ name: 'San Francisco' });
 
       const prompt = buildOutfitPrompt(defaultUserPrefs, weatherData, 'imperial');
 
-      expect(prompt).toContain('Current Temperature: N/A');
-      expect(prompt).toContain('Feels like: N/A');
-      expect(prompt).toContain("Today's High: N/A");
-      expect(prompt).toContain("Today's Low: N/A");
-      expect(prompt).toContain('Chance of Rain: 0%');
-      expect(prompt).toContain('UV Index: 0');
-      expect(prompt).toContain('Conditions: unknown conditions');
+      expect(prompt).toContain('Location: San Francisco');
     });
   });
 });

@@ -21,65 +21,16 @@ import { generateOutfitRecommendation } from '@/services/gemini-service';
 import { parseOutfitJSON } from '@/utils/outfit-parser';
 import { capitalizeAllWords } from '@/utils/strings';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
-import { WeatherData } from '@/services/openweathermap-service';
+import { WeatherData } from '@/types/weather';
+import { createMockWeatherData, createMockForecastResponse } from '../test-helpers';
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Sample weather data for testing
-const mockWeatherData: WeatherData = {
-  lat: 40.7128,
-  lon: -74.006,
-  timezone: 'America/New_York',
-  current: {
-    dt: 1700000000,
-    temp: 72,
-    feels_like: 70,
-    humidity: 65,
-    uvi: 5,
-    wind_speed: 10,
-    weather: [
-      {
-        id: 800,
-        main: 'Clear',
-        description: 'clear sky',
-        icon: '01d',
-      },
-    ],
-  },
-  daily: [
-    {
-      dt: 1700000000,
-      sunrise: 1699960000,
-      sunset: 1699997000,
-      temp: {
-        min: 65,
-        max: 75,
-        day: 72,
-        night: 67,
-        eve: 70,
-        morn: 66,
-      },
-      feels_like: {
-        day: 70,
-        night: 65,
-        eve: 68,
-        morn: 64,
-      },
-      humidity: 65,
-      wind_speed: 10,
-      weather: [
-        {
-          id: 800,
-          main: 'Clear',
-          description: 'clear sky',
-          icon: '01d',
-        },
-      ],
-      pop: 0.1,
-      uvi: 5,
-    },
-  ],
-};
+// Sample weather data for testing (using new 5-day/3-hour forecast structure)
+const mockWeatherData: WeatherData = createMockWeatherData();
+
+// Mock forecast API response for axios mock
+const mockForecastResponse = createMockForecastResponse();
 
 describe('Release Tests - Critical User Paths', () => {
   beforeEach(() => {
@@ -95,13 +46,15 @@ describe('Release Tests - Critical User Paths', () => {
     it('should persist style and temperature preferences across sessions', async () => {
       // Arrange - Mock AsyncStorage to simulate persistence
       const mockStorage: Record<string, string> = {};
-      (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) =>
-        Promise.resolve(mockStorage[key] || null)
+      (AsyncStorage.getItem as jest.MockedFunction<typeof AsyncStorage.getItem>).mockImplementation(
+        (key) => Promise.resolve(mockStorage[key] || null)
       );
-      (AsyncStorage.setItem as jest.Mock).mockImplementation((key: string, value: string) => {
-        mockStorage[key] = value;
-        return Promise.resolve();
-      });
+      (AsyncStorage.setItem as jest.MockedFunction<typeof AsyncStorage.setItem>).mockImplementation(
+        (key, value) => {
+          mockStorage[key] = value;
+          return Promise.resolve();
+        }
+      );
 
       // Act - Simulate saving preferences
       const preferences = {
@@ -125,7 +78,7 @@ describe('Release Tests - Critical User Paths', () => {
 
     it('should handle missing stored preferences gracefully', async () => {
       // Arrange - Mock empty storage
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.getItem as jest.MockedFunction<typeof AsyncStorage.getItem>).mockResolvedValue(null);
 
       // Act - Try to retrieve preferences
       const storedData = await AsyncStorage.getItem('sundressed-storage');
@@ -137,7 +90,7 @@ describe('Release Tests - Critical User Paths', () => {
 
     it('should handle corrupted stored data gracefully', async () => {
       // Arrange - Mock corrupted JSON data
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('invalid-json{{{');
+      (AsyncStorage.getItem as jest.MockedFunction<typeof AsyncStorage.getItem>).mockResolvedValue('invalid-json{{{');
 
       // Act - Try to parse corrupted data
       const storedData = await AsyncStorage.getItem('sundressed-storage');
@@ -159,17 +112,17 @@ describe('Release Tests - Critical User Paths', () => {
   describe('Weather Integration', () => {
     it('should fetch weather data successfully with valid API key', async () => {
       // Arrange
-      mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
+      mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
       // Act
       const result = await fetchWeatherData(40.7128, -74.006, 'imperial');
 
-      // Assert
-      expect(result.data).toEqual(mockWeatherData);
-      expect(result.data.current.temp).toBe(72);
-      expect(result.data.current.weather[0].description).toBe('clear sky');
+      // Assert - fetchWeatherData now returns WeatherData directly
+      expect(result).toBeDefined();
+      expect(result.temp.current).toBe(72);
+      expect(result.description).toBe('clear sky');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringContaining('api.openweathermap.org')
+        expect.stringContaining('api.openweathermap.org/data/2.5/forecast')
       );
     });
 
@@ -195,7 +148,7 @@ describe('Release Tests - Critical User Paths', () => {
 
     it('should use correct temperature units in API request', async () => {
       // Arrange
-      mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
+      mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
       // Act - Request metric units
       await fetchWeatherData(40.7128, -74.006, 'metric');
@@ -433,13 +386,12 @@ describe('Release Tests - Critical User Paths', () => {
       // Act
       const prompt = buildOutfitPrompt(userPrefs, mockWeatherData, 'imperial');
 
-      // Assert - Verify all critical data is included
+      // Assert - Verify all critical data is included (new structure)
       expect(prompt).toContain('72°F'); // Current temp
-      expect(prompt).toContain('Feels like: 70°F');
+      expect(prompt).toContain('Feels like: 68°F');
       expect(prompt).toContain("Today's High: 75°F");
-      expect(prompt).toContain("Today's Low: 65°F");
-      expect(prompt).toContain('Chance of Rain: 10%');
-      expect(prompt).toContain('UV Index: 5');
+      expect(prompt).toContain("Today's Low: 60°F");
+      expect(prompt).toContain('Chance of Rain: 30%');
       expect(prompt).toContain('clear sky');
       expect(prompt).toContain('masculine');
       expect(prompt).toContain('outdoor hiking');
@@ -455,26 +407,6 @@ describe('Release Tests - Critical User Paths', () => {
       // Assert
       expect(prompt).toContain('°C');
       expect(prompt).not.toContain('°F');
-    });
-
-    it('should handle missing weather data fields gracefully', () => {
-      // Arrange - Weather data with missing optional fields
-      const incompleteWeather: WeatherData = {
-        ...mockWeatherData,
-        current: {
-          ...mockWeatherData.current,
-          weather: [],
-        },
-      };
-      const userPrefs = { style: 'feminine' as const, activity: '' };
-
-      // Act
-      const prompt = buildOutfitPrompt(userPrefs, incompleteWeather, 'imperial');
-
-      // Assert - Should still generate a valid prompt
-      expect(prompt).toContain('WEATHER CONDITIONS');
-      expect(prompt).toContain('USER PREFERENCES');
-      expect(prompt).toContain('unknown conditions');
     });
 
     it('should include default activity when not specified', () => {
@@ -547,8 +479,8 @@ describe('Release Tests - Critical User Paths', () => {
   describe('End-to-End Critical Path', () => {
     it('should complete full outfit generation workflow', async () => {
       // Arrange - Setup complete workflow
-      // 1. Mock weather API
-      mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
+      // 1. Mock weather API (5-day/3-hour forecast)
+      mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
       // 2. Mock Gemini API
       const mockOutfitResponse = {
@@ -589,17 +521,17 @@ describe('Release Tests - Critical User Paths', () => {
       };
 
       // Act - Execute full workflow
-      // Step 1: Fetch weather
+      // Step 1: Fetch weather (now returns WeatherData directly)
       const weatherResult = await fetchWeatherData(40.7128, -74.006, 'imperial');
 
       // Step 2: Build prompt
-      const prompt = buildOutfitPrompt(userPrefs, weatherResult.data, 'imperial');
+      const prompt = buildOutfitPrompt(userPrefs, weatherResult, 'imperial');
 
       // Step 3: Generate outfit
       const outfitResult = await generateOutfitRecommendation(prompt);
 
       // Assert - Verify complete workflow
-      expect(weatherResult.data.current.temp).toBe(72);
+      expect(weatherResult.temp.current).toBe(72);
       expect(prompt).toContain('masculine');
       expect(prompt).toContain('casual brunch');
       expect(outfitResult.recommendation.items).toHaveLength(2);
@@ -619,17 +551,17 @@ describe('Release Tests - Critical User Paths', () => {
 
     it('should handle workflow failure at outfit generation gracefully', async () => {
       // Arrange - Weather succeeds, but Gemini fails
-      mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
+      mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
       mockedAxios.post.mockRejectedValue(new Error('Gemini service timeout'));
 
       const userPrefs = { style: 'neutral' as const, activity: '' };
 
-      // Act - Get weather successfully
+      // Act - Get weather successfully (now returns WeatherData directly)
       const weatherResult = await fetchWeatherData(40.7128, -74.006, 'imperial');
-      const prompt = buildOutfitPrompt(userPrefs, weatherResult.data, 'imperial');
+      const prompt = buildOutfitPrompt(userPrefs, weatherResult, 'imperial');
 
       // Assert - Weather should succeed, outfit generation should fail
-      expect(weatherResult.data).toBeDefined();
+      expect(weatherResult).toBeDefined();
       await expect(
         generateOutfitRecommendation(prompt)
       ).rejects.toThrow('Gemini service timeout');
@@ -665,22 +597,6 @@ describe('Release Tests - Critical User Paths', () => {
       await expect(
         fetchWeatherData(40.7128, -74.006, 'imperial')
       ).rejects.toThrow('timeout');
-    });
-
-    it('should handle malformed API responses', async () => {
-      // Arrange - Mock response with unexpected structure
-      mockedAxios.get.mockResolvedValue({
-        data: {
-          unexpected: 'structure',
-        },
-      });
-
-      // Act
-      const result = await fetchWeatherData(40.7128, -74.006, 'imperial');
-
-      // Assert - Should return data even if structure is unexpected
-      expect(result.data).toBeDefined();
-      expect(result.data).toHaveProperty('unexpected');
     });
   });
 });

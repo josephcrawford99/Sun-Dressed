@@ -1,114 +1,53 @@
 /**
  * Unit tests for OpenWeatherMap Service
+ * Tests the 5-day/3-hour forecast API integration
  */
 
 import axios from 'axios';
-import {
-  fetchWeatherData,
-  EXCLUDED_FIELDS,
-  type WeatherData,
-  type WeatherFetchResult,
-} from '@/services/openweathermap-service';
+import { fetchWeatherData } from '@/services/openweathermap-service';
+import { createMockForecastResponse } from '../../test-helpers';
 
 // Mock axios
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+// Restore isAxiosError to work properly with mocked errors
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(mockedAxios as any).isAxiosError = (error: unknown) => {
+  return (error as Record<string, unknown>)?.isAxiosError === true;
+};
+
 describe('openweathermap-service', () => {
+  const mockForecastResponse = createMockForecastResponse();
+
   beforeEach(() => {
-    // Clear mocks before each test
     jest.clearAllMocks();
   });
 
   describe('fetchWeatherData', () => {
-    const mockWeatherData: WeatherData = {
-      lat: 40.7128,
-      lon: -74.006,
-      timezone: 'America/New_York',
-      current: {
-        dt: 1699876800,
-        temp: 72.5,
-        feels_like: 70.2,
-        humidity: 65,
-        uvi: 3.5,
-        wind_speed: 10.5,
-        wind_gust: 15.2,
-        weather: [
-          {
-            id: 800,
-            main: 'Clear',
-            description: 'clear sky',
-            icon: '01d',
-          },
-        ],
-      },
-      daily: [
-        {
-          dt: 1699876800,
-          sunrise: 1699876800,
-          sunset: 1699920000,
-          summary: 'Clear throughout the day',
-          temp: {
-            min: 60,
-            max: 75,
-            day: 72,
-            night: 62,
-            eve: 68,
-            morn: 65,
-          },
-          feels_like: {
-            day: 70,
-            night: 60,
-            eve: 66,
-            morn: 63,
-          },
-          humidity: 65,
-          wind_speed: 10.5,
-          wind_gust: 15.2,
-          weather: [
-            {
-              id: 800,
-              main: 'Clear',
-              description: 'clear sky',
-              icon: '01d',
-            },
-          ],
-          pop: 0.1,
-          uvi: 3.5,
-          rain: 0,
-        },
-      ],
-    };
-
     describe('API Key Validation', () => {
       it('should throw error when API key is missing', async () => {
-        // Arrange
         const originalValue = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
         delete process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
 
         try {
-          // Act & Assert
           await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
             'API key not configured. Please add EXPO_PUBLIC_OPENWEATHER_API_KEY to .env.local'
           );
         } finally {
-          // Restore
           process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = originalValue;
         }
       });
 
       it('should throw error when API key is empty string', async () => {
-        // Arrange
         const originalValue = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
         process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = '';
 
         try {
-          // Act & Assert
           await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
             'API key not configured. Please add EXPO_PUBLIC_OPENWEATHER_API_KEY to .env.local'
           );
         } finally {
-          // Restore
           process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = originalValue;
         }
       });
@@ -126,88 +65,59 @@ describe('openweathermap-service', () => {
       });
 
       it('should fetch weather data successfully with default imperial units', async () => {
-        // Arrange
         const latitude = 40.7128;
         const longitude = -74.006;
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
-        const result: WeatherFetchResult = await fetchWeatherData(latitude, longitude);
+        const result = await fetchWeatherData(latitude, longitude);
 
-        // Assert
-        expect(result.data).toEqual(mockWeatherData);
-        expect(result.rawJson).toBe(JSON.stringify(mockWeatherData, null, 2));
+        expect(result).toBeDefined();
+        expect(result.lat).toBe(40.7128);
+        expect(result.lon).toBe(-74.006);
+        expect(result.name).toBe('New York');
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-          `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=test-api-key-12345&units=imperial&exclude=${EXCLUDED_FIELDS}`
+          expect.stringContaining('api.openweathermap.org/data/2.5/forecast')
         );
       });
 
       it('should fetch weather data successfully with metric units', async () => {
-        // Arrange
         const latitude = 51.5074;
         const longitude = -0.1278;
-        const metricWeatherData = { ...mockWeatherData, lat: latitude, lon: longitude };
-        mockedAxios.get.mockResolvedValue({ data: metricWeatherData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
-        const result: WeatherFetchResult = await fetchWeatherData(latitude, longitude, 'metric');
+        const result = await fetchWeatherData(latitude, longitude, 'metric');
 
-        // Assert
-        expect(result.data).toEqual(metricWeatherData);
-        expect(result.rawJson).toBe(JSON.stringify(metricWeatherData, null, 2));
-        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(result).toBeDefined();
         expect(mockedAxios.get).toHaveBeenCalledWith(
-          `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=test-api-key-12345&units=metric&exclude=${EXCLUDED_FIELDS}`
+          expect.stringContaining('units=metric')
         );
       });
 
       it('should fetch weather data successfully with imperial units explicitly', async () => {
-        // Arrange
         const latitude = 34.0522;
         const longitude = -118.2437;
-        const imperialWeatherData = { ...mockWeatherData, lat: latitude, lon: longitude };
-        mockedAxios.get.mockResolvedValue({ data: imperialWeatherData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
-        const result: WeatherFetchResult = await fetchWeatherData(latitude, longitude, 'imperial');
+        const result = await fetchWeatherData(latitude, longitude, 'imperial');
 
-        // Assert
-        expect(result.data).toEqual(imperialWeatherData);
+        expect(result).toBeDefined();
         expect(mockedAxios.get).toHaveBeenCalledWith(
-          `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=test-api-key-12345&units=imperial&exclude=${EXCLUDED_FIELDS}`
+          expect.stringContaining('units=imperial')
         );
       });
 
       it('should handle negative coordinates correctly', async () => {
-        // Arrange
         const latitude = -33.8688;
         const longitude = 151.2093;
-        const sydneyWeatherData = { ...mockWeatherData, lat: latitude, lon: longitude };
-        mockedAxios.get.mockResolvedValue({ data: sydneyWeatherData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
-        const result: WeatherFetchResult = await fetchWeatherData(latitude, longitude);
+        const result = await fetchWeatherData(latitude, longitude);
 
-        // Assert
-        expect(result.data).toEqual(sydneyWeatherData);
+        expect(result).toBeDefined();
         expect(mockedAxios.get).toHaveBeenCalledWith(
-          `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=test-api-key-12345&units=imperial&exclude=${EXCLUDED_FIELDS}`
+          expect.stringContaining(`lat=${latitude}&lon=${longitude}`)
         );
-      });
-
-      it('should return properly formatted raw JSON string', async () => {
-        // Arrange
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
-
-        // Act
-        const result: WeatherFetchResult = await fetchWeatherData(40.7128, -74.006);
-
-        // Assert
-        const parsedRawJson = JSON.parse(result.rawJson);
-        expect(parsedRawJson).toEqual(mockWeatherData);
-        expect(result.rawJson).toContain('\n'); // Should be formatted with newlines
-        expect(result.rawJson.split('\n').length).toBeGreaterThan(1); // Multiple lines
       });
     });
 
@@ -216,7 +126,7 @@ describe('openweathermap-service', () => {
 
       beforeEach(() => {
         process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = 'test-api-key-12345';
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
       });
 
       afterEach(() => {
@@ -224,39 +134,110 @@ describe('openweathermap-service', () => {
       });
 
       it('should construct correct URL with all required parameters', async () => {
-        // Arrange
         const latitude = 40.7128;
         const longitude = -74.006;
 
-        // Act
         await fetchWeatherData(latitude, longitude);
 
-        // Assert
         const calledUrl = mockedAxios.get.mock.calls[0][0];
-        expect(calledUrl).toContain('https://api.openweathermap.org/data/3.0/onecall');
+        expect(calledUrl).toContain('https://api.openweathermap.org/data/2.5/forecast');
         expect(calledUrl).toContain(`lat=${latitude}`);
         expect(calledUrl).toContain(`lon=${longitude}`);
         expect(calledUrl).toContain('appid=test-api-key-12345');
         expect(calledUrl).toContain('units=imperial');
-        expect(calledUrl).toContain(`exclude=${EXCLUDED_FIELDS}`);
+        expect(calledUrl).toContain('cnt=8');
       });
 
-      it('should exclude minutely, hourly, and alerts from response', async () => {
-        // Act
+      it('should use cnt=8 to get 24 hours of forecast data', async () => {
         await fetchWeatherData(40.7128, -74.006);
 
-        // Assert
         const calledUrl = mockedAxios.get.mock.calls[0][0];
-        expect(calledUrl).toContain('exclude=minutely,hourly,alerts');
+        expect(calledUrl).toContain('cnt=8');
       });
 
-      it('should use correct API endpoint version 3.0', async () => {
-        // Act
+      it('should use correct API endpoint version 2.5 forecast', async () => {
         await fetchWeatherData(40.7128, -74.006);
 
-        // Assert
         const calledUrl = mockedAxios.get.mock.calls[0][0];
-        expect(calledUrl).toContain('/data/3.0/onecall');
+        expect(calledUrl).toContain('/data/2.5/forecast');
+      });
+    });
+
+    describe('Response Transformation', () => {
+      const originalValue = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
+
+      beforeEach(() => {
+        process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = 'test-api-key-12345';
+      });
+
+      afterEach(() => {
+        process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = originalValue;
+      });
+
+      it('should transform forecast response to WeatherData correctly', async () => {
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
+
+        const result = await fetchWeatherData(40.7128, -74.006);
+
+        // Check transformed data
+        expect(result.lat).toBe(40.7128);
+        expect(result.lon).toBe(-74.006);
+        expect(result.name).toBe('New York');
+        expect(result.temp.current).toBe(72); // First chunk's temp
+        expect(result.temp.feels_like).toBe(68); // First chunk's feels_like
+        expect(result.description).toBe('clear sky'); // First chunk's description
+        expect(result.icon).toBe('01d'); // First chunk's icon
+      });
+
+      it('should calculate min temp from all chunks', async () => {
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
+
+        const result = await fetchWeatherData(40.7128, -74.006);
+
+        // Min temp from mock data is 58 (from chunk 7)
+        expect(result.temp.min).toBe(58);
+      });
+
+      it('should calculate max temp from all chunks', async () => {
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
+
+        const result = await fetchWeatherData(40.7128, -74.006);
+
+        // Max temp from mock data is 75 (from chunk 2)
+        expect(result.temp.max).toBe(75);
+      });
+
+      it('should calculate max pop from all chunks', async () => {
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
+
+        const result = await fetchWeatherData(40.7128, -74.006);
+
+        // Max pop from mock data is 0.15 (from chunk 3)
+        expect(result.pop).toBe(0.15);
+      });
+
+      it('should use wind data from first chunk', async () => {
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
+
+        const result = await fetchWeatherData(40.7128, -74.006);
+
+        expect(result.wind.speed).toBe(10);
+        expect(result.wind.gust).toBe(15);
+      });
+
+      it('should handle missing wind gust', async () => {
+        const responseWithNoGust = {
+          ...mockForecastResponse,
+          list: mockForecastResponse.list.map((item, i) =>
+            i === 0 ? { ...item, wind: { speed: 10, deg: 180 } } : item
+          ),
+        };
+        mockedAxios.get.mockResolvedValue({ data: responseWithNoGust });
+
+        const result = await fetchWeatherData(40.7128, -74.006);
+
+        expect(result.wind.speed).toBe(10);
+        expect(result.wind.gust).toBeUndefined();
       });
     });
 
@@ -271,76 +252,66 @@ describe('openweathermap-service', () => {
         process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = originalValue;
       });
 
-      it('should throw error when network request fails', async () => {
-        // Arrange
-        const networkError = new Error('Network Error');
-        mockedAxios.get.mockRejectedValue(networkError);
+      it('should throw user-friendly error for 503 Service Unavailable', async () => {
+        const error: any = new Error('Request failed');
+        error.isAxiosError = true;
+        error.response = { status: 503, statusText: 'Service Unavailable' };
+        mockedAxios.get.mockRejectedValue(error);
 
-        // Act & Assert
-        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow('Network Error');
+        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
+          'Weather service unavailable (503). Please try again later.'
+        );
       });
 
-      it('should throw error when API returns 401 Unauthorized', async () => {
-        // Arrange
-        const apiError = Object.assign(new Error('Request failed with status code 401'), {
-          response: {
-            status: 401,
-            data: { message: 'Invalid API key' },
-          },
-        });
-        mockedAxios.get.mockRejectedValue(apiError);
+      it('should throw user-friendly error for 401 Unauthorized', async () => {
+        const error: any = new Error('Request failed');
+        error.isAxiosError = true;
+        error.response = { status: 401, statusText: 'Unauthorized' };
+        mockedAxios.get.mockRejectedValue(error);
 
-        // Act & Assert
-        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow();
+        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
+          'Weather API key authentication failed.'
+        );
       });
 
-      it('should throw error when API returns 404 Not Found', async () => {
-        // Arrange
-        const apiError = Object.assign(new Error('Request failed with status code 404'), {
-          response: {
-            status: 404,
-            data: { message: 'City not found' },
-          },
-        });
-        mockedAxios.get.mockRejectedValue(apiError);
+      it('should throw user-friendly error for 429 Rate Limit', async () => {
+        const error: any = new Error('Request failed');
+        error.isAxiosError = true;
+        error.response = { status: 429, statusText: 'Too Many Requests' };
+        mockedAxios.get.mockRejectedValue(error);
 
-        // Act & Assert
-        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow();
+        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
+          'Weather API rate limit exceeded. Please try again later.'
+        );
       });
 
-      it('should throw error when API returns 500 Internal Server Error', async () => {
-        // Arrange
-        const apiError = Object.assign(new Error('Request failed with status code 500'), {
-          response: {
-            status: 500,
-            data: { message: 'Internal server error' },
-          },
-        });
-        mockedAxios.get.mockRejectedValue(apiError);
+      it('should throw error with status code for other API errors', async () => {
+        const error: any = new Error('Request failed');
+        error.isAxiosError = true;
+        error.response = { status: 500, statusText: 'Internal Server Error' };
+        mockedAxios.get.mockRejectedValue(error);
 
-        // Act & Assert
-        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow();
+        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
+          'Weather API error (500): Internal Server Error'
+        );
       });
 
-      it('should throw error when request times out', async () => {
-        // Arrange
-        const timeoutError = new Error('timeout of 10000ms exceeded');
-        timeoutError.name = 'ECONNABORTED';
-        mockedAxios.get.mockRejectedValue(timeoutError);
+      it('should throw network error message when request fails', async () => {
+        const error: any = new Error('Network Error');
+        error.isAxiosError = true;
+        error.request = {}; // No response means network error
+        mockedAxios.get.mockRejectedValue(error);
 
-        // Act & Assert
-        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow('timeout of 10000ms exceeded');
+        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow(
+          'Network error: Unable to reach weather service. Check your connection.'
+        );
       });
 
-      it('should throw error when response data is malformed', async () => {
-        // Arrange
-        mockedAxios.get.mockResolvedValue({ data: null });
+      it('should rethrow non-axios errors', async () => {
+        const error = new Error('Unexpected error');
+        mockedAxios.get.mockRejectedValue(error);
 
-        // Act
-        const result = await fetchWeatherData(40.7128, -74.006);
-
-        // Assert - should still return result even with null data
-        expect(result.data).toBeNull();
+        await expect(fetchWeatherData(40.7128, -74.006)).rejects.toThrow('Unexpected error');
       });
     });
 
@@ -356,136 +327,44 @@ describe('openweathermap-service', () => {
       });
 
       it('should handle coordinates at equator (0, 0)', async () => {
-        // Arrange
-        const equatorData = { ...mockWeatherData, lat: 0, lon: 0 };
-        mockedAxios.get.mockResolvedValue({ data: equatorData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
         const result = await fetchWeatherData(0, 0);
 
-        // Assert
-        expect(result.data).toEqual(equatorData);
+        expect(result).toBeDefined();
         expect(mockedAxios.get).toHaveBeenCalledWith(
           expect.stringContaining('lat=0&lon=0')
         );
       });
 
       it('should handle extreme northern coordinates', async () => {
-        // Arrange
-        const arcticData = { ...mockWeatherData, lat: 89.9, lon: 0 };
-        mockedAxios.get.mockResolvedValue({ data: arcticData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
         const result = await fetchWeatherData(89.9, 0);
 
-        // Assert
-        expect(result.data).toEqual(arcticData);
+        expect(result).toBeDefined();
       });
 
       it('should handle extreme southern coordinates', async () => {
-        // Arrange
-        const antarcticData = { ...mockWeatherData, lat: -89.9, lon: 0 };
-        mockedAxios.get.mockResolvedValue({ data: antarcticData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
         const result = await fetchWeatherData(-89.9, 0);
 
-        // Assert
-        expect(result.data).toEqual(antarcticData);
+        expect(result).toBeDefined();
       });
 
       it('should handle decimal coordinates with high precision', async () => {
-        // Arrange
         const latitude = 40.712776;
         const longitude = -74.005974;
-        const preciseData = { ...mockWeatherData, lat: latitude, lon: longitude };
-        mockedAxios.get.mockResolvedValue({ data: preciseData });
+        mockedAxios.get.mockResolvedValue({ data: mockForecastResponse });
 
-        // Act
         const result = await fetchWeatherData(latitude, longitude);
 
-        // Assert
-        expect(result.data).toEqual(preciseData);
+        expect(result).toBeDefined();
         expect(mockedAxios.get).toHaveBeenCalledWith(
           expect.stringContaining(`lat=${latitude}&lon=${longitude}`)
         );
       });
-    });
-
-    describe('Response Data Structure', () => {
-      const originalValue = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
-
-      beforeEach(() => {
-        process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = 'test-api-key-12345';
-      });
-
-      afterEach(() => {
-        process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY = originalValue;
-      });
-
-      it('should return WeatherFetchResult with correct structure', async () => {
-        // Arrange
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
-
-        // Act
-        const result = await fetchWeatherData(40.7128, -74.006);
-
-        // Assert
-        expect(result).toHaveProperty('data');
-        expect(result).toHaveProperty('rawJson');
-        expect(typeof result.rawJson).toBe('string');
-      });
-
-      it('should return weather data with current conditions', async () => {
-        // Arrange
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
-
-        // Act
-        const result = await fetchWeatherData(40.7128, -74.006);
-
-        // Assert
-        expect(result.data.current).toBeDefined();
-        expect(result.data.current.temp).toBe(72.5);
-        expect(result.data.current.feels_like).toBe(70.2);
-        expect(result.data.current.humidity).toBe(65);
-        expect(result.data.current.uvi).toBe(3.5);
-        expect(result.data.current.wind_speed).toBe(10.5);
-      });
-
-      it('should return weather data with daily forecast', async () => {
-        // Arrange
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
-
-        // Act
-        const result = await fetchWeatherData(40.7128, -74.006);
-
-        // Assert
-        expect(result.data.daily).toBeDefined();
-        expect(Array.isArray(result.data.daily)).toBe(true);
-        expect(result.data.daily.length).toBeGreaterThan(0);
-        expect(result.data.daily[0].temp).toBeDefined();
-        expect(result.data.daily[0].weather).toBeDefined();
-      });
-
-      it('should return weather data with location information', async () => {
-        // Arrange
-        mockedAxios.get.mockResolvedValue({ data: mockWeatherData });
-
-        // Act
-        const result = await fetchWeatherData(40.7128, -74.006);
-
-        // Assert
-        expect(result.data.lat).toBe(40.7128);
-        expect(result.data.lon).toBe(-74.006);
-        expect(result.data.timezone).toBe('America/New_York');
-      });
-    });
-  });
-
-  describe('EXCLUDED_FIELDS constant', () => {
-    it('should have correct excluded fields', () => {
-      // Assert
-      expect(EXCLUDED_FIELDS).toBe('minutely,hourly,alerts');
     });
   });
 });

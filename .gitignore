@@ -46,7 +46,7 @@ CLAUDE.md
 claude.*
 .claude/
 .vscode/
-
+joey.*
 # app submission checklist
 APP_SUBMISSION_CHECKLIST.md
 coverage/

@@ -10,22 +10,18 @@ import { useStore } from '@/store/store';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
 import { useQueryClient } from '@tanstack/react-query';
 import { OutfitGenerationResult } from '@/services/gemini-service';
-import { Weather30Result, Weather25Result } from '@/services/openweathermap-service';
+import { getDebugRawForecast } from '@/services/openweathermap-service';
 
 export default function DebugScreen() {
-  const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
+  const { data: weather, isLoading: weatherLoading, error: weatherError, dataUpdatedAt } = useWeather();
 
   // Get user preferences from store
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
 
-  // Access React Query cache to get full weather API results (includes raw data)
-  const queryClient = useQueryClient();
-  const weather30State = queryClient.getQueryState<Weather30Result>(['weather-3.0', tempFormat]);
-  const weather25State = queryClient.getQueryState<Weather25Result>(['weather-2.5', tempFormat]);
-
   // Access mutation cache to get last outfit data
+  const queryClient = useQueryClient();
   const mutationCache = queryClient.getMutationCache();
   const mutations = mutationCache.findAll({ mutationKey: ['outfit-generation'] });
   const lastMutation = mutations[mutations.length - 1];
@@ -40,9 +36,8 @@ export default function DebugScreen() {
   // Collapsible state
   const [expanded, setExpanded] = useState({
     preferences: true,
-    weather30: false,
-    weather25: false,
-    weatherMerged: false,
+    rawForecast: false,
+    weatherData: false,
     prompt: true,
     outfit: true,
   });
@@ -50,6 +45,9 @@ export default function DebugScreen() {
   const toggleSection = (section: keyof typeof expanded) => {
     setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
   };
+
+  // Get raw forecast data for debug display
+  const rawForecast = getDebugRawForecast();
 
   return (
     <ThemedBackground style={styles.container}>
@@ -78,94 +76,43 @@ export default function DebugScreen() {
           )}
         </ThemedView>
 
-        {/* Weather 3.0 API Section */}
+        {/* Raw Forecast API Response */}
         <ThemedView style={styles.section}>
-          <Pressable onPress={() => toggleSection('weather30')}>
+          <Pressable onPress={() => toggleSection('rawForecast')}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              {expanded.weather30 ? '▼' : '▶'} Weather 3.0 API (12hr stale)
+              {expanded.rawForecast ? '▼' : '▶'} Raw API Response (5-day/3-hour)
             </ThemedText>
           </Pressable>
-          {expanded.weather30 ? (
+          {expanded.rawForecast && (
             <>
-              {weather30State?.dataUpdatedAt ? (
+              {dataUpdatedAt ? (
                 <ThemedText style={styles.infoText}>
-                  Last updated: {new Date(weather30State.dataUpdatedAt).toLocaleString()}
+                  Last updated: {new Date(dataUpdatedAt).toLocaleString()}
                 </ThemedText>
               ) : null}
-              {weather30State?.data?.raw?.daily?.[0]?.dt ? (
-                <ThemedText style={styles.infoText}>
-                  Daily[0] Date: {new Date(weather30State.data.raw.daily[0].dt * 1000).toLocaleDateString()} {new Date(weather30State.data.raw.daily[0].dt * 1000).toLocaleTimeString()}
-                </ThemedText>
-              ) : null}
-              {weather30State?.data?.raw ? (
+              {rawForecast ? (
                 <ThemedCard variant="data">
                   <ThemedText style={styles.jsonText}>
-                    {JSON.stringify(weather30State.data.raw, null, 2)}
+                    {JSON.stringify(rawForecast, null, 2)}
                   </ThemedText>
                 </ThemedCard>
               ) : (
                 <ThemedText style={styles.infoText}>
-                  3.0 API data not yet loaded
+                  API data not yet loaded
                 </ThemedText>
               )}
             </>
-          ) : null}
+          )}
         </ThemedView>
 
-        {/* Weather 2.5 API Section */}
+        {/* Transformed Weather Data */}
         <ThemedView style={styles.section}>
-          <Pressable onPress={() => toggleSection('weather25')}>
+          <Pressable onPress={() => toggleSection('weatherData')}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              {expanded.weather25 ? '▼' : '▶'} Weather 2.5 API (5min stale)
+              {expanded.weatherData ? '▼' : '▶'} Transformed Weather Data
             </ThemedText>
           </Pressable>
-          {expanded.weather25 ? (
-            <>
-              {weather25State?.dataUpdatedAt ? (
-                <ThemedText style={styles.infoText}>
-                  Last updated: {new Date(weather25State.dataUpdatedAt).toLocaleString()}
-                </ThemedText>
-              ) : null}
-              {weather25State?.data?.raw ? (
-                <>
-                  <ThemedText style={styles.infoText}>Current Weather (/weather):</ThemedText>
-                  <ThemedCard variant="data">
-                    <ThemedText style={styles.jsonText}>
-                      {JSON.stringify(weather25State.data.raw.current, null, 2)}
-                    </ThemedText>
-                  </ThemedCard>
-                  {weather25State.data.raw.forecast ? (
-                    <>
-                      <ThemedText style={[styles.infoText, { marginTop: 12 }]}>Forecast (/forecast):</ThemedText>
-                      <ThemedCard variant="data">
-                        <ThemedText style={styles.jsonText}>
-                          {JSON.stringify(weather25State.data.raw.forecast, null, 2)}
-                        </ThemedText>
-                      </ThemedCard>
-                    </>
-                  ) : (
-                    <ThemedText style={[styles.infoText, { marginTop: 12 }]}>
-                      Forecast endpoint disabled (not needed - 3.0 provides better daily data)
-                    </ThemedText>
-                  )}
-                </>
-              ) : (
-                <ThemedText style={styles.infoText}>
-                  2.5 API data not yet loaded
-                </ThemedText>
-              )}
-            </>
-          ) : null}
-        </ThemedView>
-
-        {/* Merged Weather Data Section */}
-        <ThemedView style={styles.section}>
-          <Pressable onPress={() => toggleSection('weatherMerged')}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              {expanded.weatherMerged ? '▼' : '▶'} Merged Weather Data (Synthesis)
-            </ThemedText>
-          </Pressable>
-          {expanded.weatherMerged ? (
+          {expanded.weatherData && (
             <>
               {weatherLoading ? (
                 <ThemedText style={styles.infoText}>Loading weather data...</ThemedText>
@@ -178,7 +125,7 @@ export default function DebugScreen() {
               {weather ? (
                 <>
                   <ThemedText style={styles.infoText}>
-                    Strategy: Current conditions from 2.5 (fresher), UV + daily from 3.0 (comprehensive)
+                    Uses 5-day/3-hour forecast API with cnt=8 (24 hours)
                   </ThemedText>
                   <ThemedCard variant="data">
                     <ThemedText style={styles.jsonText}>
@@ -188,7 +135,7 @@ export default function DebugScreen() {
                 </>
               ) : null}
             </>
-          ) : null}
+          )}
         </ThemedView>
 
         {/* Gemini API - Prompt Section */}

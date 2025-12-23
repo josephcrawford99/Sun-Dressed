@@ -16,13 +16,13 @@ export default function WeatherScreen() {
 
     const queryClient = useQueryClient();
 
-    // Check if the 2.5 query is currently fetching
-    const isFetching25 = useIsFetching({ queryKey: ['weather-2.5', tempFormat] }) > 0;
+    // Check if the weather query is currently fetching
+    const isFetching = useIsFetching({ queryKey: ['weather', tempFormat] }) > 0;
 
-    // Pull-to-refresh handler - only invalidates the 2.5 API query
+    // Pull-to-refresh handler
     const onRefresh = async () => {
         await queryClient.invalidateQueries({
-            queryKey: ['weather-2.5', tempFormat]
+            queryKey: ['weather', tempFormat]
         });
     };
 
@@ -33,7 +33,7 @@ export default function WeatherScreen() {
                 stickyHeaderIndices={[0]}
                 contentContainerStyle={{ flexGrow: 1 }}
                 refreshControl={
-                    <RefreshControl refreshing={isFetching25} onRefresh={onRefresh} />
+                    <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
                 }
             >
                 <ThemedView style={styles.titleContainer}>
@@ -108,13 +108,6 @@ export default function WeatherScreen() {
                             )}
                         </Section>
 
-                        {weather.uvi !== undefined && (
-                            <Section title="UV Index">
-                                <ThemedText style={styles.dataText}>
-                                    UV Index: {Math.round(weather.uvi)}
-                                </ThemedText>
-                            </Section>
-                        )}
                     </>
                 )}
                 </ThemedView>

@@ -1,6 +1,7 @@
 import { getItemsList } from '@/constants/clothing-icons';
-import { TempFormat, WeatherData } from '@/services/openweathermap-service';
+import { TempFormat } from '@/services/openweathermap-service';
 import { OutfitStyle } from '@/types/outfit';
+import { WeatherData } from '@/types/weather';
 
 /**
  * User preferences for outfit generation
@@ -14,7 +15,7 @@ export interface UserPreferences {
  * Builds a structured prompt for outfit recommendation based on user preferences and weather data
  *
  * @param userPrefs - User's style preferences and planned activity
- * @param weatherData - Current weather data including temperature, forecast, UV index, etc.
+ * @param weatherData - Current weather data including temperature, forecast, etc.
  * @param tempFormat - Temperature format to use in the prompt ('metric' or 'imperial')
  * @returns Structured prompt string to send to Gemini API
  */
@@ -50,11 +51,6 @@ export function buildOutfitPrompt(userPrefs: UserPreferences, weatherData: Weath
   // Only add Wind Gust if available
   if (weatherData.wind.gust !== undefined) {
     weatherConditions.push(`- Wind Gust: ${Math.round(weatherData.wind.gust)} ${windSpeedUnit}`);
-  }
-
-  // Only add UV Index if available
-  if (weatherData.uvi !== undefined) {
-    weatherConditions.push(`- UV Index: ${Math.round(weatherData.uvi)}`);
   }
 
   weatherConditions.push(`- Conditions: ${weatherDescription}`);

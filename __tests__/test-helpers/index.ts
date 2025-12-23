@@ -5,7 +5,7 @@
  * and resilient to feature changes.
  */
 
-import { WeatherData } from '@/services/openweathermap-service';
+import { WeatherData } from '@/types/weather';
 import { Outfit, ClothingItem } from '@/types/outfit';
 
 /**
@@ -16,56 +16,20 @@ export function createMockWeatherData(overrides?: Partial<WeatherData>): Weather
   return {
     lat: 40.7128,
     lon: -74.006,
-    timezone: 'America/New_York',
-    current: {
-      dt: 1699000000,
-      temp: 72,
+    name: 'New York',
+    temp: {
+      current: 72,
+      min: 60,
+      max: 75,
       feels_like: 68,
-      humidity: 65,
-      uvi: 5,
-      wind_speed: 10,
-      weather: [
-        {
-          id: 800,
-          main: 'Clear',
-          description: 'clear sky',
-          icon: '01d',
-        },
-      ],
     },
-    daily: [
-      {
-        dt: 1699000000,
-        sunrise: 1698998000,
-        sunset: 1699038000,
-        temp: {
-          min: 60,
-          max: 75,
-          day: 70,
-          night: 62,
-          eve: 68,
-          morn: 61,
-        },
-        feels_like: {
-          day: 68,
-          night: 60,
-          eve: 66,
-          morn: 59,
-        },
-        humidity: 65,
-        wind_speed: 10,
-        weather: [
-          {
-            id: 800,
-            main: 'Clear',
-            description: 'clear sky',
-            icon: '01d',
-          },
-        ],
-        pop: 0.3,
-        uvi: 6,
-      },
-    ],
+    pop: 0.3,
+    wind: {
+      speed: 10,
+      gust: 15,
+    },
+    description: 'clear sky',
+    icon: '01d',
     ...overrides,
   };
 }
@@ -104,15 +68,277 @@ export function createMockOutfit(overrides?: Partial<Outfit>): Outfit {
 }
 
 /**
- * Creates a minimal weather data object (useful for testing error handling)
+ * Creates a minimal weather data object (useful for testing edge cases)
  */
 export function createMinimalWeatherData(): WeatherData {
   return {
     lat: 0,
     lon: 0,
-    timezone: 'UTC',
-    current: {} as any,
-    daily: [],
+    name: '',
+    temp: {
+      current: 0,
+      min: 0,
+      max: 0,
+      feels_like: 0,
+    },
+    pop: 0,
+    wind: {
+      speed: 0,
+    },
+    description: '',
+    icon: '',
+  };
+}
+
+/**
+ * Creates a mock OpenWeatherMap 5-day/3-hour forecast API response
+ */
+export function createMockForecastResponse() {
+  return {
+    cod: '200',
+    message: 0,
+    cnt: 8,
+    list: [
+      {
+        dt: 1699000000,
+        main: {
+          temp: 72,
+          feels_like: 68,
+          temp_min: 70,
+          temp_max: 74,
+          pressure: 1015,
+          humidity: 65,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01d',
+          },
+        ],
+        clouds: { all: 0 },
+        wind: {
+          speed: 10,
+          deg: 180,
+          gust: 15,
+        },
+        visibility: 10000,
+        pop: 0.1,
+        sys: { pod: 'd' },
+        dt_txt: '2023-11-01 12:00:00',
+      },
+      {
+        dt: 1699010800,
+        main: {
+          temp: 75,
+          feels_like: 72,
+          temp_min: 73,
+          temp_max: 77,
+          pressure: 1014,
+          humidity: 60,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01d',
+          },
+        ],
+        clouds: { all: 5 },
+        wind: {
+          speed: 12,
+          deg: 190,
+          gust: 18,
+        },
+        visibility: 10000,
+        pop: 0.05,
+        sys: { pod: 'd' },
+        dt_txt: '2023-11-01 15:00:00',
+      },
+      {
+        dt: 1699021600,
+        main: {
+          temp: 70,
+          feels_like: 67,
+          temp_min: 68,
+          temp_max: 72,
+          pressure: 1015,
+          humidity: 68,
+        },
+        weather: [
+          {
+            id: 801,
+            main: 'Clouds',
+            description: 'few clouds',
+            icon: '02d',
+          },
+        ],
+        clouds: { all: 20 },
+        wind: {
+          speed: 8,
+          deg: 200,
+        },
+        visibility: 10000,
+        pop: 0.15,
+        sys: { pod: 'd' },
+        dt_txt: '2023-11-01 18:00:00',
+      },
+      {
+        dt: 1699032400,
+        main: {
+          temp: 65,
+          feels_like: 63,
+          temp_min: 63,
+          temp_max: 67,
+          pressure: 1016,
+          humidity: 72,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01n',
+          },
+        ],
+        clouds: { all: 0 },
+        wind: {
+          speed: 6,
+          deg: 210,
+        },
+        visibility: 10000,
+        pop: 0.1,
+        sys: { pod: 'n' },
+        dt_txt: '2023-11-01 21:00:00',
+      },
+      {
+        dt: 1699043200,
+        main: {
+          temp: 62,
+          feels_like: 60,
+          temp_min: 60,
+          temp_max: 64,
+          pressure: 1017,
+          humidity: 75,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01n',
+          },
+        ],
+        clouds: { all: 0 },
+        wind: {
+          speed: 5,
+          deg: 220,
+        },
+        visibility: 10000,
+        pop: 0.05,
+        sys: { pod: 'n' },
+        dt_txt: '2023-11-02 00:00:00',
+      },
+      {
+        dt: 1699054000,
+        main: {
+          temp: 60,
+          feels_like: 58,
+          temp_min: 58,
+          temp_max: 62,
+          pressure: 1018,
+          humidity: 78,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01n',
+          },
+        ],
+        clouds: { all: 0 },
+        wind: {
+          speed: 4,
+          deg: 230,
+        },
+        visibility: 10000,
+        pop: 0.0,
+        sys: { pod: 'n' },
+        dt_txt: '2023-11-02 03:00:00',
+      },
+      {
+        dt: 1699064800,
+        main: {
+          temp: 58,
+          feels_like: 56,
+          temp_min: 56,
+          temp_max: 60,
+          pressure: 1018,
+          humidity: 80,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01n',
+          },
+        ],
+        clouds: { all: 0 },
+        wind: {
+          speed: 3,
+          deg: 240,
+        },
+        visibility: 10000,
+        pop: 0.0,
+        sys: { pod: 'n' },
+        dt_txt: '2023-11-02 06:00:00',
+      },
+      {
+        dt: 1699075600,
+        main: {
+          temp: 61,
+          feels_like: 59,
+          temp_min: 59,
+          temp_max: 63,
+          pressure: 1017,
+          humidity: 76,
+        },
+        weather: [
+          {
+            id: 800,
+            main: 'Clear',
+            description: 'clear sky',
+            icon: '01d',
+          },
+        ],
+        clouds: { all: 5 },
+        wind: {
+          speed: 5,
+          deg: 180,
+        },
+        visibility: 10000,
+        pop: 0.0,
+        sys: { pod: 'd' },
+        dt_txt: '2023-11-02 09:00:00',
+      },
+    ],
+    city: {
+      id: 5128581,
+      name: 'New York',
+      coord: {
+        lat: 40.7128,
+        lon: -74.006,
+      },
+      country: 'US',
+      population: 8175133,
+      timezone: -18000,
+      sunrise: 1698998000,
+      sunset: 1699038000,
+    },
   };
 }
 
