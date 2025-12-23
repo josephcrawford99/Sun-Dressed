@@ -68,11 +68,11 @@ export default function WeatherScreen() {
                                     source={{ uri: `https://openweathermap.org/img/wn/${weather.icon}@4x.png` }}
                                     style={styles.weatherIcon}
                                 />
-                                <ThemedText style={{fontSize: 24}}>
+                                <ThemedText style={styles.descriptionText} numberOfLines={1}>
                                     {capitalizeAllWords(weather.description)}
                                 </ThemedText>
-                                <ThemedText style={{ fontSize: 24 }}>
-                                    {"  " + Math.round(weather.temp.current)} {tempSymbol}
+                                <ThemedText style={styles.tempText}>
+                                    {Math.round(weather.temp.current)}{tempSymbol}
                                 </ThemedText>
                             </ThemedView>
                         {/* Temperature Display */}
@@ -147,6 +147,14 @@ const styles = StyleSheet.create({
         width: 75,
         height: 75,
         marginRight: 6,
+    },
+    descriptionText: {
+        fontSize: 24,
+        flexShrink: 1,
+    },
+    tempText: {
+        fontSize: 24,
+        marginLeft: 18,
     },
     error: {
         color: '#ff6b6b',
