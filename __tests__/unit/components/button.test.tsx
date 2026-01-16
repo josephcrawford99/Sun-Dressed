@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { ThemedButton } from '@/components/ui/button';
+import { ThemedButton } from '@/components/button';
 
 // Mock dependencies
 jest.mock('@/hooks/use-theme-color', () => ({

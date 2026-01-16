@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { ThemedCard } from '@/components/ui/card';
+import { ThemedCard } from '@/components/card';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';

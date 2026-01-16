@@ -1,7 +1,7 @@
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Section } from '@/components/ui/section';
+import { Section } from '@/components/section';
 import { Shadows } from '@/constants/theme';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';

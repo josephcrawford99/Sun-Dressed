@@ -13,12 +13,12 @@ export function ThemedButton({ children, style, disabled, ...rest }: ThemedButto
 
   return (
     <Pressable
-      style={({ pressed }) => [
+      style={(state) => [
         styles.button,
         { backgroundColor },
-        pressed && styles.buttonPressed,
+        state.pressed && styles.buttonPressed,
         disabled && styles.buttonDisabled,
-        style,
+        typeof style === 'function' ? style(state) : style,
       ]}
       disabled={disabled}
       {...rest}

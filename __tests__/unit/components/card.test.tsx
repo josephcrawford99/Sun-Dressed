@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import { ThemedCard } from '@/components/ui/card';
+import { ThemedCard } from '@/components/card';
 
 // Mock dependencies
 jest.mock('@/hooks/use-theme-color', () => ({

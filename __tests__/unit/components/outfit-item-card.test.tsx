@@ -14,14 +14,14 @@ jest.mock('@/components/themed-text', () => ({
   },
 }));
 
-jest.mock('@/components/ui/card', () => ({
+jest.mock('@/components/card', () => ({
   ThemedCard: ({ children, ...props }: any) => {
     const { View } = require('react-native');
     return <View {...props}>{children}</View>;
   },
 }));
 
-jest.mock('@/components/ui/chevron', () => ({
+jest.mock('@/components/chevron', () => ({
   Chevron: ({ isCollapsed }: any) => {
     const { Text } = require('react-native');
     return <Text testID="chevron">{isCollapsed ? 'collapsed' : 'expanded'}</Text>;

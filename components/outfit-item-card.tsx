@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedCard } from '@/components/ui/card';
-import { Chevron } from '@/components/ui/chevron';
+import { ThemedCard } from '@/components/card';
+import { Chevron } from '@/components/chevron';
 import { mapResponseItemToIcon } from '@/constants/clothing-icons';
 import { useStore } from '@/store/store';
 
