@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedCard } from '@/components/card';
 import { useWeather } from '@/hooks/use-weather';
-import { useStore } from '@/store/store';
+import { getApprovedItems, getDisapprovedItems, useStore } from '@/store/store';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
 import { useQueryClient } from '@tanstack/react-query';
 import { OutfitGenerationResult } from '@/services/gemini-service';
@@ -19,6 +19,7 @@ export default function DebugScreen() {
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
+  const itemFeedback = useStore((state) => state.itemFeedback);
 
   // Access mutation cache to get last outfit data
   const queryClient = useQueryClient();
@@ -30,8 +31,14 @@ export default function DebugScreen() {
   // Reconstruct the prompt that would be used
   const prompt = useMemo(() => {
     if (!weather) return null;
-    return buildOutfitPrompt({ style, activity }, weather, tempFormat);
-  }, [weather, style, activity, tempFormat]);
+    return buildOutfitPrompt(
+      { style, activity },
+      weather,
+      tempFormat,
+      getApprovedItems(itemFeedback),
+      getDisapprovedItems(itemFeedback),
+    );
+  }, [weather, style, activity, tempFormat, itemFeedback]);
 
   // Collapsible state
   const [expanded, setExpanded] = useState({

@@ -26,3 +26,6 @@ export interface Outfit {
   /** Whether rain gear is recommended for the weather conditions */
   rainGearRecommended: boolean;
 }
+
+/** Map of clothing item names to user feedback. Session-only (not persisted). */
+export type ItemFeedback = Record<string, 'up' | 'down'>;

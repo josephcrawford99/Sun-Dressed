@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedCard } from '@/components/card';
 import { Chevron } from '@/components/chevron';
+import { ItemFeedbackButtons } from '@/components/item-feedback-buttons';
 import { mapResponseItemToIcon } from '@/constants/clothing-icons';
 import { useStore } from '@/store/store';
 
@@ -15,6 +16,11 @@ export type OutfitItemCardProps = {
 export function OutfitItemCard({ name, blurb }: OutfitItemCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const userStyle = useStore((state) => state.style);
+
+  // Reset collapse state when outfit regenerates (blurb is always new per generation)
+  useEffect(() => {
+    setIsCollapsed(true);
+  }, [blurb]);
   const icon = mapResponseItemToIcon(name, userStyle);
 
   // Strip gender suffix from display name (e.g., "Boots (feminine)" -> "Boots")
@@ -29,10 +35,13 @@ export function OutfitItemCard({ name, blurb }: OutfitItemCardProps) {
           </ThemedText>
           <Chevron isCollapsed={isCollapsed} />
         </View>
-        {!isCollapsed && (
-          <ThemedText style={styles.itemBlurb}>{blurb}</ThemedText>
-        )}
       </Pressable>
+      {!isCollapsed && (
+        <>
+          <ThemedText style={styles.itemBlurb}>{blurb}</ThemedText>
+          <ItemFeedbackButtons item={{ name, blurb }} />
+        </>
+      )}
     </ThemedCard>
   );
 }

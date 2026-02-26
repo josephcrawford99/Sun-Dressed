@@ -1,6 +1,6 @@
 import { useWeather } from '@/hooks/use-weather';
 import { generateOutfitRecommendation, OutfitGenerationResult } from '@/services/gemini-service';
-import { useStore } from '@/store/store';
+import { getApprovedItems, getDisapprovedItems, useStore } from '@/store/store';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
@@ -20,6 +20,7 @@ export function useClothingRecommend(): UseQueryResult<OutfitGenerationResult, E
   const style = useStore((state) => state.style);
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
+  const itemFeedback = useStore((state) => state.itemFeedback);
 
   // Get weather data from TanStack Query
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
@@ -44,7 +45,9 @@ export function useClothingRecommend(): UseQueryResult<OutfitGenerationResult, E
       const prompt = buildOutfitPrompt(
         { style, activity },
         weather,
-        tempFormat
+        tempFormat,
+        getApprovedItems(itemFeedback),
+        getDisapprovedItems(itemFeedback),
       );
 
       // Generate outfit recommendation (returns both structured and raw data)

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TempFormat } from '@/services/openweathermap-service';
-import { OutfitStyle } from '@/types/outfit';
+import { ClothingItem, ItemFeedback, OutfitStyle } from '@/types/outfit';
 import { create } from 'zustand';
 import { combine, createJSONStorage, persist } from 'zustand/middleware';
 
@@ -16,6 +16,7 @@ export const useStore = create(
         style: 'neutral' as OutfitStyle,
         activity: '',
         tempFormat: 'imperial' as TempFormat,
+        itemFeedback: {} as ItemFeedback,
       },
       (set) => {
         return {
@@ -27,6 +28,27 @@ export const useStore = create(
           },
           setTempFormat: (nextTempFormat: TempFormat) => {
             set({ tempFormat: nextTempFormat });
+          },
+          approveItem: (item: ClothingItem) => {
+            set((state) => {
+              if (state.itemFeedback[item.name] === 'up') {
+                const { [item.name]: _, ...rest } = state.itemFeedback;
+                return { itemFeedback: rest };
+              }
+              return { itemFeedback: { ...state.itemFeedback, [item.name]: 'up' } };
+            });
+          },
+          disapproveItem: (item: ClothingItem) => {
+            set((state) => {
+              if (state.itemFeedback[item.name] === 'down') {
+                const { [item.name]: _, ...rest } = state.itemFeedback;
+                return { itemFeedback: rest };
+              }
+              return { itemFeedback: { ...state.itemFeedback, [item.name]: 'down' } };
+            });
+          },
+          clearItemFeedback: () => {
+            set({ itemFeedback: {} });
           },
         };
       },
@@ -41,3 +63,15 @@ export const useStore = create(
     },
   ),
 );
+
+export function getApprovedItems(feedback: ItemFeedback): string[] {
+  return Object.entries(feedback)
+    .filter(([, v]) => v === 'up')
+    .map(([k]) => k);
+}
+
+export function getDisapprovedItems(feedback: ItemFeedback): string[] {
+  return Object.entries(feedback)
+    .filter(([, v]) => v === 'down')
+    .map(([k]) => k);
+}
