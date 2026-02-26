@@ -1,5 +1,5 @@
 import { Outfit, ClothingItem } from '@/types/outfit';
-import { getItemsList } from '@/constants/clothing-icons';
+import { getItemsList } from '@/constants/clothing-items';
 import { useStore } from '@/store/store';
 
 /**

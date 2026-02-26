@@ -17,6 +17,7 @@ export const useStore = create(
         activity: '',
         tempFormat: 'imperial' as TempFormat,
         itemFeedback: {} as ItemFeedback,
+        closet: {} as Record<string, boolean>,
       },
       (set) => {
         return {
@@ -28,6 +29,18 @@ export const useStore = create(
           },
           setTempFormat: (nextTempFormat: TempFormat) => {
             set({ tempFormat: nextTempFormat });
+          },
+          toggleClosetItem: (iconPath: string) => {
+            set((state) => {
+              const current = state.closet[iconPath];
+              if (current === false) {
+                // Toggling back to owned — remove the key
+                const { [iconPath]: _, ...rest } = state.closet;
+                return { closet: rest };
+              }
+              // Mark as unowned
+              return { closet: { ...state.closet, [iconPath]: false } };
+            });
           },
           approveItem: (item: ClothingItem) => {
             set((state) => {
@@ -59,6 +72,7 @@ export const useStore = create(
       partialize: (state) => ({
         style: state.style,
         tempFormat: state.tempFormat,
+        closet: state.closet,
       }),
     },
   ),

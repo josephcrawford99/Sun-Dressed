@@ -1,7 +1,8 @@
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { Image, StyleSheet, View, type ImageSourcePropType, type ViewProps } from 'react-native';
+import { Image } from 'expo-image';
+import { StyleSheet, View, type ImageSourcePropType, type ViewProps } from 'react-native';
 
 export type ThemedCardProps = ViewProps & {
   variant?: 'default' | 'error' | 'info' | 'data' | 'warning';
@@ -43,7 +44,7 @@ export function ThemedCard({ variant = 'default', style, children, icon, ...rest
 
     // Check if it's an image source (number from require())
     if (typeof icon === 'number') {
-      return <Image source={icon} style={[styles.icon, { tintColor: iconTintColor }]} resizeMode="contain" />;
+      return <Image source={icon} style={[styles.icon, { tintColor: iconTintColor }]} contentFit="contain" cachePolicy="memory-disk" />;
     }
 
     // Otherwise render as React node

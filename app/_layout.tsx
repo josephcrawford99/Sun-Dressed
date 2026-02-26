@@ -51,7 +51,7 @@ function AppContent() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="settings" options={{ title: 'Settings', headerBackTitle: '' }} />
+          <Stack.Screen name="settings" options={{ title: 'Settings', headerBackTitle: "Back" }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

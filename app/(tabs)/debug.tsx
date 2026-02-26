@@ -5,6 +5,7 @@ import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedCard } from '@/components/card';
+import { CLOTHING_ITEMS } from '@/constants/clothing-items';
 import { useWeather } from '@/hooks/use-weather';
 import { getApprovedItems, getDisapprovedItems, useStore } from '@/store/store';
 import { buildOutfitPrompt } from '@/utils/prompt-generator';
@@ -20,6 +21,7 @@ export default function DebugScreen() {
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
   const itemFeedback = useStore((state) => state.itemFeedback);
+  const closet = useStore((state) => state.closet);
 
   // Access mutation cache to get last outfit data
   const queryClient = useQueryClient();
@@ -28,6 +30,24 @@ export default function DebugScreen() {
   const lastMutation = mutations[mutations.length - 1];
   const outfitRawText = (lastMutation?.state.data as OutfitGenerationResult | undefined)?.rawText || null;
 
+  // Build filtered items list (same logic as useClothingRecommend)
+  const allowedItems = useMemo(() => {
+    return CLOTHING_ITEMS
+      .filter((item) => {
+        if (item.gender && style !== 'neutral' && item.gender !== style) return false;
+        if (closet[item.iconPath] === false) return false;
+        return true;
+      })
+      .map((item) => {
+        if (style === 'neutral' && item.gender) {
+          return `${item.baseName} (${item.gender})`;
+        }
+        return item.baseName;
+      });
+  }, [style, closet]);
+
+  const unownedItems = Object.keys(closet).filter((key) => closet[key] === false);
+
   // Reconstruct the prompt that would be used
   const prompt = useMemo(() => {
     if (!weather) return null;
@@ -35,10 +55,11 @@ export default function DebugScreen() {
       { style, activity },
       weather,
       tempFormat,
+      allowedItems,
       getApprovedItems(itemFeedback),
       getDisapprovedItems(itemFeedback),
     );
-  }, [weather, style, activity, tempFormat, itemFeedback]);
+  }, [weather, style, activity, tempFormat, allowedItems, itemFeedback]);
 
   // Collapsible state
   const [expanded, setExpanded] = useState({
@@ -79,6 +100,9 @@ export default function DebugScreen() {
 
               <ThemedText style={styles.label}>Activity:</ThemedText>
               <ThemedText style={styles.value}>{activity || 'Not set'}</ThemedText>
+
+              <ThemedText style={styles.label}>Closet Unowned ({unownedItems.length}):</ThemedText>
+              <ThemedText style={styles.value}>{unownedItems.length > 0 ? unownedItems.join(', ') : 'None'}</ThemedText>
             </ThemedCard>
           )}
         </ThemedView>

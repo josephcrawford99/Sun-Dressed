@@ -1,4 +1,3 @@
-import { getItemsList } from '@/constants/clothing-icons';
 import { TempFormat } from '@/services/openweathermap-service';
 import { OutfitStyle } from '@/types/outfit';
 import { WeatherData } from '@/types/weather';
@@ -17,12 +16,14 @@ export interface UserPreferences {
  * @param userPrefs - User's style preferences and planned activity
  * @param weatherData - Current weather data including temperature, forecast, etc.
  * @param tempFormat - Temperature format to use in the prompt ('metric' or 'imperial')
+ * @param allowedItems - Pre-filtered list of item names the LLM can suggest
  * @returns Structured prompt string to send to Gemini API
  */
 export function buildOutfitPrompt(
   userPrefs: UserPreferences,
   weatherData: WeatherData,
   tempFormat: TempFormat,
+  allowedItems: string[],
   approvedItems: string[] = [],
   disapprovedItems: string[] = [],
 ): string {
@@ -73,7 +74,7 @@ USER PREFERENCES:
 
 ALLOWED CLOTHING ITEMS:
 You MUST ONLY use item names from this list. Do not suggest any items not on this list:
-${(disapprovedItems.length > 0 ? getItemsList(userPrefs.style || 'neutral').filter((item) => !disapprovedItems.includes(item)) : getItemsList(userPrefs.style || 'neutral')).join(', ')}
+${(disapprovedItems.length > 0 ? allowedItems.filter((item: string) => !disapprovedItems.includes(item)) : allowedItems).join(', ')}
 
 IMPORTANT: Item names in your response must match EXACTLY as shown above, including any text in parentheses.
 ${approvedItems.length > 0 ? `\nUSER PREFERRED ITEMS:\nThe user has indicated they like these items. Try to incorporate them into the outfit if they are weather-appropriate:\n${approvedItems.join(', ')}\n` : ''}${disapprovedItems.length > 0 ? `\nUSER DISLIKED ITEMS:\nThe user does not want these items suggested. Do NOT include any of these in the outfit:\n${disapprovedItems.join(', ')}\n` : ''}

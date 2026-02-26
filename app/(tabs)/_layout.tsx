@@ -14,14 +14,9 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].iconTint,
         headerShown: false,
+        freezeOnBlur: true,
         tabBarButton: HapticTab,
-        animation: 'fade',
-        transitionSpec: {
-          animation: 'timing',
-          config: {
-            duration: 100,
-          },
-        }}}>
+      }}>
 
       <Tabs.Screen
         name="weather"

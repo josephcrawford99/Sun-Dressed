@@ -1,73 +1,85 @@
 /**
- * Clothing icon mappings
- * Single source of truth for all clothing items with gender metadata
+ * Clothing items
+ * Single source of truth for all clothing items with gender and category metadata
  */
 
 import { OutfitStyle } from '@/types/outfit';
+
+export type ClothingCategory = 'tops' | 'bottoms' | 'outerwear' | 'footwear' | 'accessories';
+
+export const CATEGORY_ORDER: ClothingCategory[] = ['tops', 'bottoms', 'outerwear', 'footwear', 'accessories'];
+
+export const CATEGORY_LABELS: Record<ClothingCategory, string> = {
+  tops: 'Tops',
+  bottoms: 'Bottoms',
+  outerwear: 'Outerwear',
+  footwear: 'Footwear',
+  accessories: 'Accessories',
+};
 
 // Interface for clothing item metadata
 export interface ClothingItem {
   iconPath: string;       // PNG filename without extension (e.g., "Ankle_boot_women")
   baseName: string;       // Name for LLM prompt (e.g., "Boots")
+  category: ClothingCategory;
   gender?: 'masculine' | 'feminine';  // Optional: only present for gendered items
 }
 
 // All clothing items with their metadata
 export const CLOTHING_ITEMS: ClothingItem[] = [
   // Masculine items
-  { iconPath: "Boots_men", baseName: "Boots", gender: 'masculine' },
-  { iconPath: "Tank_top_mens", baseName: "Tank Top", gender: 'masculine' },
+  { iconPath: "Boots_men", baseName: "Boots", category: "footwear", gender: 'masculine' },
+  { iconPath: "Tank_top_mens", baseName: "Tank Top", category: "tops", gender: 'masculine' },
 
   // Feminine items
-  { iconPath: "Ankle_boot_women", baseName: "Boots", gender: 'feminine' },
-  { iconPath: "High_heel_women", baseName: "High Heel", gender: 'feminine' },
-  { iconPath: "Open_toe_heels_women", baseName: "Open Toe Heels", gender: 'feminine' },
-  { iconPath: "Tall_boots_women", baseName: "Tall Boots", gender: 'feminine' },
-  { iconPath: "Tank_top_womens", baseName: "Tank Top", gender: 'feminine' },
-  { iconPath: "Maxi_skirt", baseName: "Maxi Skirt", gender: 'feminine' },
-  { iconPath: "Midi_short_sleeve_dress", baseName: "Midi Short Sleeve Dress", gender: 'feminine' },
-  { iconPath: "Midi_skirt", baseName: "Midi Skirt", gender: 'feminine' },
-  { iconPath: "Mini_dress", baseName: "Mini Dress", gender: 'feminine' },
-  { iconPath: "Mini_skirt", baseName: "Mini Skirt", gender: 'feminine' },
-  { iconPath: "Strapless_top", baseName: "Strapless Top", gender: 'feminine' },
-  { iconPath: "Sweater_dress", baseName: "Sweater Dress", gender: 'feminine' },
-  { iconPath: "Tank_top_maxi_dress", baseName: "Tank Top Maxi Dress", gender: 'feminine' },
-  { iconPath: "Tights", baseName: "Tights", gender: 'feminine' },
-  { iconPath: "Ugg_boots", baseName: "Ugg Boots", gender: 'feminine' },
-
+  { iconPath: "Ankle_boot_women", baseName: "Boots", category: "footwear", gender: 'feminine' },
+  { iconPath: "High_heel_women", baseName: "High Heel", category: "footwear", gender: 'feminine' },
+  { iconPath: "Open_toe_heels_women", baseName: "Open Toe Heels", category: "footwear", gender: 'feminine' },
+  { iconPath: "Tall_boots_women", baseName: "Tall Boots", category: "footwear", gender: 'feminine' },
+  { iconPath: "Tank_top_womens", baseName: "Tank Top", category: "tops", gender: 'feminine' },
+  { iconPath: "Maxi_skirt", baseName: "Maxi Skirt", category: "bottoms", gender: 'feminine' },
+  { iconPath: "Midi_short_sleeve_dress", baseName: "Midi Short Sleeve Dress", category: "tops", gender: 'feminine' },
+  { iconPath: "Midi_skirt", baseName: "Midi Skirt", category: "bottoms", gender: 'feminine' },
+  { iconPath: "Mini_dress", baseName: "Mini Dress", category: "tops", gender: 'feminine' },
+  { iconPath: "Mini_skirt", baseName: "Mini Skirt", category: "bottoms", gender: 'feminine' },
+  { iconPath: "Strapless_top", baseName: "Strapless Top", category: "tops", gender: 'feminine' },
+  { iconPath: "Sweater_dress", baseName: "Sweater Dress", category: "tops", gender: 'feminine' },
+  { iconPath: "Tank_top_maxi_dress", baseName: "Tank Top Maxi Dress", category: "tops", gender: 'feminine' },
+  { iconPath: "Tights", baseName: "Tights", category: "bottoms", gender: 'feminine' },
+  { iconPath: "Ugg_boots", baseName: "Ugg Boots", category: "footwear", gender: 'feminine' },
 
   // Neutral items (no gender field)
-  { iconPath: "Baseball_cap", baseName: "Baseball Cap" },
-  { iconPath: "Beanie", baseName: "Beanie" },
-  { iconPath: "Cardigan", baseName: "Cardigan" },
-  { iconPath: "Flip_flops", baseName: "Flip Flops" },
-  { iconPath: "Fur_coat", baseName: "Fur Coat" },
-  { iconPath: "Fuzzy_socks", baseName: "Fuzzy Socks" },
-  { iconPath: "Jean_jacket", baseName: "Jean Jacket" },
-  { iconPath: "Jean_shorts", baseName: "Jean Shorts" },
-  { iconPath: "Jeans", baseName: "Jeans" },
-  { iconPath: "Leather_jacket", baseName: "Leather Jacket" },
-  { iconPath: "Linen_pants", baseName: "Linen Pants" },
-  { iconPath: "Long_sleeve_button_up", baseName: "Long Sleeve Button Up" },
-  { iconPath: "Long_sleeve_top", baseName: "Long Sleeve Top" },
-  { iconPath: "Long_winter_coat", baseName: "Long Winter Coat" },
-  { iconPath: "Mittens", baseName: "Mittens" },
-  { iconPath: "Rain_boots", baseName: "Rain Boots" },
-  { iconPath: "Raincoat", baseName: "Raincoat" },
-  { iconPath: "Sandals", baseName: "Sandals" },
-  { iconPath: "Scarf", baseName: "Scarf" },
-  { iconPath: "Short_sleeve_button_up", baseName: "Short Sleeve Button Up" },
-  { iconPath: "Short_sleeve_t_shirt", baseName: "Short Sleeve T-Shirt" },
-  { iconPath: "Sneakers", baseName: "Sneakers" },
-  { iconPath: "Sun_hat", baseName: "Sun Hat" },
-  { iconPath: "Sunglasses", baseName: "Sunglasses" },
-  { iconPath: "Sweater", baseName: "Sweater" },
-  { iconPath: "Sweater_vest", baseName: "Sweater Vest" },
-  { iconPath: "Sweatpants", baseName: "Sweatpants" },
-  { iconPath: "Sweatshirt", baseName: "Sweatshirt" },
-  { iconPath: "Umbrella", baseName: "Umbrella" },
-  { iconPath: "Winter_jacket", baseName: "Winter Jacket" },
-  { iconPath: "Winter_vest", baseName: "Winter Vest" },
+  { iconPath: "Baseball_cap", baseName: "Baseball Cap", category: "accessories" },
+  { iconPath: "Beanie", baseName: "Beanie", category: "accessories" },
+  { iconPath: "Cardigan", baseName: "Cardigan", category: "tops" },
+  { iconPath: "Flip_flops", baseName: "Flip Flops", category: "footwear" },
+  { iconPath: "Fur_coat", baseName: "Fur Coat", category: "outerwear" },
+  { iconPath: "Fuzzy_socks", baseName: "Fuzzy Socks", category: "footwear" },
+  { iconPath: "Jean_jacket", baseName: "Jean Jacket", category: "outerwear" },
+  { iconPath: "Jean_shorts", baseName: "Jean Shorts", category: "bottoms" },
+  { iconPath: "Jeans", baseName: "Jeans", category: "bottoms" },
+  { iconPath: "Leather_jacket", baseName: "Leather Jacket", category: "outerwear" },
+  { iconPath: "Linen_pants", baseName: "Linen Pants", category: "bottoms" },
+  { iconPath: "Long_sleeve_button_up", baseName: "Long Sleeve Button Up", category: "tops" },
+  { iconPath: "Long_sleeve_top", baseName: "Long Sleeve Top", category: "tops" },
+  { iconPath: "Long_winter_coat", baseName: "Long Winter Coat", category: "outerwear" },
+  { iconPath: "Mittens", baseName: "Mittens", category: "accessories" },
+  { iconPath: "Rain_boots", baseName: "Rain Boots", category: "footwear" },
+  { iconPath: "Raincoat", baseName: "Raincoat", category: "outerwear" },
+  { iconPath: "Sandals", baseName: "Sandals", category: "footwear" },
+  { iconPath: "Scarf", baseName: "Scarf", category: "accessories" },
+  { iconPath: "Short_sleeve_button_up", baseName: "Short Sleeve Button Up", category: "tops" },
+  { iconPath: "Short_sleeve_t_shirt", baseName: "Short Sleeve T-Shirt", category: "tops" },
+  { iconPath: "Sneakers", baseName: "Sneakers", category: "footwear" },
+  { iconPath: "Sun_hat", baseName: "Sun Hat", category: "accessories" },
+  { iconPath: "Sunglasses", baseName: "Sunglasses", category: "accessories" },
+  { iconPath: "Sweater", baseName: "Sweater", category: "outerwear" },
+  { iconPath: "Sweater_vest", baseName: "Sweater Vest", category: "outerwear" },
+  { iconPath: "Sweatpants", baseName: "Sweatpants", category: "bottoms" },
+  { iconPath: "Sweatshirt", baseName: "Sweatshirt", category: "outerwear" },
+  { iconPath: "Umbrella", baseName: "Umbrella", category: "accessories" },
+  { iconPath: "Winter_jacket", baseName: "Winter Jacket", category: "outerwear" },
+  { iconPath: "Winter_vest", baseName: "Winter Vest", category: "outerwear" },
 ];
 
 // Static icon mappings (Metro bundler requires static require paths)

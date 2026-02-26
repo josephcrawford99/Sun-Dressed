@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedCard } from '@/components/card';
 import { Chevron } from '@/components/chevron';
 import { ItemFeedbackButtons } from '@/components/item-feedback-buttons';
-import { mapResponseItemToIcon } from '@/constants/clothing-icons';
+import { mapResponseItemToIcon } from '@/constants/clothing-items';
 import { useStore } from '@/store/store';
 
 export type OutfitItemCardProps = {
