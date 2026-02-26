@@ -1,8 +1,8 @@
+import { ScreenHeader } from '@/components/screen-header';
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Section } from '@/components/section';
-import { Shadows } from '@/constants/theme';
 import { useWeather } from '@/hooks/use-weather';
 import { useStore } from '@/store/store';
 import { capitalizeAllWords } from '@/utils/strings';
@@ -36,11 +36,7 @@ export default function WeatherScreen() {
                     <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
                 }
             >
-                <ThemedView style={styles.titleContainer}>
-                    <ThemedText type="title" style={styles.title}>
-                        Weather
-                    </ThemedText>
-                </ThemedView>
+                <ScreenHeader title="Weather" />
                 <ThemedView style={styles.content}>
                     {loading && (
                         <ThemedText>Loading weather data...</ThemedText>
@@ -120,13 +116,6 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    titleContainer: {
-        ...Shadows.stickyHeader,
-    },
-    title: {
-        padding: 20,
-        paddingVertical: 8,
     },
     content: {
         padding: 20,

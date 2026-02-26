@@ -1,6 +1,7 @@
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet } from 'react-native';
 
 import { OutfitItemCard } from '@/components/outfit-item-card';
+import { ScreenHeader } from '@/components/screen-header';
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -8,7 +9,6 @@ import { ThemedButton } from '@/components/button';
 import { ThemedCard } from '@/components/card';
 import { ThemedTextInput } from '@/components/input';
 import { Section } from '@/components/section';
-import { Shadows } from '@/constants/theme';
 import { useClothingRecommend } from '@/hooks/use-clothing-recommend';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useStore } from '@/store/store';
@@ -64,11 +64,7 @@ export default function OutfitScreen() {
           <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
         }
       >
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={styles.title}>
-            Outfit
-          </ThemedText>
-        </ThemedView>
+        <ScreenHeader title="Outfit" />
         <ThemedView style={styles.content}>
           <ThemedView>
             <Section title="Activity">
@@ -150,13 +146,6 @@ export default function OutfitScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  titleContainer: {
-    ...Shadows.stickyHeader,
-  },
-  title: {
-    padding: 20,
-    paddingVertical: 8
   },
   content: {
     padding: 20,

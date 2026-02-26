@@ -5,7 +5,6 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedRadioGroup } from '@/components/radio-group';
 import { Section } from '@/components/section';
-import { Shadows } from '@/constants/theme';
 import { TempFormat } from '@/services/openweathermap-service';
 import { useStore } from '@/store/store';
 import { OutfitStyle } from '@/types/outfit';
@@ -32,14 +31,7 @@ export default function SettingsScreen() {
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1 }}
-        stickyHeaderIndices={[0]}
       >
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={styles.title}>
-            Settings
-          </ThemedText>
-        </ThemedView>
-
         <ThemedView style={styles.content}>
           <ThemedView>
             <Section title="Outfit Style" style={styles.section}>
@@ -74,13 +66,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  titleContainer: {
-    ...Shadows.stickyHeader,
-  },
-  title: {
-    padding: 20,
-    paddingVertical: 8,
   },
   content: {
     padding: 20,
