@@ -64,9 +64,6 @@ export function parseOutfitJSON(text: string): Outfit {
     if (!allowedItemNames.includes(itemObj.name)) {
       throw new Error(`Item "${itemObj.name}" at index ${i} is not in the allowed clothing items list. LLM must only use items from the provided list.`);
     }
-    if (typeof itemObj.description !== 'string') {
-      throw new Error(`Item at index ${i} missing or invalid "description" field`);
-    }
     if (typeof itemObj.blurb !== 'string') {
       throw new Error(`Item at index ${i} missing or invalid "blurb" field`);
     }
@@ -74,7 +71,6 @@ export function parseOutfitJSON(text: string): Outfit {
     // Construct validated ClothingItem
     items.push({
       name: itemObj.name,
-      description: itemObj.description,
       blurb: itemObj.blurb,
     });
   }

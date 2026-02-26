@@ -113,7 +113,6 @@ export default function OutfitScreen() {
                       <OutfitItemCard
                         key={index}
                         name={item.name}
-                        description={item.description}
                         blurb={item.blurb}
                       />
                     ))}

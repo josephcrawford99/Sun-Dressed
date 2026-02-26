@@ -78,7 +78,6 @@ Required JSON format:
   "items": [
     {
       "name": "Exact item name from the ALLOWED CLOTHING ITEMS list above",
-      "description": "Short description of what the item is. Do NOT include the item name in this field. Not a complete sentence, no punctuation.",
       "blurb": "One sentence about why this item is perfect for these conditions and complements the outfit"
     }
   ],

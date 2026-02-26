@@ -9,11 +9,10 @@ import { useStore } from '@/store/store';
 
 export type OutfitItemCardProps = {
   name: string;
-  description: string;
   blurb: string;
 };
 
-export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps) {
+export function OutfitItemCard({ name, blurb }: OutfitItemCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const userStyle = useStore((state) => state.style);
   const icon = mapResponseItemToIcon(name, userStyle);
@@ -30,9 +29,6 @@ export function OutfitItemCard({ name, description, blurb }: OutfitItemCardProps
           </ThemedText>
           <Chevron isCollapsed={isCollapsed} />
         </View>
-        <ThemedText style={[styles.itemDescription, isCollapsed && styles.itemDescriptionLast]}>
-          {description}
-        </ThemedText>
         {!isCollapsed && (
           <ThemedText style={styles.itemBlurb}>{blurb}</ThemedText>
         )}
@@ -51,14 +47,6 @@ const styles = StyleSheet.create({
   itemName: {
     marginBottom: 0,
     flex: 1,
-  },
-  itemDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  itemDescriptionLast: {
-    marginBottom: 0,
   },
   itemBlurb: {
     fontSize: 13,
