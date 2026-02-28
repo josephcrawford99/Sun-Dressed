@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TempFormat } from '@/services/openweathermap-service';
 import { ClothingItem, ItemFeedback, OutfitStyle } from '@/types/outfit';
+import { ColorSchemePreference } from '@/types/settings';
 import { Trip } from '@/types/trip';
 /** Generate a v4-style unique ID without native crypto dependency */
 function generateId(): string {
@@ -26,6 +27,7 @@ export const useStore = create(
         style: 'neutral' as OutfitStyle,
         activity: '',
         tempFormat: 'imperial' as TempFormat,
+        colorScheme: 'auto' as ColorSchemePreference,
         itemFeedback: {} as ItemFeedback,
         unownedItems: [] as string[],
         trips: [] as Trip[],
@@ -40,6 +42,9 @@ export const useStore = create(
           },
           setTempFormat: (nextTempFormat: TempFormat) => {
             set({ tempFormat: nextTempFormat });
+          },
+          setColorScheme: (next: ColorSchemePreference) => {
+            set({ colorScheme: next });
           },
           markAllOwned: () => {
             set({ unownedItems: [] });
@@ -109,6 +114,7 @@ export const useStore = create(
       partialize: (state) => ({
         style: state.style,
         tempFormat: state.tempFormat,
+        colorScheme: state.colorScheme,
         unownedItems: state.unownedItems,
         trips: state.trips,
       }),

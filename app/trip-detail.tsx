@@ -15,7 +15,7 @@ import { CATEGORY_ORDER, CATEGORY_LABELS, ClothingCategory } from '@/constants/c
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTripPlan } from '@/hooks/use-trip-plan';
 import { useStore } from '@/store/store';
-import { PackingItem } from '@/types/trip';
+import { PackingItem, getTripStatus } from '@/types/trip';
 
 function groupByCategory(items: PackingItem[]): Map<ClothingCategory, PackingItem[]> {
   const grouped = new Map<ClothingCategory, PackingItem[]>();
@@ -144,12 +144,14 @@ export default function TripDetailScreen() {
             </>
           )}
 
-          <ThemedButton
-            onPress={() => router.push({ pathname: '/trip-edit', params: { tripId } })}
-            style={styles.editButton}
-          >
-            Edit Trip
-          </ThemedButton>
+          {trip && getTripStatus(trip) !== 'past' && (
+            <ThemedButton
+              onPress={() => router.push({ pathname: '/trip-edit', params: { tripId } })}
+              style={styles.editButton}
+            >
+              Edit Trip
+            </ThemedButton>
+          )}
 
           <ThemedDestructiveButton onPress={confirmDelete} style={styles.deleteButton}>
             Delete Trip

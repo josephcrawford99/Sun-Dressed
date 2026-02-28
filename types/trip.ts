@@ -18,6 +18,20 @@ export interface TripPlan {
   packingSummary: string;
 }
 
+export type TripStatus = 'past' | 'ongoing' | 'upcoming';
+
+export function getTripStatus(trip: Trip): TripStatus {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(trip.endDate);
+  end.setHours(0, 0, 0, 0);
+  const start = new Date(trip.startDate);
+  start.setHours(0, 0, 0, 0);
+  if (end < today) return 'past';
+  if (start <= today) return 'ongoing';
+  return 'upcoming';
+}
+
 /** A saved trip */
 export interface Trip {
   /** Unique identifier */

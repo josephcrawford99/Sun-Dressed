@@ -4,6 +4,7 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedButton } from '@/components/button';
@@ -11,7 +12,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedTextInput } from '@/components/input';
 import { ThemedView } from '@/components/themed-view';
 import { Section } from '@/components/section';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { getTripById, useStore } from '@/store/store';
+import { getTripStatus } from '@/types/trip';
 
 export default function TripEditScreen() {
   const router = useRouter();
@@ -22,6 +25,8 @@ export default function TripEditScreen() {
   const addTrip = useStore((state) => state.addTrip);
   const updateTrip = useStore((state) => state.updateTrip);
 
+  const tintColor = useThemeColor({}, 'tint');
+
   const isEditing = !!tripId;
   const trip = isEditing ? getTripById(tripId) : undefined;
 
@@ -30,11 +35,26 @@ export default function TripEditScreen() {
   const [endDate, setEndDate] = useState(trip?.endDate ?? new Date());
   const [activities, setActivities] = useState(trip?.activities ?? '');
 
+  const status = trip ? getTripStatus(trip) : 'upcoming';
+
   if (isEditing && !trip) {
     return (
       <ThemedBackground style={styles.container}>
         <ThemedView style={styles.content}>
           <ThemedText>Trip not found.</ThemedText>
+        </ThemedView>
+      </ThemedBackground>
+    );
+  }
+
+  if (status === 'past') {
+    return (
+      <ThemedBackground style={styles.container}>
+        <ThemedView style={styles.content}>
+          <ThemedText>This trip has ended and can no longer be edited.</ThemedText>
+          <Pressable onPress={() => router.back()} style={styles.cancelButton}>
+            <ThemedText style={styles.cancelText}>Go Back</ThemedText>
+          </Pressable>
         </ThemedView>
       </ThemedBackground>
     );
@@ -97,8 +117,9 @@ export default function TripEditScreen() {
               mode="date"
               display="inline"
               onChange={handleStartDateChange}
-              minimumDate={new Date()}
-              themeVariant="dark"
+              minimumDate={status === 'ongoing' ? undefined : new Date()}
+              accentColor={tintColor}
+              themeVariant={useColorScheme()||"dark"}
               style={styles.datePicker}
             />
           </Section>
@@ -109,8 +130,9 @@ export default function TripEditScreen() {
               mode="date"
               display="inline"
               onChange={handleEndDateChange}
-              minimumDate={startDate}
-              themeVariant="dark"
+              minimumDate={status === 'ongoing' ? new Date() : startDate}
+              accentColor={tintColor}
+              themeVariant={useColorScheme()||"dark"}
               style={styles.datePicker}
             />
           </Section>

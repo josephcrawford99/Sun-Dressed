@@ -9,12 +9,21 @@ import { Section } from '@/components/section';
 import { TempFormat } from '@/services/openweathermap-service';
 import { useStore } from '@/store/store';
 import { OutfitStyle } from '@/types/outfit';
+import { ColorSchemePreference } from '@/types/settings';
 
 export default function SettingsScreen() {
   const style = useStore((state) => state.style);
   const setStyle = useStore((state) => state.setStyle);
   const tempFormat = useStore((state) => state.tempFormat);
   const setTempFormat = useStore((state) => state.setTempFormat);
+  const colorScheme = useStore((state) => state.colorScheme);
+  const setColorScheme = useStore((state) => state.setColorScheme);
+
+  const appearanceOptions = [
+    { id: 'auto', label: 'Automatic', value: 'auto' },
+    { id: 'light', label: 'Light', value: 'light' },
+    { id: 'dark', label: 'Dark', value: 'dark' },
+  ];
 
   const styleOptions = [
     { id: 'masculine', label: 'Masculine', value: 'masculine' },
@@ -37,6 +46,14 @@ export default function SettingsScreen() {
         <ScreenHeader title="Settings" showBack showSettings={false} />
         <ThemedView style={styles.content}>
           <ThemedView>
+            <Section title="Appearance" style={styles.section}>
+              <ThemedRadioGroup
+                options={appearanceOptions}
+                onPress={(selectedId) => setColorScheme(selectedId as ColorSchemePreference)}
+                selectedId={colorScheme}
+              />
+            </Section>
+
             <Section title="Outfit Style" style={styles.section}>
               <ThemedRadioGroup
                 options={styleOptions}

@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/temp-icon.png",
     "scheme": "sundressed",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "auto",
     "platforms": [
       "ios"
     ],
