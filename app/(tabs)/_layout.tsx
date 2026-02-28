@@ -51,7 +51,8 @@ export default function TabLayout() {
         options={{
           title: 'Debug',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="debug" color={color} />,
-          href: __DEV__ ? '/debug' : null,
+          // href: __DEV__ ? '/debug' : null,
+          href: null,
         }}
       />
     </Tabs>

@@ -95,7 +95,7 @@ export default function TripDetailScreen() {
           {error && (
             <ThemedCard variant="error" style={styles.errorCard}>
               <ThemedText style={styles.errorText}>
-                Failed to generate packing plan. Please try again.
+                Failed to generate packing plan: {error.message}
               </ThemedText>
             </ThemedCard>
           )}
