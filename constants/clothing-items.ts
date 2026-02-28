@@ -147,12 +147,13 @@ export function getIconForItem(iconName: string): number | undefined {
  * @returns Array of allowed item names formatted for LLM prompt
  */
 export function getAllowedItemNames(): string[] {
-  const { style, closet } = useStore.getState();
+  const { style, unownedItems } = useStore.getState();
+  const unownedSet = new Set(unownedItems);
 
   return CLOTHING_ITEMS
     .filter((item: ClothingItem) => {
       if (item.gender && style !== 'neutral' && item.gender !== style) return false;
-      if (closet[item.iconName] === false) return false;
+      if (unownedSet.has(item.iconName)) return false;
       return true;
     })
     .map((item: ClothingItem) => {

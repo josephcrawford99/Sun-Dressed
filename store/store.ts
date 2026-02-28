@@ -27,7 +27,7 @@ export const useStore = create(
         activity: '',
         tempFormat: 'imperial' as TempFormat,
         itemFeedback: {} as ItemFeedback,
-        closet: {} as Record<string, boolean>,
+        unownedItems: [] as string[],
         trips: [] as Trip[],
       },
       (set) => {
@@ -41,16 +41,17 @@ export const useStore = create(
           setTempFormat: (nextTempFormat: TempFormat) => {
             set({ tempFormat: nextTempFormat });
           },
+          markAllOwned: () => {
+            set({ unownedItems: [] });
+          },
           toggleClosetItem: (iconName: string) => {
             set((state) => {
-              const current = state.closet[iconName];
-              if (current === false) {
-                // Toggling back to owned — remove the key
-                const { [iconName]: _, ...rest } = state.closet;
-                return { closet: rest };
-              }
-              // Mark as unowned
-              return { closet: { ...state.closet, [iconName]: false } };
+              const isUnowned = state.unownedItems.includes(iconName);
+              return {
+                unownedItems: isUnowned
+                  ? state.unownedItems.filter((name) => name !== iconName)
+                  : [...state.unownedItems, iconName],
+              };
             });
           },
           approveItem: (item: ClothingItem) => {
@@ -108,7 +109,7 @@ export const useStore = create(
       partialize: (state) => ({
         style: state.style,
         tempFormat: state.tempFormat,
-        closet: state.closet,
+        unownedItems: state.unownedItems,
         trips: state.trips,
       }),
       // JSON.stringify turns Date objects into strings when saving to AsyncStorage.

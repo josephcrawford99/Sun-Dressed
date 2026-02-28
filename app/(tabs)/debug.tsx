@@ -21,7 +21,7 @@ export default function DebugScreen() {
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
   const itemFeedback = useStore((state) => state.itemFeedback);
-  const closet = useStore((state) => state.closet);
+  const unownedItems = useStore((state) => state.unownedItems);
 
   // Access mutation cache to get last outfit data
   const queryClient = useQueryClient();
@@ -31,9 +31,7 @@ export default function DebugScreen() {
   const outfitRawText = (lastMutation?.state.data as OutfitGenerationResult | undefined)?.rawText || null;
 
   // Build filtered items list using shared utility
-  const allowedItems = useMemo(() => getAllowedItemNames(), [style, closet]);
-
-  const unownedItems = Object.keys(closet).filter((key) => closet[key] === false);
+  const allowedItems = useMemo(() => getAllowedItemNames(), [style, unownedItems]);
 
   // Reconstruct the prompt that would be used
   const prompt = useMemo(() => {
