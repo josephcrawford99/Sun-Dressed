@@ -1,6 +1,5 @@
 import { Outfit, ClothingItem } from '@/types/outfit';
-import { getItemsList } from '@/constants/clothing-items';
-import { useStore } from '@/store/store';
+import { getAllowedItemNames, mapResponseToItem } from '@/constants/clothing-items';
 
 /**
  * Parses a text response from the AI into a structured Outfit
@@ -43,9 +42,7 @@ export function parseOutfitJSON(text: string): Outfit {
     throw new Error('Missing or invalid "items" array in response');
   }
 
-  // Get user's style preference from store for validation
-  const userStyle = useStore.getState().style;
-  const allowedItemNames = getItemsList(userStyle);
+  const allowedItemNames = getAllowedItemNames();
 
   // Validate and construct items array
   const items: ClothingItem[] = [];
@@ -68,10 +65,16 @@ export function parseOutfitJSON(text: string): Outfit {
       throw new Error(`Item at index ${i} missing or invalid "blurb" field`);
     }
 
-    // Construct validated ClothingItem
+    // Resolve clothing item metadata for icon
+    const matched = mapResponseToItem(itemObj.name);
+    if (!matched) {
+      throw new Error(`Item "${itemObj.name}" at index ${i} could not be matched to a known clothing item`);
+    }
+
     items.push({
       name: itemObj.name,
       blurb: itemObj.blurb,
+      iconName: matched.iconName,
     });
   }
 

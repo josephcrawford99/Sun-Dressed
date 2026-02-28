@@ -5,10 +5,10 @@ import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedCard } from '@/components/card';
-import { CLOTHING_ITEMS } from '@/constants/clothing-items';
+import { getAllowedItemNames } from '@/constants/clothing-items';
 import { useWeather } from '@/hooks/use-weather';
 import { getApprovedItems, getDisapprovedItems, useStore } from '@/store/store';
-import { buildOutfitPrompt } from '@/utils/prompt-generator';
+import { buildOutfitPrompt } from '@/utils/outfit-prompt-generator';
 import { useQueryClient } from '@tanstack/react-query';
 import { OutfitGenerationResult } from '@/services/gemini-service';
 import { getDebugRawForecast } from '@/services/openweathermap-service';
@@ -30,21 +30,8 @@ export default function DebugScreen() {
   const lastMutation = mutations[mutations.length - 1];
   const outfitRawText = (lastMutation?.state.data as OutfitGenerationResult | undefined)?.rawText || null;
 
-  // Build filtered items list (same logic as useClothingRecommend)
-  const allowedItems = useMemo(() => {
-    return CLOTHING_ITEMS
-      .filter((item) => {
-        if (item.gender && style !== 'neutral' && item.gender !== style) return false;
-        if (closet[item.iconPath] === false) return false;
-        return true;
-      })
-      .map((item) => {
-        if (style === 'neutral' && item.gender) {
-          return `${item.baseName} (${item.gender})`;
-        }
-        return item.baseName;
-      });
-  }, [style, closet]);
+  // Build filtered items list using shared utility
+  const allowedItems = useMemo(() => getAllowedItemNames(), [style, closet]);
 
   const unownedItems = Object.keys(closet).filter((key) => closet[key] === false);
 

@@ -1,11 +1,13 @@
 /**
  * Gemini API Service
- * Handles communication with Google Gemini API for outfit recommendations
+ * Handles communication with Google Gemini API
  * Uses official @google/genai SDK
  */
 
 import { Outfit } from '@/types/outfit';
+import { TripPlan } from '@/types/trip';
 import { parseOutfitJSON } from '@/utils/outfit-parser';
+import { parseTripPlanJSON } from '@/utils/trip-parser';
 import { GoogleGenAI } from '@google/genai';
 
 /**
@@ -56,6 +58,50 @@ function handleGeminiApiError(error: unknown): never {
 }
 
 /**
+ * Sends a prompt to the Gemini API and returns the raw text response.
+ */
+async function callGemini(prompt: string, config?: GeminiConfig): Promise<string> {
+  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('Gemini API key not configured. Please add EXPO_PUBLIC_GEMINI_API_KEY to .env.local');
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
+  try {
+    const modelName = config?.model ?? DEFAULT_MODEL;
+    const sdkConfig: any = {
+      model: modelName,
+      contents: prompt,
+    };
+
+    const configOptions: any = {};
+
+    if (config?.thinkingBudget !== undefined) {
+      configOptions.thinkingConfig = { thinkingBudget: config.thinkingBudget };
+    }
+    if (config?.temperature !== undefined) {
+      configOptions.temperature = config.temperature;
+    }
+    if (config?.systemInstruction) {
+      configOptions.systemInstruction = config.systemInstruction;
+    }
+    if (Object.keys(configOptions).length > 0) {
+      sdkConfig.config = configOptions;
+    }
+
+    const response = await ai.models.generateContent(sdkConfig);
+    const rawText = response.text;
+    if (!rawText) {
+      throw new Error('No response generated from Gemini API');
+    }
+    return rawText;
+  } catch (error) {
+    handleGeminiApiError(error);
+  }
+}
+
+/**
  * Result from generating an outfit, includes both structured and raw data
  */
 export interface OutfitGenerationResult {
@@ -67,72 +113,22 @@ export interface OutfitGenerationResult {
 
 /**
  * Generates outfit recommendation using Google Gemini API
- *
- * @param prompt - The structured prompt to send to the API
- * @param config - Optional configuration (model, thinking budget, temperature, system instruction)
- * @returns Promise resolving to OutfitGenerationResult with both structured and raw data
- * @throws Error if API key is missing, request fails, or JSON parsing fails
  */
 export async function generateOutfitRecommendation(
   prompt: string,
-  config?: GeminiConfig
+  config?: GeminiConfig,
 ): Promise<OutfitGenerationResult> {
-  // Get API key from environment
-  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('Gemini API key not configured. Please add EXPO_PUBLIC_GEMINI_API_KEY to .env.local');
-  }
+  const rawText = await callGemini(prompt, config);
+  return { recommendation: parseOutfitJSON(rawText), rawText };
+}
 
-  // Initialize GoogleGenAI client
-  const ai = new GoogleGenAI({ apiKey });
-
-  try {
-    // Build configuration object with defaults
-    const modelName = config?.model ?? DEFAULT_MODEL;
-    const sdkConfig: any = {
-      model: modelName,
-      contents: prompt,
-    };
-
-    // Add optional configuration parameters
-    const configOptions: any = {};
-
-    if (config?.thinkingBudget !== undefined) {
-      configOptions.thinkingConfig = {
-        thinkingBudget: config.thinkingBudget,
-      };
-    }
-
-    if (config?.temperature !== undefined) {
-      configOptions.temperature = config.temperature;
-    }
-
-    if (config?.systemInstruction) {
-      configOptions.systemInstruction = config.systemInstruction;
-    }
-
-    // Add config options if any exist
-    if (Object.keys(configOptions).length > 0) {
-      sdkConfig.config = configOptions;
-    }
-
-    // Generate content using SDK
-    const response = await ai.models.generateContent(sdkConfig);
-
-    // Extract generated text
-    const rawText = response.text;
-    if (!rawText) {
-      throw new Error('No response generated from Gemini API');
-    }
-
-    // Parse the JSON response
-    const recommendation = parseOutfitJSON(rawText);
-
-    return {
-      recommendation,
-      rawText,
-    };
-  } catch (error) {
-    handleGeminiApiError(error);
-  }
+/**
+ * Generates a trip packing plan using Google Gemini API
+ */
+export async function generateTripPlan(
+  prompt: string,
+  config?: GeminiConfig,
+): Promise<TripPlan> {
+  const rawText = await callGemini(prompt, config);
+  return parseTripPlanJSON(rawText);
 }

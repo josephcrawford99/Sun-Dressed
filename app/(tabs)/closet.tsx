@@ -16,7 +16,7 @@ const ClosetItemRow = React.memo(function ClosetItemRow({ item }: { item: Closet
   const toggleClosetItem = useStore((state) => state.toggleClosetItem);
   const tintColor = useThemeColor({}, 'tint');
   const iconTintColor = useThemeColor({}, 'text');
-  const icon = getIconForItem(item.iconPath);
+  const icon = getIconForItem(item.iconName);
 
   return (
     <View style={styles.itemRow}>
@@ -31,7 +31,7 @@ const ClosetItemRow = React.memo(function ClosetItemRow({ item }: { item: Closet
       <ThemedText style={styles.itemName}>{item.baseName}</ThemedText>
       <Switch
         value={item.isOwned}
-        onValueChange={() => toggleClosetItem(item.iconPath)}
+        onValueChange={() => toggleClosetItem(item.iconName)}
         trackColor={{ true: tintColor }}
       />
     </View>
@@ -56,7 +56,7 @@ export default function ClosetScreen() {
             return (
               <Section key={cat} title={CATEGORY_LABELS[cat]}>
                 {items.map((item) => (
-                  <ClosetItemRow key={item.iconPath} item={item} />
+                  <ClosetItemRow key={item.iconName} item={item} />
                 ))}
               </Section>
             );

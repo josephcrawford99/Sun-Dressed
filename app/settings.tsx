@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet } from 'react-native';
 
+import { ScreenHeader } from '@/components/screen-header';
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -31,7 +32,9 @@ export default function SettingsScreen() {
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1 }}
+        stickyHeaderIndices={[0]}
       >
+        <ScreenHeader title="Settings" showBack showSettings={false} />
         <ThemedView style={styles.content}>
           <ThemedView>
             <Section title="Outfit Style" style={styles.section}>

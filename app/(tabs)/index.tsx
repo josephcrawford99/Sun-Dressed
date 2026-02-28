@@ -106,11 +106,7 @@ export default function OutfitScreen() {
                   {/* Clothing Items */}
                   <ThemedView style={styles.itemsContainer}>
                     {outfit.items.map((item, index) => (
-                      <OutfitItemCard
-                        key={index}
-                        name={item.name}
-                        blurb={item.blurb}
-                      />
+                      <OutfitItemCard key={index} {...item} />
                     ))}
                   </ThemedView>
                 </Section>

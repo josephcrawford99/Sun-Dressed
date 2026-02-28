@@ -28,7 +28,7 @@ export function useClosetItems(): Record<ClothingCategory, ClosetItem[]> {
         .filter((item) => item.category === cat)
         .map((item) => ({
           ...item,
-          isOwned: closet[item.iconPath] !== false,
+          isOwned: closet[item.iconName] !== false,
         }));
       if (items.length > 0) {
         grouped[cat] = items;

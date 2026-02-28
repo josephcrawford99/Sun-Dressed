@@ -1,8 +1,8 @@
-import { CLOTHING_ITEMS } from '@/constants/clothing-items';
+import { getAllowedItemNames } from '@/constants/clothing-items';
 import { useWeather } from '@/hooks/use-weather';
 import { generateOutfitRecommendation, OutfitGenerationResult } from '@/services/gemini-service';
 import { getApprovedItems, getDisapprovedItems, useStore } from '@/store/store';
-import { buildOutfitPrompt } from '@/utils/prompt-generator';
+import { buildOutfitPrompt } from '@/utils/outfit-prompt-generator';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 /**
@@ -23,7 +23,6 @@ export function useClothingRecommend(): UseQueryResult<OutfitGenerationResult, E
   const activity = useStore((state) => state.activity);
   const tempFormat = useStore((state) => state.tempFormat);
   const itemFeedback = useStore((state) => state.itemFeedback);
-  const closet = useStore((state) => state.closet);
 
   // Get weather data from TanStack Query
   const { data: weather, isLoading: weatherLoading, error: weatherError } = useWeather();
@@ -44,28 +43,12 @@ export function useClothingRecommend(): UseQueryResult<OutfitGenerationResult, E
         throw new Error('Weather data not available. Please ensure weather has loaded.');
       }
 
-      // Filter items by style and closet ownership
-      const allowedItems = CLOTHING_ITEMS
-        .filter((item) => {
-          // Style filter
-          if (item.gender && style !== 'neutral' && item.gender !== style) return false;
-          // Closet filter — exclude unowned items
-          if (closet[item.iconPath] === false) return false;
-          return true;
-        })
-        .map((item) => {
-          if (style === 'neutral' && item.gender) {
-            return `${item.baseName} (${item.gender})`;
-          }
-          return item.baseName;
-        });
-
       // Build the prompt
       const prompt = buildOutfitPrompt(
         { style, activity },
         weather,
         tempFormat,
-        allowedItems,
+        getAllowedItemNames(),
         getApprovedItems(itemFeedback),
         getDisapprovedItems(itemFeedback),
       );

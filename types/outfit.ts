@@ -6,6 +6,8 @@ export interface ClothingItem {
   name: string;
   /** One sentence explanation of why this item is good for the conditions and outfit */
   blurb: string;
+  /** Resolved icon name from CLOTHING_ITEMS metadata (e.g., "Ankle_boot_women") */
+  iconName: string;
 }
 
 /**
