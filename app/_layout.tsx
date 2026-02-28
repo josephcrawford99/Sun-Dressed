@@ -55,7 +55,7 @@ function AppContent() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ headerShown: false }} />
           <Stack.Screen name="trip-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="trip-edit" options={{ title: 'Plan a Trip', headerBackTitle: "Back", presentation: 'modal' }} />
+          <Stack.Screen name="trip-edit" options={{ headerShown: false, presentation: 'modal' }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

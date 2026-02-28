@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
+import { ModalHeader } from '@/components/modal-header';
 import { ThemedBackground } from '@/components/themed-background';
 import { ThemedButton } from '@/components/button';
 import { ThemedText } from '@/components/themed-text';
@@ -95,7 +96,7 @@ export default function TripEditScreen() {
 
   return (
     <ThemedBackground style={styles.container}>
-      <Stack.Screen options={{ title: isEditing ? 'Edit Trip' : 'Plan a Trip' }} />
+      <ModalHeader title={isEditing ? 'Edit Trip' : 'Plan a Trip'} />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom }}
@@ -107,7 +108,6 @@ export default function TripEditScreen() {
               value={destination}
               onChangeText={setDestination}
               placeholder="e.g., Paris, Tokyo, New York"
-              autoFocus
             />
           </Section>
 
